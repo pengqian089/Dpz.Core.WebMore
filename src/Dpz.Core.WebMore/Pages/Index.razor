@@ -1,0 +1,44 @@
+﻿@page "/"
+@using Dpz.Core.WebMore.Pages.ArticleComponent
+<PageTitle>首页 - 个人文章分享</PageTitle>
+<article>
+    <div class="pics-box">
+        @if (_banners.Any())
+        {
+            <!--banner begin-->
+            <div class="banner">
+                <div id="banner" class="fader">
+                    <ul>
+                        @foreach (var item in _banners)
+                        {
+
+                            <li class="slide">
+                                <img src="@item.AccessUrl" alt="@item.Description">
+                                <span class="img-info">@item.Description</span>
+                            </li>
+                        }
+                    </ul>
+                    <div class="fader_controls">
+                        <div class="page prev" data-target="prev">&lsaquo;</div>
+                        <div class="page next" data-target="next">&rsaquo;</div>
+                        <ul class="pager_list">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!--banner end-->
+        }
+        else
+        {
+            <MudCard>
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="300px" />
+            </MudCard>
+        }
+    </div>
+    <div class="blank"></div>
+    <!--blogs box begin-->
+    <div class="blogsbox">
+        <ArticleShow Source="_topArticles" IsLoading="_loading"></ArticleShow>
+    </div>
+    <RightComponent></RightComponent>
+</article>

@@ -1,0 +1,57 @@
+﻿@using Dpz.Core.WebMore.Models
+@using BlazorMonaco.Editor
+
+<StandaloneCodeEditor
+    @ref="_editor"
+    Id = "@string.Join("/",Node.CurrentPaths)"
+    CssClass="editor"
+    ConstructionOptions="EditorConstructionOptions"/>
+
+@code {
+
+    [Parameter]
+    public CodeNoteTree Node { get; set; }
+    
+    StandaloneCodeEditor _editor;
+    public StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
+    {
+        var options = new StandaloneEditorConstructionOptions
+        {
+            Language = Node.CodeContainer.Language,
+            GlyphMargin = true,
+            Value = Node.CodeContainer.CodeContent,
+            AutomaticLayout = true,
+            ReadOnly = true,
+            //Model = model
+        };
+
+        if (AppTools.IsDark)
+        {
+            options.Theme = "vs-dark";
+        }
+
+        return options;
+    }
+
+    private bool _isRender;
+
+
+    static string GetLanguage(string language)
+    {
+        if (string.IsNullOrEmpty(language))
+            return "text";
+        
+        switch (language)
+        {
+            case "ignore":
+                return "gitignore";
+        }
+        var languages = new[] { "sln", "docker", "git" };
+        if (languages.Contains(language))
+        {
+            return "text";
+        }
+        return language;
+    }
+
+}

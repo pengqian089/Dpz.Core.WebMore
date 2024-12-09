@@ -1,0 +1,31 @@
+﻿@if (Commenter is MemberCommenter memberCommenter)
+{
+    <span class="head-nickname">@Commenter.NickName</span><span class="identity">@memberCommenter.Identity</span>
+}
+else if(Commenter is GuestCommenter guestCommenter)
+{
+    if (!string.IsNullOrEmpty(guestCommenter.Site))
+    {
+        <a target="_blank" class="head-nickname" href="@ForceHttps(guestCommenter.Site)">@Commenter.NickName</a>
+    }
+    else
+    {
+        <span class="head-nickname">@Commenter.NickName</span>
+    }
+}
+
+@code {
+    [Parameter]
+    public Commenter Commenter { get; set; }
+    
+    private static string ForceHttps(string url)
+    {
+        var uri = new UriBuilder(url);
+
+        var hadDefaultPort = uri.Uri.IsDefaultPort;
+        uri.Scheme = Uri.UriSchemeHttps;
+        uri.Port = hadDefaultPort ? -1 : uri.Port;
+
+        return uri.ToString();
+    }
+}

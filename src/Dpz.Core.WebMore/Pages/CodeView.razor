@@ -1,0 +1,103 @@
+﻿@page "/code"
+@using Dpz.Core.WebMore.Pages.CodeComponent
+<PageTitle>"网站源码 - 个人文章分享</PageTitle>
+<div style="margin: 80px auto 0">
+    <div class="code-view">
+        <div class="view-box">
+            <div class="tree">
+                <div class="tree-items">
+                    <div class="split">
+                        <div class="split-separator"></div>
+                    </div>
+                    <div class="tree-box" style="--pane-width:320px;resize: horizontal;">
+                        <div class="items">
+                            <div class="tree-nodes">
+                                <div class="nodes">
+                                    <nav style="width: 100%">
+                                        @if (_isLoading)
+                                        {
+                                            <MudCard>
+                                                <MudCardContent>
+                                                    <MudSkeleton Width="30%" Height="42px;"/>
+                                                    <MudSkeleton Width="80%"/>
+                                                    <MudSkeleton Width="100%"/>
+                                                    <MudSkeleton Width="100%"/>
+                                                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px"/>
+                                                    <MudSkeleton Width="100%"/>
+                                                    <MudSkeleton Width="100%"/>
+                                                    <MudSkeleton Width="100%"/>
+                                                </MudCardContent>
+                                                <MudCardActions>
+                                                    <MudSkeleton Width="64px" Height="40px" Class="ml-2"/>
+                                                    <MudSkeleton Width="105px" Height="40px" Class="ml-3"/>
+                                                </MudCardActions>
+                                            </MudCard>
+                                        }
+                                        else
+                                        {
+                                            <MudTextField
+                                                @bind-Value="_search"
+                                                Label="搜索"
+                                                Variant="Variant.Outlined"
+                                                Adornment="Adornment.End"
+                                                AdornmentIcon="@Icons.Material.Filled.Search"
+                                                OnAdornmentClick="SearchAsync"
+                                                Margin="Margin.Dense"
+                                                OnKeyUp="SearchKeyUpAsync"
+                                                AdornmentColor="Color.Secondary"/>
+                                            <Tree
+                                                OnSelectedFile="SelectedFile"
+                                                Node="_treeData"
+                                                Keyword="@_search"
+                                                OnExpandFolder="ExpandFolder"/>
+                                        }
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <main class="main">
+                <MudDynamicTabs @ref="@_dynamicTabs"
+                                @bind-ActivePanelIndex="@_tabIndex"
+                                CloseTab="@CloseTabCallback"
+                                TabHeaderClass="code-tab-head"
+                                AddIconStyle="display:none"
+                                Rounded 
+                                ApplyEffectsToContainer>
+                    <MudTabPanel ID="@("README.md")" Text="README.md" ShowCloseIcon="@false">
+                        <div class="readme-main">
+                            <MarkdownPreview Markdown="@_treeData.ReadmeContent"></MarkdownPreview>    
+                        </div>
+                    </MudTabPanel>
+
+                    @foreach (var tab in _tabs)
+                    {
+                        var expandName = "";
+                        var index = tab.FileName.LastIndexOf('.');
+                        if (index >= 0)
+                        {
+                            expandName = "icon-" + tab.FileName[(index + 1)..].ToLower();
+                        }
+                        <MudTabPanel
+                            Icon="@($"{expandName.Replace(".",string.Empty)} icon-{tab.FileName.ToLower().Replace(".",string.Empty)}")"
+                            ID="@string.Join("-", tab.CurrentPaths)"
+                            Text="@tab.FileName"
+                            ToolTip="@string.Join("/", tab.CurrentPaths)"
+                            ShowCloseIcon="@true">
+                            <ShowPreview Node="tab"/>
+                        </MudTabPanel>
+                    }
+                </MudDynamicTabs>
+            </main>
+        </div>
+    </div>
+</div>
+
+@code{
+
+
+
+}

@@ -1,0 +1,42 @@
+﻿.infos-box{
+    background: inherit;
+}
+.news-view{
+    background: #fff;
+}
+.comment{
+    margin: 10px 0;
+    padding: 15px;
+    background: #fff;
+}
+.topic-info {
+    margin-top: 15px;
+}
+
+.topic-info .vote-up {
+    float: left;
+    background: #bb0650;
+    line-height: 20px;
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.topic-info .pub-time {
+    float: right;
+    line-height: 20px;
+    height: 20px;
+    padding: 10px;
+}
+.clear {
+    clear: both;
+}
+@media (prefers-color-scheme: dark) {
+    .comment {
+        border: 1px solid #30363d;
+        background: #0d1117;
+    }
+    .news-view{
+        background: #0d1117;
+    }
+}

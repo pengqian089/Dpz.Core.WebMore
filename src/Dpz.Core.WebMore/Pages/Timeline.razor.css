@@ -1,0 +1,15 @@
+﻿.content{
+    border: 1px solid #15af61;
+    padding: 5px;
+    border-radius: 3px;
+    box-shadow: 0 0 5px 0 #5181b1;
+}
+@media (prefers-color-scheme: dark)  {
+    .content{
+        border: 1px solid #808f88;
+        padding: 10px;
+        border-radius: 6px;
+        box-shadow: 0 0 9px 3px #7d9bb9;
+        color: #c9d1d9
+    }
+}

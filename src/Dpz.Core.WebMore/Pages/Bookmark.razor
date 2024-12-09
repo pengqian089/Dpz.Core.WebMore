@@ -1,0 +1,90 @@
+﻿@page "/bookmark"
+<PageTitle>书签 - 个人文章分享</PageTitle>
+
+
+<div class="bookmark">
+    <div class="search-box">
+        @* <input type="search" id="search-bookmark" title="搜索书签" placeholder="搜索书签" value="" autocomplete="off"/> *@
+
+        <Autocomplete
+            T="string"
+            Label="搜索书签"
+            @bind-Value="_title"
+            SearchFunc="@SearchAsync"
+            ResetValueOnEmptyText="false"
+            CoerceText="false"
+            CoerceValue="false"
+            OnAdornmentClick="@LoadDataAsync"
+            Variant="Variant.Outlined"
+            AdornmentIcon="@Icons.Material.Filled.Search"
+            ShowProgressIndicator="true"
+            AdornmentColor="Color.Primary">
+            <ProgressIndicatorTemplate>
+                <MudProgressLinear Size="Size.Small" Indeterminate="true" Color="Color.Info"/>
+            </ProgressIndicatorTemplate>
+        </Autocomplete>
+    </div>
+    <div class="category-box">
+        @if (_loading)
+        {
+            for (var i = 0; i < 10; i++)
+            {
+                <MudSkeleton Class="category" SkeletonType="SkeletonType.Rectangle" Width="32px"/>
+            }
+        }
+        else
+        {
+            foreach (var item in _categories)
+            {
+                <MudButton Class="category" Variant="Variant.Filled" OnClick="async () => await UnSelectCategoryAsync(item)">@item</MudButton>
+            }
+
+            foreach (var item in _source.SelectMany(x => x.Categories).Where(x => !_categories.Contains(x)).Distinct())
+            {
+                <MudButton Class="category" Variant="Variant.Filled" Color="Color.Secondary" OnClick="async () => await SelectCategoryAsync(item)">@item</MudButton>
+            }
+        }
+    </div>
+    <div class="bookmark-container">
+        @if (_loading)
+        {
+            var random = new Random();
+            for (var i = 0; i < 50; i++)
+            {
+                <div class="bookmark-item">
+                    <div class="bookmark-card">
+                        <MudSkeleton Width="100%" Height="@(random.Next(30, 500) + "px")"/>
+                        <div class="bookmark-info">
+                            <MudSkeleton Class="bookmark-icon" SkeletonType="SkeletonType.Rectangle" Height="32px"/>
+                            <MudSkeleton Class="bookmark-title" Width="100%"/>
+                        </div>
+                    </div>
+
+                </div>
+            }
+        }
+        else
+        {
+            foreach (var item in _source)
+            {
+                <div class="bookmark-item">
+                    <a href="@item.Url" target="_blank">
+                        <div class="bookmark-card">
+                            @if (!string.IsNullOrEmpty(item.Image))
+                            {
+                                <img data-src="@(item.Image + "!bookmark")" alt="@item.Title" class="lazy" src="@(Program.CdnBaseAddress)/core/loaders/puff.svg"/>
+                            }
+                            <div class="bookmark-info">
+                                @if (!string.IsNullOrEmpty(item.Icon))
+                                {
+                                    <img class="bookmark-icon" src="@item.Icon" alt="icon"/>
+                                }
+                                <span class="bookmark-title" title="@item.Title">@item.Title</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        }
+    </div>
+</div>

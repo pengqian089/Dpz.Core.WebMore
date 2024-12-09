@@ -1,0 +1,125 @@
+﻿@using System.Diagnostics
+@using System.Text.Json
+<div class="comment-block">
+    @if (Node != null && !string.IsNullOrEmpty(Relation) && _showForm)
+    {
+        <CommentForm Node="@Node.Value" Relation="@Relation" SendCommentAsync="SendAsync"></CommentForm>
+    }
+</div>
+
+@if (_loading)
+{
+    <MudCard>
+        <MudCardContent>
+            <MudSkeleton Width="30%" Height="42px;"/>
+            <MudSkeleton Width="80%"/>
+            <MudSkeleton Width="100%"/>
+            <MudSkeleton Width="100%"/>
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px"/>
+            <MudSkeleton Width="100%"/>
+            <MudSkeleton Width="100%"/>
+            <MudSkeleton Width="100%"/>
+        </MudCardContent>
+        <MudCardActions>
+            <MudSkeleton Width="64px" Height="40px" Class="ml-2"/>
+            <MudSkeleton Width="105px" Height="40px" Class="ml-3"/>
+        </MudCardActions>
+    </MudCard>
+}
+else
+{
+    <div class="comment-count">
+        <span>@_comments.TotalItemCount 评论</span>
+        <button class="refresh" title="刷新评论" @onclick="RefreshAsync">
+            <MudIcon Icon="@Icons.Filled.Refresh"></MudIcon>
+        </button>
+    </div>
+    <div class="comments-area">
+        <CommentList
+            @ref="_commentList"
+            Comments="@_comments.ToList()"
+            TotalPageCount="@_comments.TotalPageCount"
+            CurrentPageIndex="@_comments.CurrentPageIndex"
+            OnReply="Reply"
+            OnCancelReply="CancelReply"
+            SendCommentAsync="SendAsync"
+            ToNextPageAsync="NextAsync"/>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public CommentNode? Node { get; set; }
+
+    [Parameter]
+    public string Relation { get; set; }
+
+    [Inject]
+    ICommentService CommentService { get; set; }
+
+    IPagedList<CommentModel> _comments = new PagedList<CommentModel>(Array.Empty<CommentModel>(), 1, 10);
+
+    bool _loading = true;
+    
+    bool _showForm = true;
+
+    int _pageIndex = 1;
+
+    int _pageSize = 10;
+
+    CommentList _commentList;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadCommentsAsync();
+        await base.OnParametersSetAsync();
+    }
+
+    private async Task LoadCommentsAsync()
+    {
+        _loading = true;
+        if (Node == null || string.IsNullOrEmpty(Relation))
+        {
+            _comments = new PagedList<CommentModel>(Array.Empty<CommentModel>(), 1, 10);
+            _loading = false;
+            return;
+        }
+        _comments = await CommentService.GetPageAsync(Node.Value, Relation, _pageIndex, _pageSize);
+        _loading = false;
+    }
+
+    private async Task SendAsync(SendComment arg)
+    {
+        _comments = await CommentService.SendAsync(arg, _pageSize);
+        _commentList.Refresh(_comments.ToList(), _comments.CurrentPageIndex, _comments.TotalPageCount);
+    }
+
+    private async Task<(List<CommentModel> comments, int currentPageIndex, int totalPageCount)> NextAsync(int nextPageIndex)
+    {
+        _pageIndex = nextPageIndex;
+        await LoadCommentsAsync();
+        return (_comments.ToList(),_comments.CurrentPageIndex,_comments.TotalPageCount);
+    }
+
+    private async Task RefreshAsync()
+    {
+        _pageIndex = 1;
+        await LoadCommentsAsync();
+        _commentList.Refresh(_comments.ToList(), _comments.CurrentPageIndex, _comments.TotalPageCount);
+        CancelReply();
+    }
+
+    void Reply()
+    {
+        _showForm = false;
+        //StateHasChanged();
+    }
+
+    void CancelReply()
+    {
+        _showForm = true;
+        //StateHasChanged();
+    }
+
+}

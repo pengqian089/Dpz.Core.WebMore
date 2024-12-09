@@ -1,0 +1,81 @@
+﻿@using Microsoft.Extensions.Configuration
+@if (!_source.Any())
+{
+    <MudCard>
+        <MudSkeleton Width="30%" Height="40px" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="170px"/>
+        <MudCardContent>
+            <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="75px"/>
+            <MudSkeleton Width="100%"/>
+            <MudSkeleton Width="100%"/>
+            <MudSkeleton Width="100%"/>
+            <MudSkeleton Width="100%"/>
+        </MudCardContent>
+    </MudCard>
+}
+else
+{
+    <div class="article-module">
+        <h2 class="home-title">最新文章</h2>
+        <ul class="module-picture">
+            @if (!string.IsNullOrEmpty(@_source.First().MainImage))
+            {
+                <i>
+                    <img src="@(Program.CdnBaseAddress)/core/loaders/tail-spin.svg" data-src="@_source.First().MainImage" alt="@_source.First().Title" class="lazy"/>
+                </i>
+            }
+            else
+            {
+                <i><img src="@(Program.CdnBaseAddress)/more/images/no-picture.jpg" alt="@_source.First().Title"/></i>
+            }
+            <p>
+                <a href="/article/read/@_source.First().Id">@_source.First().Title</a>
+            </p>
+        </ul>
+        <ul class="side-news">
+            @foreach (var item in _source)
+            {
+                if(_source.IndexOf(item) ==0)continue;
+                <li>
+                    @if (!string.IsNullOrEmpty(item.MainImage))
+                    {
+                        <i>
+                            <img data-src="@item.MainImage" src="@(Program.CdnBaseAddress)/core/loaders/tail-spin.svg" alt="@item.Title" class="lazy"/>
+                        </i>
+                    }
+                    <p>
+                        <a href="/article/read/@item.Id">@item.Title</a>
+                    </p>
+                    <span>@item.CreateTime.ToString("yyyy-MM-dd")</span>
+                </li>
+            }
+        </ul>
+    </div>
+}
+
+@code {
+
+    [Inject]
+    private IArticleService ArticleService { get; set; }
+
+    [Inject]
+    private IConfiguration Configuration { get; set; }
+    
+    [Inject]
+    private IJSRuntime JsRuntime { get; set; }
+
+    private List<ArticleMiniModel> _source = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _source = await ArticleService.GetNewsAsync();
+        await base.OnInitializedAsync();
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JsRuntime.InvokeVoidAsync("showLazyImage");
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+}

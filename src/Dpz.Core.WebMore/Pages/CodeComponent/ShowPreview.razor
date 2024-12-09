@@ -1,0 +1,21 @@
+﻿@if (Node.CodeContainer.Language == "markdown" || !string.IsNullOrEmpty(Node.ReadmeContent))
+{
+    var markdown = Node.CodeContainer.Language == "markdown" ? Node.CodeContainer.CodeContent : Node.ReadmeContent;
+    <div class="readme-main">
+        <MarkdownPreview Markdown="@markdown"></MarkdownPreview>
+    </div>
+}
+else
+{
+    <Preview Node="Node"></Preview>
+}
+
+
+
+@code {
+
+    [Parameter]
+    public CodeNoteTree Node { get; set; }
+    
+    private bool _previewLoading = true;
+}

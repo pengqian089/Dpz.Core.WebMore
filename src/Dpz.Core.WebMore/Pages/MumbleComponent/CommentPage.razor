@@ -1,0 +1,52 @@
+﻿@using Dpz.Core.WebMore.Models
+@using Dpz.Core.WebMore.Helper
+@using System.Globalization
+@using Markdig
+@{ var pipeline = new MarkdownPipelineBuilder().DisableHtml().Build();}
+@foreach (var item in PagedList)
+{
+    var htmlContent = Markdown.ToHtml(item.Comment,pipeline);
+    if (string.IsNullOrEmpty(item.Avatar))
+    {
+        var name = new StringInfo(item.NickName);
+        var first = name.SubstringByTextElements(0, 1);
+        <div class="row">
+            <div class="comment-face">
+                <span>@first</span>
+            </div>
+            <div class="comment-text">
+                <div class="comment-user">@item.NickName</div>
+                <div class="comment-content">
+                    @((MarkupString)htmlContent)
+                </div>
+                <div class="time" title="@item.CommentTime.ToString("yyyy-MM-dd HH:mm:ss")">
+                    @item.CommentTime.TimeAgo() 回复
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="comment-face">
+                <img src="@($"{item.Avatar}")" alt="@item.NickName"/>
+            </div>
+            <div class="comment-text">
+                <div class="comment-user">@item.NickName</div>
+                <div class="comment-content">
+                    @((MarkupString)htmlContent)
+                </div>
+                <div class="time" title="@item.CommentTime.ToString("yyyy-MM-dd HH:mm:ss")">
+                    @item.CommentTime.TimeAgo() 回复
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@code {
+
+    [Parameter]
+    public IPagedList<MumbleCommentModel> PagedList { get; set; }
+
+}

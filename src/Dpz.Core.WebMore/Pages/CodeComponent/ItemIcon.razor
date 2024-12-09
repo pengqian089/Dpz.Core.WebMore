@@ -1,0 +1,143 @@
+﻿@if (IsFolder)
+{
+    var name = Name.ToLower();
+    switch (name)
+    {
+        case "src":
+            <img src="https://dpangzi.com/icons/folder-src.svg" alt="folder-src"/>
+            break;
+        case "wwwroot":
+            <img src="https://dpangzi.com/icons/folder-public.svg" alt="folder-public"/>
+            break;
+        case "api":
+            <img src="https://dpangzi.com/icons/folder-api.svg" alt="folder-api"/>
+            break;
+        case "dist":
+            <img src="https://dpangzi.com/icons/folder-dist.svg" alt="folder-dist"/>
+            break;
+        case "service":
+        case "services":
+        case "controller":
+        case "controllers":
+            <img src="https://dpangzi.com/icons/folder-controller.svg" alt="folder-controller"/>
+            break;
+        case "view":
+        case "views":
+        case "page":
+        case "pages":
+            <img src="https://dpangzi.com/icons/folder-views.svg" alt="folder-views"/>
+            break;
+        case "model":
+        case "models":
+            <img src="https://dpangzi.com/icons/folder-class.svg" alt="folder-class"/>
+            break;
+        case "middleware":
+        case "middlewares":
+            <img src="https://dpangzi.com/icons/folder-middleware.svg" alt="folder-middleware"/>
+            break;
+        case "lib":
+        case "library":
+        case "libraries":
+            <img src="https://dpangzi.com/icons/folder-lib.svg" alt="folder-lib"/>
+            break;
+        default:
+            <img src="https://dpangzi.com/icons/folder.svg" alt="folder"/>
+            break;
+    }
+}
+else
+{
+    var name = Name.ToLower();
+    if (name == "dockerfile")
+    {
+        <img src="https://dpangzi.com/icons/docker.svg" alt="docker"/>
+        return;
+    }
+    if (name == "license.txt")
+    {
+        <img src="https://dpangzi.com/icons/certificate.svg" alt="certificate"/>
+        return;
+    }
+    if (name == "favicon.ico")
+    {
+        <img src="https://dpangzi.com/icons/favicon.svg" alt="favicon"/>
+        return;
+    }
+    
+    
+    var index = Name.LastIndexOf('.');
+    if (index < 0)
+    {
+        <img src="https://dpangzi.com/icons/file.svg" alt="file"/>
+    }
+    else
+    {
+        var expandName = name[index..];
+        switch (expandName)
+        {
+            case ".cs":
+                <img src="https://dpangzi.com/icons/csharp.svg" alt="csharp"/>
+                break;
+            case ".razor":
+            case ".cshtml":
+                <img src="https://dpangzi.com/icons/razor.svg" alt="razor"/>
+                break;
+            case ".sql":
+                <img src="https://dpangzi.com/icons/database.svg" alt="sql"/>
+                break;
+            case ".gitattributes":
+            case ".gitignore":
+                <img src="https://dpangzi.com/icons/git.svg" alt="git"/>
+                break;
+            case ".md":
+                if (Name.ToLower() == "readme.md")
+                {
+                    <img src="https://dpangzi.com/icons/readme.svg" alt="markdown"/>
+                }
+                else
+                {
+                    <img src="https://dpangzi.com/icons/markdown.svg" alt="markdown"/>
+                }
+                break;
+            case ".ps1":
+                <img src="https://dpangzi.com/icons/powershell.svg" alt="folder"/>
+                break;
+            case ".json":
+                <img src="https://dpangzi.com/icons/json.svg" alt="json"/>
+                break;
+            case ".js":
+                <img src="https://dpangzi.com/icons/javascript.svg" alt="javascript"/>
+                break;
+            case ".css":
+                <img src="https://dpangzi.com/icons/css.svg" alt="css"/>
+                break;
+            case ".sass":
+                <img src="https://dpangzi.com/icons/sass.svg" alt="sass"/>
+                break;
+            case ".html":
+                <img src="https://dpangzi.com/icons/html.svg" alt="html"/>
+                break;
+            case ".sln":
+            case ".csproj":
+                <img src="https://dpangzi.com/icons/visualstudio.svg" alt="visualstudio"/>
+                break;
+            case "xml":
+            case "config":
+                <img src="https://dpangzi.com/icons/xml.svg" alt="xml"/>
+                break;
+            default:
+                <img src="https://dpangzi.com/icons/file.svg" alt="file"/>
+                break;
+        }
+    }
+}
+
+@code {
+
+    [Parameter]
+    public bool IsFolder { get; set; }
+
+    [Parameter]
+    public string Name { get; set; } = "";
+
+}

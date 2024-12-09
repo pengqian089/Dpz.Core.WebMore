@@ -1,0 +1,19 @@
+﻿@if (!string.IsNullOrEmpty(Content?.ReplyId) && !string.IsNullOrEmpty(Content?.ReplyNickName))
+{
+    <a href="javascript:">@@@(Content.ReplyNickName)</a>
+}
+@((MarkupString)_content)
+
+@code {
+    [Parameter]
+    public CommentContentModel Content { get; set; }
+
+    string _content = "";
+    
+    protected override void OnParametersSet()
+    {
+        _content = Content?.CommentText?.MarkdownToHtml() ?? "";
+        base.OnParametersSet();
+    }
+
+}

@@ -1,0 +1,15 @@
+﻿<div class="avatar">
+    @if (Commenter is GuestCommenter guestCommenter)
+    {
+        <img src="https://cravatar.cn/avatar/@guestCommenter.EmailMd5" alt="@guestCommenter.NickName"/>
+    }
+    else if(Commenter is MemberCommenter memberCommenter)
+    {
+        <img src="@memberCommenter.Avatar" alt="@memberCommenter.NickName"/>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public Commenter Commenter { get; set; }
+}

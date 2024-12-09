@@ -1,0 +1,112 @@
+﻿@page "/timeline"
+<PageTitle>时间轴 - 个人文章分享</PageTitle>
+<div class="pagebg timer"> </div>
+<div class="container">
+    <h1 class="nav-map">
+        <span>
+            年年岁岁花相似，岁岁年年人不同。
+        </span>
+        <a href="/" class="n1">网站首页</a>
+        <a href="/timeline" class="n2">时间轴</a>
+    </h1>
+    <div class="timeline">
+        @if (_source.Any())
+        {
+            @if (_width > 960)
+            {
+                <MudTimeline>
+                    @foreach (var item in _source)
+                    {
+                        <MudTimelineItem Color="Color.Success" Size="Size.Small">
+                            <ItemOpposite>
+                                <MudText Color="Color.Success" Typo="Typo.h5">@item.Date.ToString("yyyy-MM-dd")</MudText>
+                            </ItemOpposite>
+                            <ItemContent>
+                                <MudCard>
+                                    <MudCardContent>
+                                        @if (!string.IsNullOrEmpty(item.Title))
+                                        {
+                                            <MudText Color="Color.Success" Typo="Typo.h6" GutterBottom="true">@item.Title</MudText>
+                                        }
+                                        @if (!string.IsNullOrEmpty(item.Content))
+                                        {
+                                            <MarkdownPreview Style="background: initial" Markdown="@item.Content"></MarkdownPreview>
+                                        }
+                                    </MudCardContent>
+                                    @if (!string.IsNullOrEmpty(item.More))
+                                    {
+                                        <MudCardActions>
+                                            <MudButton Href="@item.More"
+                                                       Target="_blank"
+                                                       Variant="Variant.Filled"
+                                                       Color="Color.Primary">
+                                                查看更多
+                                            </MudButton>
+                                        </MudCardActions>
+                                    }
+                                </MudCard>
+                            </ItemContent>
+                        </MudTimelineItem>
+                    }
+                </MudTimeline>
+            }
+            else
+            {
+                <MudTimeline TimelineOrientation="TimelineOrientation.Vertical" TimelinePosition="TimelinePosition.Left">
+                    @foreach (var item in _source)
+                    {
+                        <MudTimelineItem Color="Color.Success" Size="Size.Small">
+                            <ItemOpposite>
+                                <MudText Color="Color.Success" Typo="Typo.h5">@item.Date.ToString("yyyy-MM-dd")</MudText>
+                            </ItemOpposite>
+                            <ItemContent>
+                                <MudCard>
+                                    <MudCardContent>
+                                        @if (!string.IsNullOrEmpty(item.Title))
+                                        {
+                                            <MudText Color="Color.Success" Typo="Typo.h6" GutterBottom="true">@item.Title</MudText>
+                                        }
+                                        @if (!string.IsNullOrEmpty(item.Content))
+                                        {
+                                            <MarkdownPreview Style="background: initial" Markdown="@item.Content"></MarkdownPreview>
+                                        }
+                                    </MudCardContent>
+                                    @if (!string.IsNullOrEmpty(item.More))
+                                    {
+                                        <MudCardActions>
+                                            <MudButton Href="@item.More"
+                                                       Target="_blank"
+                                                       Variant="Variant.Filled"
+                                                       Color="Color.Primary">
+                                                查看更多
+                                            </MudButton>
+                                        </MudCardActions>
+                                    }
+                                </MudCard>
+                            </ItemContent>
+                        </MudTimelineItem>
+                    }
+                </MudTimeline>
+            }
+        }
+        else
+        {
+            <MudCard>
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="300px"/>
+            </MudCard>
+
+            <MudCard>
+                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px"/>
+                <MudCardContent>
+                    <MudSkeleton Width="30%" Height="42px;"/>
+                    <MudSkeleton Width="80%"/>
+                    <MudSkeleton Width="100%"/>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudSkeleton Width="64px" Height="40px" Class="ml-2"/>
+                    <MudSkeleton Width="105px" Height="40px" Class="ml-3"/>
+                </MudCardActions>
+            </MudCard>
+        }
+    </div>
+</div>

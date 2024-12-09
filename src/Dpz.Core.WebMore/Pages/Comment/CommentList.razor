@@ -1,0 +1,99 @@
+﻿@if (Comments is null || !Comments.Any())
+{
+    <blockquote class="comment-item no-reply">暂无评论，来抢沙发吧</blockquote>
+}
+else
+{
+    @foreach (var item in Comments)
+    {
+        <blockquote class="comment-item">
+            <Avatar Commenter="@item.Commenter"></Avatar>
+            <div class="detail">
+                <div class="comment-head">
+                    <ShowNickName Commenter="@item.Commenter"></ShowNickName>
+                    <time class="timeago" datetime="@item.PublishTime" title="@item.PublishTime">@item.PublishTime.TimeAgo()</time>
+                    @if (item.IsDelete != true)
+                    {
+                        <button class="btn-reply" title="回复" @onclick="() => Reply(item)">
+                            <MudIcon Icon="@Icons.Filled.Reply" Title="回复"/>
+                        </button>
+                    }
+                </div>
+                <div class="comment-content">
+                    @{
+                        var commentContent = new CommentContentModel
+                        {
+                            CommentText = item.CommentText
+                        };
+                    }
+                    <CommentText Content="@commentContent"></CommentText>
+                </div>
+                @if (item.ShowReply)
+                {
+                    <CommentForm Node="@item.Node" Relation="@item.Relation" ReplyId="@item.Id" SendCommentAsync="SendCommentAsync"></CommentForm>
+                }
+                @if (item.Children != null && item.Children.Any())
+                {
+                    <div class="replies">
+                        @foreach (var reply in item.Children)
+                        {
+                            var replier = Comments.FirstOrDefault(x => x.Id == reply.Replies.Last());
+                            var replier2 = item.Children.FirstOrDefault(x => x.Id == reply.Replies.Last());
+                            <blockquote class="comment-item">
+                                <Avatar Commenter="@reply.Commenter"></Avatar>
+                                <div class="detail">
+                                    <div class="comment-head">
+                                        <ShowNickName Commenter="@reply.Commenter"></ShowNickName>
+                                        <time class="timeago" datetime="@reply.PublishTime" title="@reply.PublishTime">@reply.PublishTime.TimeAgo()</time>
+                                        @if (reply.IsDelete != true)
+                                        {
+                                            <button class="btn-reply" title="回复" @onclick="() => Reply(reply)">
+                                                <MudIcon Icon="@Icons.Filled.Reply" Title="回复"/>
+                                            </button>
+                                        }
+                                    </div>
+                                    <div class="comment-content">
+                                        @{
+                                            var content = new CommentContentModel
+                                            {
+                                                CommentText = reply.CommentText
+                                            };
+                                            if (replier != null)
+                                            {
+                                                content.ReplyId = replier.Id;
+                                                content.ReplyNickName = replier.Commenter.NickName;
+                                            }
+                                            else if (replier2 != null)
+                                            {
+                                                content.ReplyId = replier2.Id;
+                                                content.ReplyNickName = replier2.Commenter.NickName;
+                                            }
+                                        }
+                                        <CommentText Content="@content"></CommentText>
+                                    </div>
+                                    @if (reply.ShowReply)
+                                    {
+                                        <CommentForm Node="@item.Node" Relation="@item.Relation" ReplyId="@reply.Id" SendCommentAsync="SendCommentAsync"></CommentForm>
+                                    }
+                                </div>
+                            </blockquote>
+                        }
+                    </div>
+                }
+            </div>
+        </blockquote>
+    }
+    @if (CurrentPageIndex < TotalPageCount)
+    {
+        <div class="load-more">
+            @if (_loadNextPage)
+            {
+                <img src="@($"{Program.CdnBaseAddress}/core/images/loading-dark.gif")" alt=""/>
+            }
+            else
+            {
+                <MudButton OnClick="NextAsync" Variant="Variant.Filled" Color="Color.Secondary">加载更多...</MudButton>
+            }
+        </div>
+    }
+}

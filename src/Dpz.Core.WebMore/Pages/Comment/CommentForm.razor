@@ -1,0 +1,158 @@
+﻿@using Dpz.Core.WebMore.Models
+@using Dpz.Core.WebMore.Helper
+<EditForm class="comment-form" autocomplete="off" OnValidSubmit="SendAsync" Model="_model">
+    <div class="comment-panel">
+        <div class="comment-form-head">
+            <div class="form-head-item">
+                <label>昵称<span style="color:red">*</span></label>
+                <input name="nickname" autocomplete="off" class="form-input" required @bind="@_model.NickName"/>
+            </div>
+            <div class="form-head-item">
+                <label>邮箱<span style="color:red">*</span></label>
+                <input name="email" type="email" autocomplete="off" class="form-input" required @bind="@_model.Email"/>
+            </div>
+            <div class="form-head-item">
+                <label>个人网站</label>
+                <input name="site" type="url" autocomplete="off" class="form-input" @bind="@_model.Site"/>
+            </div>
+            <button class="comment-btn-close" type="button" title="取消回复" style="display: none">
+                <svg style="color:#ddd" viewBox="0 0 1024 1024" width="24" height="24">
+                    <path d="M697.173 85.333h-369.92c-144.64 0-241.92 101.547-241.92 252.587v348.587c0 150.613 97.28 252.16 241.92 252.16h369.92c144.64 0 241.494-101.547 241.494-252.16V337.92c0-151.04-96.854-252.587-241.494-252.587z" fill="currentColor"></path>
+                    <path d="m640.683 587.52-75.947-75.861 75.904-75.862a37.29 37.29 0 0 0 0-52.778 37.205 37.205 0 0 0-52.779 0l-75.946 75.818-75.862-75.946a37.419 37.419 0 0 0-52.821 0 37.419 37.419 0 0 0 0 52.821l75.947 75.947-75.776 75.733a37.29 37.29 0 1 0 52.778 52.821l75.776-75.776 75.947 75.947a37.376 37.376 0 0 0 52.779-52.821z" fill="#888">
+                    </path>
+                </svg>
+            </button>
+        </div>
+        <textarea @bind="@_model.CommentText" required class="comment-form-editor"
+                    placeholder="支持markdown语法
+理论上不会暴露你的邮箱地址
+😁
+使用CommonMark 规范，该规范如需了解更多，请点击左下角Markdown图标。
+在此基础上，扩展了自动识别链接地址、额外强调语法、高亮代码语言，并禁用了HTML标签等功能。" 
+                    name="commentText" 
+                    maxlength="1000">
+        </textarea>
+        <div class="comment-form-footer">
+            <div class="form-footer-action">
+                <a href="https://spec.commonmark.org/" title="CommonMark 规范" class="footer-action-item" target="_blank">
+                    <svg width="16" height="16" ariaHidden="true">
+                        <path d="M14.85 3H1.15C.52 3 0 3.52 0 4.15v7.69C0 12.48.52 13 1.15 13h13.69c.64 0 1.15-.52 1.15-1.15v-7.7C16 3.52 15.48 3 14.85 3zM9 11H7V8L5.5 9.92 4 8v3H2V5h2l1.5 2L7 5h2v6zm2.99.5L9.5 8H11V5h2v3h1.5l-2.51 3.5z" fill="currentColor"></path>
+                    </svg>
+                </a>
+                <label class="footer-action-item" data-image="" title="添加图片&#10;只提供网络图片&#10;不提供上传" @onclick="ShowPicture">
+                    <svg viewBox="0 0 1024 1024" width="24" height="24">
+                        <path d="M784 112H240c-88 0-160 72-160 160v480c0 88 72 160 160 160h544c88 0 160-72 160-160V272c0-88-72-160-160-160zm96 640c0 52.8-43.2 96-96 96H240c-52.8 0-96-43.2-96-96V272c0-52.8 43.2-96 96-96h544c52.8 0 96 43.2 96 96v480z" fill="currentColor"></path><path d="M352 480c52.8 0 96-43.2 96-96s-43.2-96-96-96-96 43.2-96 96 43.2 96 96 96zm0-128c17.6 0 32 14.4 32 32s-14.4 32-32 32-32-14.4-32-32 14.4-32 32-32zm462.4 379.2-3.2-3.2-177.6-177.6c-25.6-25.6-65.6-25.6-91.2 0l-80 80-36.8-36.8c-25.6-25.6-65.6-25.6-91.2 0L200 728c-4.8 6.4-8 14.4-8 24 0 17.6 14.4 32 32 32 9.6 0 16-3.2 22.4-9.6L380.8 640l134.4 134.4c6.4 6.4 14.4 9.6 24 9.6 17.6 0 32-14.4 32-32 0-9.6-4.8-17.6-9.6-24l-52.8-52.8 80-80L769.6 776c6.4 4.8 12.8 8 20.8 8 17.6 0 32-14.4 32-32 0-8-3.2-16-8-20.8z" fill="currentColor"></path>
+                    </svg>
+                </label>
+            </div>
+            <div class="form-footer-btn">
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.Send" Disabled="_isSending" Color="Color.Primary">
+                    @if (_isSending)
+                    {
+                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+                        <MudText Class="ms-2">正在发送</MudText>
+                    }
+                    else
+                    {
+                        <MudText>发送</MudText>
+                    }
+                </MudButton>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" @bind="@_model.Relation" name="relation"/>
+    <input type="hidden" @bind="@_model.Node" name="node"/>
+    <input type="hidden" @bind="@_model.ReplyId" name="replyId"/>
+</EditForm>
+
+@code {
+
+    [Parameter]
+    public CommentNode Node { get; set; }
+
+    [Parameter]
+    public string Relation { get; set; }
+    
+    [Parameter]
+    public string ReplyId { get; set; }
+    
+    [Parameter]
+    public Func<SendComment,Task> SendCommentAsync { get; set; }
+
+    [Inject]
+    IJSRuntime JsRuntime { get; set; }
+    
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+    
+    [Inject]
+    IDialogService DialogService { get; set; }
+
+    bool _isSending;
+
+    readonly SendComment _model = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _model.NickName = await JsRuntime.InvokeAsync<string>("localStorage.getItem", "nickname");
+        _model.Email = await JsRuntime.InvokeAsync<string>("localStorage.getItem", "email");
+        _model.Site = await JsRuntime.InvokeAsync<string>("localStorage.getItem", "site");
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _model.Node = Node;
+        _model.Relation = Relation;
+        _model.ReplyId = ReplyId;
+        await base.OnParametersSetAsync();
+    }
+
+    private async Task SendAsync(EditContext arg)
+    {
+        if (!arg.Validate())
+        {
+            foreach (var message in arg.GetValidationMessages())
+            {
+                Snackbar.Add(message, Severity.Warning);
+            }
+            return;
+        }
+        
+        _isSending = true;
+
+        if (!string.IsNullOrEmpty(_model.NickName))
+        {
+            await JsRuntime.InvokeVoidAsync("localStorage.setItem", "nickname",_model.NickName);    
+        }
+        if (!string.IsNullOrEmpty(_model.Email))
+        {
+            await JsRuntime.InvokeVoidAsync("localStorage.setItem", "email",_model.Email);
+        }
+        if (!string.IsNullOrEmpty(_model.Site))
+        {
+            await JsRuntime.InvokeVoidAsync("localStorage.setItem", "site",_model.Site);    
+        }
+        
+        
+        StateHasChanged();
+        if (arg.Model is SendComment sendComment)
+            await SendCommentAsync?.Invoke(sendComment)!;
+        await Task.CompletedTask;
+        _isSending = false;
+
+        _model.CommentText = "";
+    }
+
+    private async Task ShowPicture()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var dialog = DialogService.Show<AddPicture>("添加网络图片", options);
+        var result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            _model.CommentText += "\r\n\r\n" + result.Data;
+        }
+    }
+
+}

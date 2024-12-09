@@ -1,0 +1,89 @@
+﻿@inject ISnackbar _snackbar;
+<header class="header-navigation" id="header">
+    <nav>
+        <div class="logo">
+            <a href="">叫我阿胖嗷~</a>
+        </div>
+        <h2 id="menu-nav" @onclick="ShowMenu" class="@(_mMenuShow ? "open" : "")">
+            <span class="nav-icon"></span>
+        </h2>
+        <ul id="menu-list" style="@(_menuList)">
+            <li>
+                <NavLink href="/" Match="NavLinkMatch.All" @onclick="Nav">首页</NavLink>
+            </li>
+            <li>
+                <NavLink href="/article/list" Match="NavLinkMatch.Prefix" @onclick="Nav">文章列表</NavLink>
+            </li>
+            <li>
+                <NavLink href="/mumble" @onclick="Nav">碎碎念</NavLink>
+            </li>
+            <li>
+                <NavLink href="/timeline" @onclick="Nav">时间轴</NavLink>
+            </li>
+            <li>
+                <NavLink href="/code" @onclick="Nav">源码</NavLink>
+            </li>
+            <li>
+                <NavLink href="/bookmark" @onclick="Nav">书签</NavLink>
+            </li>
+            <li></li>
+            <li>
+                <a>其他</a>
+                <ul class="sub">
+                    <li>
+                       <NavLink href="/bson-to-json" @onclick="Nav">显示BSON</NavLink>
+                    </li>
+                </ul>
+            </li>
+            
+            @* <li> *@
+            @*     <a href="">留言</a> *@
+            @* </li> *@
+            @* <li> *@
+            @*     <a href="/article/read/1011">内容页</a> *@
+            @* </li> *@
+        </ul>
+        <div class="search-box">
+            <div id="search_bar" class="search_bar">
+                <form method="post">
+                    <input class="input" placeholder="想搜点什么呢.." type="text" name="keyboard" id="keyboard">
+                    <p class="search_ico" @onclick="Search">
+                        <span></span>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </nav>
+</header>
+
+@code {
+    private bool _mMenuShow = false;
+
+    private string _menuList = "";
+
+    private void ShowMenu()
+    {
+        _mMenuShow = !_mMenuShow;
+        _menuList = _mMenuShow ? "display:block" : "display:none";
+    }
+
+    private void Search()
+    {
+        _snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+        _snackbar.Add("暂时没有实现搜索的打算！", Severity.Normal);
+    }
+
+    private void Nav()
+    {
+        if (_mMenuShow)
+        {
+            ShowMenu();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+}

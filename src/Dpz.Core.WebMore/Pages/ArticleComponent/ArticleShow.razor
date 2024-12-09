@@ -1,0 +1,87 @@
+﻿@using Microsoft.Extensions.Configuration
+@if (IsLoading)
+{
+    <MudCard>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="300px" />
+        <MudCardContent>
+            <MudSkeleton Width="30%" Height="42px;" />
+            <MudSkeleton Width="80%" />
+            <MudSkeleton Width="100%" />
+        </MudCardContent>
+        <MudCardActions>
+            <MudSkeleton Width="64px" Height="40px" Class="ml-2" />
+            <MudSkeleton Width="105px" Height="40px" Class="ml-3" />
+        </MudCardActions>
+    </MudCard>
+}
+else
+{
+    @foreach (var item in Source)
+    {
+        <div class="blogs" data-scroll-reveal="enter bottom over 1s">
+            <h3 class="blog-title">
+                <a href="/article/read/@(item.Id)">@item.Title</a>
+            </h3>
+            @if (item.ImagesAddress.Count >= 3)
+            {
+                <div class="article-list">
+                    <ul>
+                        @foreach (var image in item.ImagesAddress)
+                        {
+                            <li>
+                                <img data-src="@image" alt="@item.Title" class="lazy" src="@(Program.CdnBaseAddress)/core/loaders/bars.svg">
+                            </li>
+                            var index = item.ImagesAddress.IndexOf(image);
+                            if (index >= 2) break;
+                        }
+                    </ul>
+                </div>
+            }
+            else if (!string.IsNullOrEmpty(item.MainImage))
+            {
+                <span class="article-single-picture">
+                    <img data-src="@item.MainImage" alt="@item.Title" class="lazy" src="@(Program.CdnBaseAddress)/core/loaders/bars.svg">
+                </span>
+            }
+            <p class="article-text">
+                @((MarkupString) item.Introduction)
+            </p>
+            <div class="blog-info">
+                <ul>
+                    <li class="author">@item.Author.Name</li>
+                    <li class="article-tag">
+                        @foreach (var tag in item.Tags)
+                        {
+                            <a href="javascript:;">@tag</a>
+                        }
+                    </li>
+                    <li class="timer">@item.CreateTime.ToString("yyyy-MM-dd")</li>
+                    <li class="view"><span>@item.ViewCount</span>已阅读</li>
+                    <li class="like">0</li>
+                </ul>
+            </div>
+        </div>
+    }
+}
+
+@code {
+
+    [Parameter]
+    public bool IsLoading { get; set; }
+
+    [Parameter]
+    public List<ArticleMiniModel> Source { get; set; }
+
+    [Inject]
+    private IConfiguration Configuration { get; set; }
+
+    [Inject]
+    private IJSRuntime JsRuntime { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JsRuntime.InvokeVoidAsync("showLazyImage");
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+}
