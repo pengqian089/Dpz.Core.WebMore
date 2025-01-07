@@ -14,7 +14,7 @@ public class BookmarkService(HttpClient httpClient) : IBookmarkService
 {
     private static Hashtable _hashtable = new Hashtable();
 
-    public async Task<List<BookmarkModel>> GetBookmarksAsync(string? title, ICollection<string?>? categories)
+    public async Task<List<BookmarkModel>> GetBookmarksAsync(string title, ICollection<string> categories)
     {
         const string cachePrefix = "bookmark";
         var (cacheKey, parameterJoin) = GetParameters(cachePrefix, title, categories);
@@ -27,7 +27,7 @@ public class BookmarkService(HttpClient httpClient) : IBookmarkService
         return await GetDataAsync<string>(cacheKey, "/api/Bookmark/categories");
     }
 
-    public async Task<List<string>> SearchAsync(string? title, ICollection<string?>? categories)
+    public async Task<List<string>> SearchAsync(string title, ICollection<string> categories)
     {
         const string cachePrefix = "search";
         var (cacheKey, parameterJoin) = GetParameters(cachePrefix, title, categories);
@@ -36,8 +36,8 @@ public class BookmarkService(HttpClient httpClient) : IBookmarkService
 
     private static (string cacheKey, string parameterJoin) GetParameters(
         string cachePrefix, 
-        string? title,
-        ICollection<string?>? categories)
+        string title,
+        ICollection<string> categories)
     {
         var parameters = new List<string>();
         if (!string.IsNullOrEmpty(title))

@@ -84,7 +84,7 @@
         _snackbar.Add("没必要吧？！", Severity.Normal);
     }
 
-    private async Task ViewComment()
+    private Task ViewComment()
     {
         if (!_commentLoading)
         {
@@ -97,6 +97,8 @@
         {
             _commentLoading = false;
         }
+
+        return Task.CompletedTask;
     }
 
     private async Task ToPageAsync(int page)

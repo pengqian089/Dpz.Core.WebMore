@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Logging;
 using MudBlazor;
 using MudBlazor.Utilities;
-#nullable disable
 
 namespace Dpz.Core.WebMore.Pages.Comment;
 
@@ -127,11 +126,13 @@ public partial class Autocomplete<T> : MudBaseInput<T>
     public int MaxHeight { get; set; } = 300;
 
     /// <summary>
-    /// Defines how values are displayed in the drop-down list
+    /// 定义下拉列表中值的显示方式
     /// </summary>
     [Parameter]
     [Category(CategoryTypes.FormComponent.ListBehavior)]
+#pragma warning disable BL0007
     public Func<T, string> ToStringFunc
+#pragma warning restore BL0007
     {
         get => _toStringFunc;
         set
@@ -350,7 +351,7 @@ public partial class Autocomplete<T> : MudBaseInput<T>
                 return;
             _isOpen = value;
 
-            IsOpenChanged.InvokeAsync(_isOpen).AndForget();
+            IsOpenChanged.InvokeAsync(_isOpen).CatchAndLog();
         }
     }
 
@@ -381,7 +382,7 @@ public partial class Autocomplete<T> : MudBaseInput<T>
             await BeginValidateAsync();
             if (!_isCleared)
                 _elementReference?.SetText(optionText);
-            _elementReference?.FocusAsync().AndForget();
+            _elementReference?.FocusAsync().CatchAndLog();
             StateHasChanged();
         }
         finally
@@ -511,11 +512,12 @@ public partial class Autocomplete<T> : MudBaseInput<T>
                 IsOpen = true;
             }
 
+            //search while selected if enabled and the Text is equivalent to the Value
             searchingWhileSelected = !Strict && Value != null &&
                                      (Value.ToString() == Text ||
                                       (ToStringFunc != null &&
                                        ToStringFunc(Value) ==
-                                       Text)); //search while selected if enabled and the Text is equivalent to the Value
+                                       Text)); 
             var searchText = searchingWhileSelected ? string.Empty : Text;
 
             var searchTask = SearchFunc(searchText, _cancellationTokenSrc.Token);

@@ -15,7 +15,7 @@ else
                     @if (item.IsDelete != true)
                     {
                         <button class="btn-reply" title="回复" @onclick="() => Reply(item)">
-                            <MudIcon Icon="@Icons.Filled.Reply" Title="回复"/>
+                            <MudIcon Icon="@Icons.Material.Filled.Reply" Title="回复"/>
                         </button>
                     }
                 </div>
@@ -48,7 +48,7 @@ else
                                         @if (reply.IsDelete != true)
                                         {
                                             <button class="btn-reply" title="回复" @onclick="() => Reply(reply)">
-                                                <MudIcon Icon="@Icons.Filled.Reply" Title="回复"/>
+                                                <MudIcon Icon="@Icons.Material.Filled.Reply" Title="回复"/>
                                             </button>
                                         }
                                     </div>

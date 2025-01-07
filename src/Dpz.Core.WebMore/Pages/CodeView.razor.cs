@@ -32,7 +32,7 @@ public partial class CodeView
 
     private string _homeReadmeContent;
 
-    private async Task LoadTreeData(IEnumerable<string>? path)
+    private async Task LoadTreeData(IEnumerable<string> path)
     {
         _isLoading = true;
         path ??= Array.Empty<string>();
@@ -43,8 +43,8 @@ public partial class CodeView
         _isLoading = false;
     }
 
-    private string? _search;
-    private string? _tempSearch;
+    private string _search;
+    private string _tempSearch;
     [Inject] private ISnackbar Snackbar { get; set; }
 
     private async Task SearchAsync()
@@ -84,7 +84,7 @@ public partial class CodeView
     }
 
     //private CodeNoteTree? _selectedNode;
-    private Task SelectedFile(CodeNoteTree? arg)
+    private Task SelectedFile(CodeNoteTree arg)
     {
         if (arg?.CodeContainer == null)
             return Task.CompletedTask;

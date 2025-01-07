@@ -39,7 +39,9 @@
                 <MudCard Style="margin-bottom: 1em">
                     <MudCardHeader>
                         <CardHeaderAvatar>
-                            <MudAvatar Image="@item.Author.Avatar" Alt="@item.Author.Name"/>
+                            <MudAvatar>
+                                <MudImage Src="@item.Author.Avatar" Alt="@item.Author.Name"></MudImage>
+                            </MudAvatar>
                         </CardHeaderAvatar>
                         <CardHeaderContent>
                             <MudText Typo="Typo.body1">@item.Author.Name</MudText>

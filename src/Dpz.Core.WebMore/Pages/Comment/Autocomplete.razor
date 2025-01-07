@@ -65,7 +65,7 @@
                     }
                     else if (_items != null && _items.Length != 0)
                     {
-                        <MudList Class="@ListClass" Clickable="true" Dense="@Dense">
+                        <MudList Class="@ListClass" Dense="@Dense" T="string">
                             @if (BeforeItemsTemplate != null)
                             {
                                 <div class="mud-autocomplete-before-items pa-1">
@@ -78,7 +78,13 @@
                                 bool isSelected = index == _selectedListItemIndex;
                                 bool isDisabled = !_enabledItemIndices.Contains(index);
                                 var captureIndex = index;
-                                <MudListItem @key="@item" id="@GetListItemId(captureIndex)" Disabled="@(isDisabled)" OnClick="@(async () => await ListItemOnClick(item))" OnClickHandlerPreventDefault="true" Class="@GetListItemClassname(isSelected)">
+                                <MudListItem 
+                                    @key="@item" 
+                                    id="@GetListItemId(captureIndex)" 
+                                    Disabled="@(isDisabled)" 
+                                    OnClick="@(async () => await ListItemOnClick(item))"
+                                    OnClickPreventDefault="true" 
+                                    Class="@GetListItemClassname(isSelected)">
                                     @if (ItemTemplate == null)
                                     {
                                         @GetItemString(item)

@@ -10,9 +10,7 @@ namespace Dpz.Core.WebMore.Pages;
 
 public partial class Timeline
 {
-    private bool _isLoading = false;
-
-    private double _width = 0d;
+    private double _width;
 
     private DotNetObjectReference<Timeline> _objectReference;
 
@@ -30,11 +28,9 @@ public partial class Timeline
 
     protected override async Task OnInitializedAsync()
     {
-        _isLoading = true;
         _objectReference = DotNetObjectReference.Create(this);
         _width = await JsRuntime.InvokeAsync<double>("getWindowWidth");
         _source = await TimelineService.GetTimelineAsync();
-        _isLoading = false;
         await base.OnInitializedAsync();
     }
 

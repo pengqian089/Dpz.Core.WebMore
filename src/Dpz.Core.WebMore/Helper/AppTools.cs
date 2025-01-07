@@ -28,7 +28,7 @@ public static class AppTools
 
     public static bool IsDark;
 
-    private static string HandleParameter(HttpClient client, string url, Dictionary<string, string>? parameters)
+    private static string HandleParameter(HttpClient client, string url, Dictionary<string, string> parameters)
     {
         if (client == null)
         {
