@@ -10,9 +10,9 @@ namespace Dpz.Core.WebMore.Service.Impl;
 
 public class CodeService(HttpClient httpClient) : ICodeService
 {
-    private static Dictionary<string, CodeNoteTree?> _cache = new();
+    private static Dictionary<string, CodeNoteTree> _cache = new();
 
-    public async Task<CodeNoteTree?> GetTreeAsync(params string[]? path)
+    public async Task<CodeNoteTree> GetTreeAsync(params string[] path)
     {
         var cacheKey = "CacheKey";
         var parameters = "";
@@ -34,7 +34,7 @@ public class CodeService(HttpClient httpClient) : ICodeService
         return node;
     }
 
-    public async Task<CodeNoteTree?> SearchAsync(string keyword)
+    public async Task<CodeNoteTree> SearchAsync(string keyword)
     {
         return await httpClient.GetFromJsonAsync<CodeNoteTree>($"/api/Code/search?keyword={keyword}");
     }

@@ -16,9 +16,9 @@ public partial class Bookmark
     
     [Inject] private IJSRuntime JsRuntime { get; set; }
 
-    private string? _title = null;
+    private string _title = null;
 
-    private readonly List<string?> _categories = [];
+    private readonly List<string> _categories = [];
 
     private List<BookmarkModel> _source = [];
 
@@ -68,7 +68,7 @@ public partial class Bookmark
         await LoadDataAsync();
     }
 
-    private async Task UnSelectCategoryAsync(string? category)
+    private async Task UnSelectCategoryAsync(string category)
     {
         if (!_categories.Contains(category))
         {

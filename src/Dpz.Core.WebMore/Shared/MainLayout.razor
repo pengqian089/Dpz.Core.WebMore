@@ -1,10 +1,9 @@
-﻿@using Dpz.Core.WebMore.Service
-@using Microsoft.AspNetCore.SignalR.Client
+﻿@using Microsoft.AspNetCore.SignalR.Client
 @inherits LayoutComponentBase
 @inject IMusicService MusicService;
 @inject ISnackbar Snackbar;
 <MudThemeProvider @ref="@_mudThemeProvider" IsDarkMode="@AppTools.IsDark"/>
-@* <MudPopoverProvider/> *@
+<MudPopoverProvider/>
 <MudDialogProvider/>
 <MudSnackbarProvider />
 <NavMenu></NavMenu>
@@ -21,7 +20,7 @@
     </p>
 </footer>
 <MudScrollToTop TopOffset="100">
-    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.ArrowUpward" Color="Color.Secondary">回到顶部</MudButton>
+    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Secondary">回到顶部</MudButton>
 </MudScrollToTop>
 @code
 {

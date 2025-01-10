@@ -12,7 +12,7 @@ public interface IBookmarkService
     /// <param name="title"></param>
     /// <param name="categories"></param>
     /// <returns></returns>
-     Task<List<BookmarkModel>> GetBookmarksAsync(string? title,ICollection<string?>? categories);
+     Task<List<BookmarkModel>> GetBookmarksAsync(string title,ICollection<string> categories);
 
     /// <summary>
     /// 获取所有分类
@@ -26,5 +26,5 @@ public interface IBookmarkService
     /// <param name="title"></param>
     /// <param name="categories"></param>
     /// <returns></returns>
-    Task<List<string>> SearchAsync(string? title,ICollection<string?>? categories);
+    Task<List<string>> SearchAsync(string title,ICollection<string> categories);
 }

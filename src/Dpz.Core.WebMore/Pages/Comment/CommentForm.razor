@@ -147,11 +147,11 @@
     private async Task ShowPicture()
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
-        var dialog = DialogService.Show<AddPicture>("添加网络图片", options);
+        var dialog = await DialogService.ShowAsync<AddPicture>("添加网络图片", options);
         var result = await dialog.Result;
-        if (!result.Cancelled)
+        if (result?.Canceled != true)
         {
-            _model.CommentText += "\r\n\r\n" + result.Data;
+            _model.CommentText += "\r\n\r\n" + result?.Data;
         }
     }
 
