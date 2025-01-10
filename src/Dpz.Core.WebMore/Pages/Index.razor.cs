@@ -10,17 +10,18 @@ namespace Dpz.Core.WebMore.Pages
 {
     public partial class Index
     {
-        [Inject] private IJSRuntime JsRuntime { get; set; }
+        [Inject]
+        private IJSRuntime JsRuntime { get; set; }
 
-        [Inject] private IArticleService ArticleService { get; set; }
-        
-        [Inject]private ICommunityService CommunityService { get; set; }
-        
-        [Inject]private IConfiguration Configuration { get; set; }
+        [Inject]
+        private IArticleService ArticleService { get; set; }
 
-        private List<ArticleMiniModel> _topArticles = new();
+        [Inject]
+        private ICommunityService CommunityService { get; set; }
 
-        private List<PictureModel> _banners = new();
+        private List<ArticleMiniModel> _topArticles = [];
+
+        private List<PictureModel> _banners = [];
 
         private bool _loading = true;
 
@@ -34,7 +35,7 @@ namespace Dpz.Core.WebMore.Pages
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if(!_loading)
+            if (!_loading)
                 await JsRuntime.InvokeVoidAsync("initIndex");
             await base.OnAfterRenderAsync(firstRender);
         }
