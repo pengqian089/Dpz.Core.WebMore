@@ -14,9 +14,14 @@ namespace Dpz.Core.WebMore.Pages;
 
 public partial class CodeView
 {
-    [Inject] private ICodeService CodeService { get; set; }
+    [Parameter]
+    public string Path { get; set; }
 
-    [Inject] private IJSRuntime JsRuntime { get; set; }
+    [Inject]
+    private ICodeService CodeService { get; set; }
+
+    [Inject]
+    private IJSRuntime JsRuntime { get; set; }
 
     private CodeNoteTree _treeData = new();
 
@@ -28,6 +33,12 @@ public partial class CodeView
     {
         await LoadTreeData(null);
         await base.OnInitializedAsync();
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        Console.WriteLine(Path);
+        return base.OnParametersSetAsync();
     }
 
     private string _homeReadmeContent;
@@ -45,7 +56,9 @@ public partial class CodeView
 
     private string _search;
     private string _tempSearch;
-    [Inject] private ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    private ISnackbar Snackbar { get; set; }
 
     private async Task SearchAsync()
     {
@@ -137,7 +150,9 @@ public partial class CodeView
 
     private void RemoveTab(object id)
     {
-        var tabView = _tabs.SingleOrDefault((x) => id is string ids && string.Join("-", x.CurrentPaths) == ids);
+        var tabView = _tabs.SingleOrDefault(
+            (x) => id is string ids && string.Join("-", x.CurrentPaths) == ids
+        );
         if (tabView is not null)
         {
             _tabs.Remove(tabView);

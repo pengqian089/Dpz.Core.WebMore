@@ -9,7 +9,12 @@ else
 {
     <Preview Node="Node"></Preview>
 }
-
+@if (!string.IsNullOrWhiteSpace(Node.CodeContainer.AiAnalyzeResult))
+{
+    <div class="readme-main">
+        <MarkdownPreview Markdown="@Node.CodeContainer.AiAnalyzeResult"></MarkdownPreview>
+    </div>
+}
 
 
 @code {

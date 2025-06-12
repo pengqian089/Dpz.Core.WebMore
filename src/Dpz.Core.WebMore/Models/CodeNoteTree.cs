@@ -101,4 +101,9 @@ public class CodeContainer
     public string CodeContent { get; set; }
 
     public bool IsPreview { get; set; }
+    
+    /// <summary>
+    /// AI分析结果
+    /// </summary>
+    public string AiAnalyzeResult { get; set; }
 }
