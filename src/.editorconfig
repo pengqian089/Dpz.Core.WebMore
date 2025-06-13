@@ -1,0 +1,8 @@
+root = true
+
+[*.cs]
+charset = utf-8
+indent_size = 4
+# 强制所有控制语句（if/else/for/while等）必须使用大括号
+csharp_prefer_braces = true:warning
+csharp_style_var_for_built_in_types = true:warning
