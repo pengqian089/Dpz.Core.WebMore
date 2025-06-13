@@ -1,5 +1,5 @@
 ﻿@page "/code"
-@page "/code/{**path}"
+@* @page "/code/{*path}" *@
 @using Dpz.Core.WebMore.Pages.CodeComponent
 <PageTitle>网站源码 - 个人文章分享</PageTitle>
 <div style="margin: 80px auto 0">
@@ -47,6 +47,7 @@
                                                 OnKeyUp="SearchKeyUpAsync"
                                                 AdornmentColor="Color.Secondary"/>
                                             <Tree
+                                                @ref="_treeComponent"
                                                 OnSelectedFile="SelectedFile"
                                                 Node="_treeData"
                                                 Keyword="@_search"

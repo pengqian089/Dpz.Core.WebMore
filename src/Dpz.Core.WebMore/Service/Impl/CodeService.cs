@@ -28,7 +28,6 @@ public class CodeService(HttpClient httpClient) : ICodeService
             return cacheNode;
         }
 
-
         var node = await httpClient.GetFromJsonAsync<CodeNoteTree>("/api/Code" + parameters);
         _cache.Add(cacheKey, node);
         return node;
@@ -36,6 +35,8 @@ public class CodeService(HttpClient httpClient) : ICodeService
 
     public async Task<CodeNoteTree> SearchAsync(string keyword)
     {
-        return await httpClient.GetFromJsonAsync<CodeNoteTree>($"/api/Code/search?keyword={keyword}");
+        return await httpClient.GetFromJsonAsync<CodeNoteTree>(
+            $"/api/Code/search?keyword={keyword}"
+        );
     }
 }

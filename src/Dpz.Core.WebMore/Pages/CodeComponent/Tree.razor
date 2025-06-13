@@ -1,39 +1,25 @@
-﻿<ul>
-    @foreach (var item in Node.Directories)
-    {
-        <TreeNode 
-            OnSelectedFile="OnSelectedFile" 
-            IsFolder="@(true)" 
-            Name="@item.Name" 
-            Path="item.CurrentPath"
-            OnExpandFolder="OnExpandFolder"
-            Keyword="@Keyword"/>
-    
-    }
+﻿@using System.Linq
 
-    @foreach (var item in Node.Files)
-    {
-        <TreeNode 
-            OnSelectedFile="OnSelectedFile" 
-            IsFolder="@(false)" 
-            Name="@item.Name" 
-            Path="item.CurrentPath"
-            OnExpandFolder="OnExpandFolder"
-            Keyword="@Keyword"/>
-    }
-</ul>
+<CascadingValue Value="this">
+    <ul>
+        @foreach (var item in Node.Directories)
+        {
+            <TreeNode OnSelectedFile="OnSelectedFile"
+                      IsFolder="@(true)"
+                      Name="@item.Name"
+                      Path="item.CurrentPath"
+                      OnExpandFolder="OnExpandFolder"
+                      Keyword="@Keyword"/>
+        }
 
-@code {
-
-    [Parameter]
-    public CodeNoteTree Node { get; set; } = new();
-    
-    [Parameter] 
-    public EventCallback<CodeNoteTree> OnSelectedFile { get; set; }
-    
-    [Parameter]
-    public EventCallback<CodeNoteTree> OnExpandFolder { get; set; }
-    
-    [Parameter]
-    public string Keyword { get; set; }
-}
+        @foreach (var item in Node.Files)
+        {
+            <TreeNode OnSelectedFile="OnSelectedFile"
+                      IsFolder="@(false)"
+                      Name="@item.Name"
+                      Path="item.CurrentPath"
+                      OnExpandFolder="OnExpandFolder"
+                      Keyword="@Keyword"/>
+        }
+    </ul>
+</CascadingValue>

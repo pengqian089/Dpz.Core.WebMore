@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Dpz.Core.WebMore.Models;
 using Dpz.Core.WebMore.Service;
@@ -24,36 +25,48 @@ public partial class TreeNode : IDisposable
     [Inject]
     private ICodeService CodeService { get; set; }
 
+    [CascadingParameter]
+    private Tree ParentTree { get; set; }
+
     private bool _expand = false;
 
     private CodeNoteTree _childrenNode;
+    
+    private Tree _childTree;
 
     private const string Active = "background-color: rgb(196 224 255 / 12%)";
     private static List<string> _activePath = null;
 
-    private async Task ExpandNodeAsync()
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        ParentTree?.RegisterNode(this);
+    }
+
+    public async Task<bool> ExpandNodeAsync()
     {
         if (Name == "loading...")
-            return;
+        {
+            return false;
+        }
         _activePath = Path;
         if (!IsFolder)
         {
             await SelectFileAsync();
-            return;
+            return true;
         }
 
         if (!_expand)
         {
             _tempName = Name;
             Name = "loading...";
-            _childrenNode ??= await CodeService.GetTreeAsync(Path.ToArray());
+            _childrenNode = await CodeService.GetTreeAsync(Path.ToArray());
             await OnExpandFolder.InvokeAsync(_childrenNode);
             Name = _tempName;
+            _expand = true;
+            return true;
         }
-        // else
-        //     _childrenNode = null;
-
-        _expand = !_expand;
+        return true;
     }
 
     [Parameter]
@@ -64,7 +77,7 @@ public partial class TreeNode : IDisposable
 
     private string _tempName = "";
 
-    private async Task SelectFileAsync()
+    public async Task SelectFileAsync()
     {
         _tempName = Name;
         Name = "loading...";
@@ -74,10 +87,12 @@ public partial class TreeNode : IDisposable
         StateHasChanged();
     }
 
-    (string first, string keyword, string end) MatchKeyword(string name)
+    private (string first, string keyword, string end) MatchKeyword(string name)
     {
         if (string.IsNullOrEmpty(Keyword))
+        {
             return (name, null, null);
+        }
 
         var startIndex = name.IndexOf(Keyword, StringComparison.CurrentCultureIgnoreCase);
         if (startIndex >= 0)
@@ -108,5 +123,11 @@ public partial class TreeNode : IDisposable
             Console.WriteLine("dispose");
             _activePath = null;
         }
+        ParentTree?.UnregisterNode(this);
+    }
+
+    public TreeNode FindNodeByPath(List<string> path)
+    {
+        return _childTree?.FindNodeByPath(path);
     }
 }

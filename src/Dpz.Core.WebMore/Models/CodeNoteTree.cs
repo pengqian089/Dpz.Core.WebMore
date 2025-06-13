@@ -10,7 +10,7 @@ public class CodeNoteTree
     /// <summary>
     /// 是否为根目录，如果为根目录，ParentPaths将为null
     /// </summary>
-    public bool IsRoot { get; set; } = false;
+    public bool IsRoot { get; set; }
 
     /// <summary>
     /// 当前路径是否为目录
@@ -20,12 +20,12 @@ public class CodeNoteTree
     /// <summary>
     /// 子目录
     /// </summary>
-    public List<ChildrenTree> Directories { get; set; } = new();
+    public List<ChildrenTree> Directories { get; set; } = [];
 
     /// <summary>
     /// 该目录下的文件
     /// </summary>
-    public List<ChildrenTree> Files { get; set; } = new();
+    public List<ChildrenTree> Files { get; set; } = [];
 
     /// <summary>
     /// 上一页路径
@@ -56,7 +56,7 @@ public class CodeNoteTree
     /// 目录、文件类型
     /// </summary>
     [JsonConverter(typeof(EnumConverter<FileSystemType>))]
-    public FileSystemType Type { get; set; }
+    public FileSystemType Type { get; set; } = FileSystemType.NoExists;
 }
 
 /// <summary>
@@ -101,7 +101,7 @@ public class CodeContainer
     public string CodeContent { get; set; }
 
     public bool IsPreview { get; set; }
-    
+
     /// <summary>
     /// AI分析结果
     /// </summary>

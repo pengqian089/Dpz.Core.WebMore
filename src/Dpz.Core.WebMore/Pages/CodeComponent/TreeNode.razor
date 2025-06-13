@@ -48,7 +48,7 @@
         </div>
         @if (_childrenNode != null && _expand)
         {
-            <Tree OnSelectedFile="OnSelectedFile" Node="_childrenNode" OnExpandFolder="OnExpandFolder"></Tree>
+            <Tree @ref="_childTree" OnSelectedFile="OnSelectedFile" Node="_childrenNode" OnExpandFolder="OnExpandFolder"></Tree>
         }
     </li>
 }
