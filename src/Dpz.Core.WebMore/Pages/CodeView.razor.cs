@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Dpz.Core.EnumLibrary;
 using Dpz.Core.WebMore.Models;
 using Dpz.Core.WebMore.Pages.CodeComponent;
 using Dpz.Core.WebMore.Service;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Logging;
-using Microsoft.JSInterop;
 using MudBlazor;
 
 namespace Dpz.Core.WebMore.Pages;
@@ -23,9 +23,6 @@ public partial class CodeView
 
     [Inject]
     private ICodeService CodeService { get; set; }
-
-    [Inject]
-    private IJSRuntime JsRuntime { get; set; }
 
     [Inject]
     private NavigationManager NavigationManager { get; set; }
@@ -65,14 +62,20 @@ public partial class CodeView
         {
             Logger.LogInformation("路径发生变化，开始处理");
             var paths = Path.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            var index = _tabs.FindIndex(x => x.CurrentPaths.SequenceEqual(paths));
+            if (index >= 0)
+            {
+                ActiveTabIndex = index + 1;
+                return;
+            }
             var tempPaths = new List<string>();
 
             // 等待根目录加载完成
-            if (_treeData == null || _isLoading)
+            if (_treeData.Type == FileSystemType.NoExists || _isLoading)
             {
                 Logger.LogInformation(
                     "等待根目录加载，当前状态: TreeData={HasTreeData}, IsLoading={IsLoading}",
-                    _treeData != null,
+                    _treeData.Type,
                     _isLoading
                 );
                 await Task.Delay(100);
@@ -138,10 +141,7 @@ public partial class CodeView
 
     private async Task LoadTreeData(IEnumerable<string> path)
     {
-        Logger.LogInformation(
-            "开始加载树数据，路径: {Path}",
-            string.Join("/", path ?? Array.Empty<string>())
-        );
+        Logger.LogInformation("开始加载树数据，路径: {Path}", string.Join("/", path ?? []));
         _isLoading = true;
         path ??= [];
         var currentPath = path.ToArray();
@@ -240,8 +240,9 @@ public partial class CodeView
             Logger.LogWarning("文件内容为空");
             return Task.CompletedTask;
         }
-        var tab = _tabs.SingleOrDefault(x => x.CurrentPaths.SequenceEqual(arg.CurrentPaths));
-        if (tab is null)
+        _currentPath = arg.CurrentPaths;
+        var tabIndex = _tabs.FindIndex(x => x.CurrentPaths.SequenceEqual(arg.CurrentPaths));
+        if (tabIndex == -1)
         {
             Logger.LogInformation("添加新标签页");
             AddTab(arg);
@@ -249,26 +250,26 @@ public partial class CodeView
         else
         {
             Logger.LogInformation("激活已有标签页");
-            _dynamicTabs.ActivatePanel(_tabs.IndexOf(tab) + 1);
+            ActiveTabIndex = tabIndex + 1;
         }
-        _currentPath = arg.CurrentPaths;
-
-        UpdateUrl(arg.CurrentPaths);
         return Task.CompletedTask;
     }
 
     private void ExpandFolder(CodeNoteTree obj)
     {
         Logger.LogInformation("展开文件夹: {FolderData}", JsonSerializer.Serialize(obj));
+        _currentPath = obj.CurrentPaths;
+        _readmePath = obj.CurrentPaths;
         if (!string.IsNullOrEmpty(obj.ReadmeContent))
         {
             Logger.LogInformation("更新 README 内容");
             _treeData.ReadmeContent = obj.ReadmeContent;
-            _dynamicTabs.ActivatePanel(0);
+            ActiveTabIndex = 0;
         }
-        _currentPath = obj.CurrentPaths;
-
-        UpdateUrl(obj.CurrentPaths);
+        else
+        {
+            UpdateUrl(obj.CurrentPaths);
+        }
     }
 
     private void UpdateUrl(IEnumerable<string> paths)
@@ -286,10 +287,41 @@ public partial class CodeView
     #region tabs
 
     private MudDynamicTabs _dynamicTabs;
-    private readonly List<CodeNoteTree> _tabs = new();
-    private int _tabIndex;
+    private readonly List<CodeNoteTree> _tabs = [];
     private bool _stateHasChanged;
     private Tree _treeComponent;
+    private IEnumerable<string> _readmePath = [];
+
+    private int _activeTabIndex;
+    private int ActiveTabIndex
+    {
+        get => _activeTabIndex;
+        set
+        {
+            if (_activeTabIndex == value)
+            {
+                return;
+            }
+            Logger.LogInformation(
+                "标签页切换，旧索引: {OldIndex}, 新索引: {NewIndex}",
+                _activeTabIndex,
+                value
+            );
+            _activeTabIndex = value;
+            switch (_activeTabIndex)
+            {
+                case 0:
+                    UpdateUrl(_readmePath);
+                    break;
+                case > 0 when _activeTabIndex <= _tabs.Count:
+                {
+                    var tab = _tabs[_activeTabIndex - 1];
+                    UpdateUrl(tab.CurrentPaths);
+                    break;
+                }
+            }
+        }
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -306,7 +338,7 @@ public partial class CodeView
     {
         Logger.LogInformation("添加标签页: {TabData}", JsonSerializer.Serialize(node));
         _tabs.Add(node);
-        _tabIndex = _tabs.Count;
+        ActiveTabIndex = _tabs.Count;
         _stateHasChanged = true;
     }
 

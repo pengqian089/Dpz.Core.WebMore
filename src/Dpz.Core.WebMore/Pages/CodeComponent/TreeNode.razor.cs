@@ -31,7 +31,7 @@ public partial class TreeNode : IDisposable
     private bool _expand = false;
 
     private CodeNoteTree _childrenNode;
-    
+
     private Tree _childTree;
 
     private const string Active = "background-color: rgb(196 224 255 / 12%)";
@@ -66,7 +66,11 @@ public partial class TreeNode : IDisposable
             _expand = true;
             return true;
         }
-        return true;
+        else
+        {
+            _expand = false;
+            return true;
+        }
     }
 
     [Parameter]

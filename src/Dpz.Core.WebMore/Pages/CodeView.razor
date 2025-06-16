@@ -63,10 +63,11 @@
             </div>
             <main class="main">
                 <MudDynamicTabs @ref="@_dynamicTabs"
-                                @bind-ActivePanelIndex="@_tabIndex"
+                                @bind-ActivePanelIndex="@ActiveTabIndex"
                                 CloseTab="@CloseTabCallback"
                                 TabHeaderClass="code-tab-head"
                                 AddIconStyle="display:none"
+                                
                                 Rounded 
                                 ApplyEffectsToContainer>
                     <MudTabPanel ID="@("README.md")" Text="README.md" ShowCloseIcon="@false">
