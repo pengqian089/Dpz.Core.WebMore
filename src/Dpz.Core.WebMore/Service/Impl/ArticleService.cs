@@ -23,7 +23,7 @@ public class ArticleService(HttpClient httpClient, ILogger<ArticleService> logge
         {
             { nameof(pageIndex), pageIndex.ToString() },
             { nameof(pageSize), pageSize.ToString() },
-            { nameof(tag), tag ?? "" },
+            { "tags", tag ?? "" },
             { nameof(title), title ?? "" },
         };
         return await httpClient.ToPagedListAsync<ArticleMiniModel>("/api/Article", parameter);

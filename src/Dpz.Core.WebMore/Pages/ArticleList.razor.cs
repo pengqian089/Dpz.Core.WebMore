@@ -21,13 +21,6 @@ public partial class ArticleList(IArticleService articleService, NavigationManag
 
     private bool _loading = true;
 
-    protected override async Task OnInitializedAsync()
-    {
-        PageIndex = PageIndex == 0 ? 1 : PageIndex;
-        PageSize = PageSize == 0 ? 10 : PageSize;
-        await base.OnInitializedAsync();
-    }
-
     private string LinkTemplate()
     {
         if (string.IsNullOrWhiteSpace(Tag))
@@ -40,7 +33,18 @@ public partial class ArticleList(IArticleService articleService, NavigationManag
     protected override async Task OnParametersSetAsync()
     {
         _loading = true;
-        _source = await articleService.GetPageAsync(PageIndex, PageSize, Tag, "");
+        var pageIndex = PageIndex;
+        if (pageIndex == 0)
+        {
+            pageIndex = 1;
+        }
+        var pageSize = PageSize;
+        if (pageSize == 0)
+        {
+            pageSize = 10;
+        }
+
+        _source = await articleService.GetPageAsync(pageIndex, pageSize, Tag, "");
         _loading = false;
         PageIndex = _source.CurrentPageIndex;
         await base.OnParametersSetAsync();
