@@ -1,0 +1,69 @@
+﻿@foreach (var item in Articles)
+{
+    <article class="article-card">
+        @if (!string.IsNullOrEmpty(item.MainImage))
+        {
+            <div class="article-card__cover">
+                @if (!item.MainImage.StartsWith(Program.AssetsHost, StringComparison.OrdinalIgnoreCase))
+                {
+                    <img
+                        src="@Program.LibraryHost/loaders/oval.svg"
+                        data-src="@item.MainImage"
+                        alt="@item.Title"
+                        class="lazy"
+                        loading="lazy"/>
+                }
+                else
+                {
+                    <img
+                        src="@Program.LibraryHost/loaders/oval.svg"
+                        data-src="@(item.MainImage + "!article.list")"
+                        data-origin="@item.MainImage"
+                        alt="@item.Title"
+                        class="lazy"
+                        loading="lazy"/>
+                }
+            </div>
+        }
+        <div class="article-card__content">
+            <div class="article-card__meta">
+                <span class="article-card__date">
+                    <i class="fa-regular fa-calendar"></i>
+                    <time datetime="@item.CreateTime">@item.CreateTime.ToString("yyyy-MM-dd HH:mm:ss")</time>
+                </span>
+                <span class="article-card__category">
+                    <i class="fa-regular fa-user"></i>
+                    @item.Author.Name
+                </span>
+            </div>
+            <h3 class="article-card__title">
+                <a asp-action="Read" asp-controller="Article" asp-route-id="@item.Id" data-pjax>@item.Title</a>
+            </h3>
+            <div class="article-card__excerpt">
+                @((MarkupString)item.Introduction)
+            </div>
+            <div class="article-card__footer">
+                <div class="article-card__tags">
+                    @foreach (var tag in item.Tags.Take(3))
+                    {
+                        <a asp-controller="Article"
+                           asp-action="Index"
+                           asp-route-tag="@tag"
+                           class="article__tag"
+                           data-pjax>
+                            #@tag
+                        </a>
+                    }
+                </div>
+                <div class="article-card__stats">
+                    <span class="stat-item" title="浏览量">
+                        <i class="fa fa-eye"></i> @item.ViewCount
+                    </span>
+                    <span class="stat-item" title="评论数">
+                        <i class="fa-solid fa-comment-dots"></i> @item.CommentCount
+                    </span>
+                </div>
+            </div>
+        </div>
+    </article>
+}

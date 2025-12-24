@@ -6,22 +6,34 @@
 <MudPopoverProvider/>
 <MudDialogProvider/>
 <MudSnackbarProvider />
-<NavMenu></NavMenu>
-@Body
 
-<div id="music-player"></div>
-<footer>
-    <p>
-        Copyright &copy;@DateTime.Now.Year Design by
-        <a href="https://core.dpangzi.com" target="_blank">叫我阿胖</a>
-    </p>
-    <p>
-        <a href="https://beian.miit.gov.cn/" target="_blank">鄂ICP备20001883号-1</a>
-    </p>
-</footer>
-<MudScrollToTop TopOffset="100">
-    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Secondary">回到顶部</MudButton>
-</MudScrollToTop>
+
+<div class="site-wrapper">
+    <NavMenu></NavMenu>
+    <main class="site-main">
+        @Body
+    </main>
+    <footer class="site-footer">
+        <div class="container">
+            <p>
+                <a href="https://beian.miit.gov.cn/" target="_blank">鄂ICP备20001883号-1</a>
+            </p>
+            <p class="mt-1" id="app-version">
+                当前版本：@Program.Version
+                <span class="connection-status" title="连接状态：未连接"></span>
+            </p>
+            <p>&copy; @DateTime.Now.Year Dpz.Core.Web</p>
+        </div>
+    </footer>
+
+    <!-- Back To Top Button -->
+    <MudScrollToTop TopOffset="100">
+        <div class="back-to-top" title="返回顶部">
+            <i class="fa fa-arrow-up"></i>
+        </div>
+    </MudScrollToTop>
+</div>
+
 @code
 {
     [Inject]
@@ -40,11 +52,11 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await JsRuntime.InvokeVoidAsync("appInit");
+        //await JsRuntime.InvokeVoidAsync("appInit");
         if (firstRender)
         {
             AppTools.IsDark = await _mudThemeProvider.GetSystemPreference();
-            await JsRuntime.InvokeVoidAsync("playerInit");
+            //await JsRuntime.InvokeVoidAsync("playerInit");
             var musics = await MusicService.GetMusicPageAsync(1, 50);
             var list = musics.Select(x => new
             {
@@ -54,7 +66,7 @@
                 name = x.Title,
                 url = x.MusicUrl,
             });
-            await JsRuntime.InvokeVoidAsync("playerAddList", list);
+            //await JsRuntime.InvokeVoidAsync("playerAddList", list);
             StateHasChanged();
         }
         await base.OnAfterRenderAsync(firstRender);

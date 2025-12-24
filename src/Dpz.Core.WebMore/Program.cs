@@ -29,9 +29,16 @@ builder.Services.AddMudServices(config =>
     ;
     config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
 });
-BaseAddress = builder.Configuration.GetSection("BaseAddress").Get<string>();
-CdnBaseAddress = builder.Configuration["CDNBaseAddress"];
-WebHost = builder.Configuration["SourceSite"];
+var configuration = builder.Configuration;
+BaseAddress = configuration.GetSection("BaseAddress").Get<string>();
+CdnBaseAddress = configuration["CDNBaseAddress"];
+WebHost = configuration["SourceSite"];
+AssetsHost =
+    configuration["AssetsHost"]
+    ?? throw new Exception("configuration node AssetsHost is null or empty");
+LibraryHost =
+    configuration["LibraryHost"]
+    ?? throw new Exception("configuration node LibraryHost is null or empty");
 
 Connection = new HubConnectionBuilder()
     .WithUrl(
@@ -111,10 +118,31 @@ public partial class Program
     /// </summary>
     public static string BaseAddress { get; private set; }
 
+    /// <summary>
+    /// SignalR connection
+    /// </summary>
     public static HubConnection Connection { get; private set; }
 
     /// <summary>
     /// CDN base address
     /// </summary>
     public static string CdnBaseAddress { get; set; }
+
+    public static string Version =>
+        Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "_version";
+
+    /// <summary>
+    /// assets host
+    /// </summary>
+    public static string AssetsHost { get; private set; } = "";
+
+    /// <summary>
+    /// library host
+    /// </summary>
+    public static string LibraryHost { get; private set; } = "";
+
+    /// <summary>
+    /// upyun host
+    /// </summary>
+    public static string UpyunHost => "https://cdn.dpangzi.com";
 }
