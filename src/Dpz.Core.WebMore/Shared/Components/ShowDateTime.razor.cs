@@ -9,6 +9,9 @@ public partial class ShowDateTime : ComponentBase
     [EditorRequired]
     public required DateTime DateTime { get; set; }
 
+    [Parameter]
+    public string? Class { get; set; }
+
     private string UpdateTimeTag()
     {
         var now = DateTime.Now;

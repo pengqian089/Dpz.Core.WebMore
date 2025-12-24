@@ -21,11 +21,9 @@ namespace Dpz.Core.WebMore.Helper;
 
 public static class AppTools
 {
-    private static readonly Dictionary<string, string> RequestEtag = new();
-
     private static readonly Dictionary<string, object> ClientCache = new();
     public static ILogger<Program> ProgramLogger { get; set; }
-    
+
     /// <summary>
     /// 客户端最大读取文件大小 unit byte
     /// </summary>
@@ -33,31 +31,28 @@ public static class AppTools
 
     public static bool IsDark;
 
-    private static string HandleParameter(HttpClient client, string url, Dictionary<string, string> parameters)
+    private static string HandleParameter(string url, Dictionary<string, string>? parameters)
     {
-        if (client == null)
+        if (parameters is not { Count: > 0 })
         {
-            throw new ArgumentNullException(nameof(client));
+            return url;
         }
 
-        if (parameters != null && parameters.Any())
+        var index = url.IndexOf("?", StringComparison.CurrentCultureIgnoreCase);
+        var query = index >= 0 ? url.Substring(index) : "";
+        var queryString = HttpUtility.ParseQueryString(query);
+        foreach (var item in parameters)
         {
-            var index = url.IndexOf("?", StringComparison.CurrentCultureIgnoreCase);
-            var query = index >= 0 ? url.Substring(index) : "";
-            var queryString = HttpUtility.ParseQueryString(query);
-            foreach (var item in parameters)
-            {
-                queryString.Add(item.Key, item.Value);
-            }
+            queryString.Add(item.Key, item.Value);
+        }
 
-            if (index >= 0)
-            {
-                url = url.Substring(0, index + 1) + queryString;
-            }
-            else
-            {
-                url += "?" + queryString;
-            }
+        if (index >= 0)
+        {
+            url = url.Substring(0, index + 1) + queryString;
+        }
+        else
+        {
+            url += "?" + queryString;
         }
 
         return url;
@@ -66,56 +61,46 @@ public static class AppTools
     public static async Task<IPagedList<T>> ToPagedListAsync<T>(
         this HttpClient client,
         string url,
-        Dictionary<string, string> parameters = null,
-        JsonConverter converter = null)
+        Dictionary<string, string>? parameters = null,
+        JsonConverter? converter = null
+    )
     {
-        var requestUrl = HandleParameter(client, url, parameters);
+        var requestUrl = HandleParameter(url, parameters);
         var request = new HttpRequestMessage(HttpMethod.Get, requestUrl);
         var currentUri = request.RequestUri?.ToString() ?? "";
-        if (RequestEtag.ContainsKey(currentUri))
-        {
-            request.Headers.Add("If-None-Match", RequestEtag[currentUri]);
-        }
 
         var response = await client.SendAsync(request);
 
-        if (response.StatusCode == HttpStatusCode.NotModified && ClientCache.ContainsKey(currentUri))
+        if (
+            response.StatusCode == HttpStatusCode.NotModified
+            && ClientCache.TryGetValue(currentUri, out var value)
+        )
         {
-            return ClientCache[currentUri] as PagedList<T> ?? new PagedList<T>(new List<T>(), 0, 0);
+            return value as PagedList<T> ?? new PagedList<T>(new List<T>(), 0, 0);
         }
-        else
+
+        var serializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        if (converter != null)
         {
-                
-            var serializerOptions = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            };
-            if(converter != null)
-                serializerOptions.Converters.Add(converter);
-                
-            //var result = await response.Content.ReadAsStringAsync();
-            //var list = JsonSerializer.Deserialize<List<T>>(result, serializerOptions);
-
-            var list = await response.Content.ReadFromJsonAsync<List<T>>(serializerOptions);
-            var pagination =
-                JsonSerializer.Deserialize<Pagination>(response.Headers.GetValues("X-Pagination").First(),
-                    serializerOptions) ?? new Pagination();
-            if (RequestEtag.ContainsKey(currentUri))
-            {
-                RequestEtag[currentUri] = response.Headers.ETag?.ToString();
-            }
-            else
-            {
-                RequestEtag.Add(currentUri, response.Headers.ETag?.ToString());
-            }
-
-            var pagedList = new PagedList<T>(list, pagination.CurrentPage, pagination.PageSize,
-                pagination.TotalCount);
-            ClientCache[currentUri] = pagedList;
-            return pagedList;
+            serializerOptions.Converters.Add(converter);
         }
+
+        var list = await response.Content.ReadFromJsonAsync<List<T>>(serializerOptions) ?? [];
+        var pagination =
+            JsonSerializer.Deserialize<Pagination>(
+                response.Headers.GetValues("X-Pagination").First(),
+                serializerOptions
+            ) ?? new Pagination();
+
+        var pagedList = new PagedList<T>(
+            list,
+            pagination.CurrentPage,
+            pagination.PageSize,
+            pagination.TotalCount
+        );
+        ClientCache[currentUri] = pagedList;
+        return pagedList;
     }
-
 
     public static T GetQueryString<T>(this NavigationManager navManager, string key)
     {
@@ -126,17 +111,20 @@ public static class AppTools
         {
             if (typeof(T) == typeof(int) && int.TryParse(valueFromQueryString, out var valueAsInt))
             {
-                return (T) (object) valueAsInt;
+                return (T)(object)valueAsInt;
             }
 
             if (typeof(T) == typeof(string))
             {
-                return (T) (object) valueFromQueryString;
+                return (T)(object)valueFromQueryString;
             }
 
-            if (typeof(T) == typeof(decimal) && decimal.TryParse(valueFromQueryString, out var valueAsDecimal))
+            if (
+                typeof(T) == typeof(decimal)
+                && decimal.TryParse(valueFromQueryString, out var valueAsDecimal)
+            )
             {
-                return (T) (object) valueAsDecimal;
+                return (T)(object)valueAsDecimal;
             }
         }
 
@@ -166,12 +154,12 @@ public static class AppTools
                 return $"{ts.Days}天前";
             case < 12 * 30 * 24 * 60 * 60:
             {
-                var months = Convert.ToInt32(Math.Floor((double) ts.Days / 30));
+                var months = Convert.ToInt32(Math.Floor((double)ts.Days / 30));
                 return months <= 1 ? "一个月前" : $"{months}个月前";
             }
             default:
             {
-                var years = Convert.ToInt32(Math.Floor((double) ts.Days / 365));
+                var years = Convert.ToInt32(Math.Floor((double)ts.Days / 365));
                 return years <= 1 ? "1年前" : $"{years}年前";
             }
         }
@@ -185,14 +173,14 @@ public static class AppTools
         }
     }
 
-    public static async Task ForEachAsync<T>(this IEnumerable<T> source, Func<T,Task> func)
+    public static async Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, Task> func)
     {
         foreach (var item in source)
         {
             await func(item);
         }
     }
-        
+
     /// <summary>
     /// Markdown转为Html
     /// </summary>
@@ -230,20 +218,19 @@ public static class AppTools
     }
 
 #if DEBUG
-    public static void WriteLine(string format,params object[] args)
+    public static void WriteLine(string format, params object?[] args)
     {
         var array = args.Select(x => x is null ? "NULL" : JsonSerializer.Serialize(x)).ToArray();
-        Console.WriteLine(format,array);
+        Console.WriteLine(format, array);
     }
 
     public static void WriteLine(this object obj)
     {
-        var json = JsonSerializer.Serialize(obj,new JsonSerializerOptions
-        {
-            WriteIndented = true
-        });
+        var json = JsonSerializer.Serialize(
+            obj,
+            new JsonSerializerOptions { WriteIndented = true }
+        );
         Console.WriteLine(json);
     }
 #endif
-    
 }

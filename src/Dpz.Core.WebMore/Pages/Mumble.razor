@@ -1,110 +1,73 @@
 ﻿@page "/mumble"
 @page "/mumble/{PageIndex:int}"
-@using Dpz.Core.WebMore.Pages.ArticleComponent
 <PageTitle>碎碎念 - 个人文章分享</PageTitle>
-<div class="pagebg ab"> </div>
-<div class="container">
-    <h1 class="nav-map">
-        <span>不爱社交，涉恐本恐，渐渐的，我把这里当成了树洞</span>
-        <a href="/" class="n1">网站首页</a>
-        <a href="/mumble" class="n2">碎碎念</a>
-    </h1>
-    <div class="mumble">
-        @if (_loading)
+
+
+<div class="mumble-layout">
+    <main class="mumble-layout__main">
+        @foreach (var item in _source)
         {
-            <MudCard>
-                <MudCardHeader>
-                    <CardHeaderAvatar>
-                        <MudSkeleton SkeletonType="SkeletonType.Circle" Animation="Animation.Wave" Height="40px" Width="40px"/>
-                    </CardHeaderAvatar>
-                    <CardHeaderContent>
-                        <MudSkeleton Animation="Animation.Wave" Width="40%"/>
-                        <MudSkeleton Animation="Animation.Wave" Width="60%"/>
-                    </CardHeaderContent>
-                </MudCardHeader>
-                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Animation="Animation.Wave" Height="250px"/>
-                <MudCardContent>
-                    <MudSkeleton Animation="Animation.Wave"/>
-                </MudCardContent>
-                <MudCardActions>
-                    <MudSkeleton SkeletonType="SkeletonType.Circle" Animation="Animation.Wave" Height="30px" Width="30px" Class="ml-2 mb-2"/>
-                    <MudSkeleton SkeletonType="SkeletonType.Circle" Animation="Animation.Wave" Height="30px" Width="30px" Class="ml-3 mb-2"/>
-                </MudCardActions>
-            </MudCard>
+            <article class="mumble-card" id="mumble-@item.Id">
+                <div class="mumble-card__header">
+                    <img class="mumble-card__avatar" src="@item.Author.Avatar" alt="@item.Author.Name" loading="lazy">
+                    <div class="mumble-card__meta">
+                        <div class="mumble-card__author">
+                            @item.Author.Name
+                            <span
+                                class="mumble-card__role">@(item.Author.Permissions?.HasFlag(Permissions.System) == true ? "管理员" : "成员")</span>
+                        </div>
+                        <ShowDateTime Class="mumble-card__time timeago" DateTime="@item.CreateTime"></ShowDateTime>
+                    </div>
+                </div>
+
+                <div class="mumble-card__content markdown-body">
+                    <MarkdownPreview Markdown="@item.Markdown"></MarkdownPreview>
+                </div>
+
+                <div class="mumble-card__footer">
+                    <a href="/mumble-comment" class="mumble-action" title="详情" data-pjax>
+                        <i class="fa fa-info-circle"></i>
+                        <span>详情</span>
+                    </a>
+
+                    <button class="mumble-action" data-comment-toggle="@item.Id" title="评论">
+                        <i class="fa fa-commenting"></i>
+                        <span data-comment-count>@item.CommentCount</span>
+                    </button>
+
+                    <button type="button" class="mumble-action" @onclick="() => LikeAsync(item.Id)" title="点赞">
+                        <i class="fa fa-thumbs-up"></i>
+                        <span data-like-count>@item.Like</span>
+                    </button>
+                </div>
+
+                <!-- Comments Container -->
+                <div class="mumble-comments is-hidden" id="comments-@item.Id">
+                    <!-- Content loaded via JS -->
+                    <div class="text-center text-muted p-3">
+                        <i class="fa fa-spinner fa-spin"></i> 加载评论中...
+                    </div>
+                </div>
+            </article>
         }
-        else
-        {
-            @foreach (var item in _source)
-            {
-                <MudCard Style="margin-bottom: 1em">
-                    <MudCardHeader>
-                        <CardHeaderAvatar>
-                            <MudAvatar>
-                                <MudImage Src="@item.Author.Avatar" Alt="@item.Author.Name"></MudImage>
-                            </MudAvatar>
-                        </CardHeaderAvatar>
-                        <CardHeaderContent>
-                            <MudText Typo="Typo.body1">@item.Author.Name</MudText>
-                            <MudTooltip Text="@item.CreateTime.ToString("yyyy/MM/dd HH:mm:ss")">
-                                <MudText Typo="Typo.caption">@item.CreateTime.TimeAgo()发布</MudText>
-                            </MudTooltip>
-                        </CardHeaderContent>
-                    </MudCardHeader>
-                    <MudCardContent>
-                        <MarkdownPreview Style="background: initial" Markdown="@item.Markdown"/>
-                    </MudCardContent>
-                    <MudCardActions Style="border-top:1px solid var(--mud-palette-lines-default)">
-                        <MudBadge Content="@item.Like" Color="Color.Primary" Overlap="true" Class="mx-6 my-4">
-                            <MudIconButton OnClick="async () => await LikeAsync(item.Id)" Icon="@Icons.Material.Filled.Favorite" Color="Color.Info"/>
-                        </MudBadge>
-                        <MudBadge Content="@item.CommentCount" Color="Color.Primary" Overlap="true" Class="mx-6 my-4">
-                            <MudToggleIconButton
-                                Icon="@Icons.Material.Filled.Comment"
-                                ToggledIcon="@Icons.Material.Filled.AddComment"
-                                Color="Color.Info"
-                                @bind-Toggled="@item.ShowComment"
-                                ToggledColor="Color.Info"/>
-                        </MudBadge>
-                    </MudCardActions>
-                    @if (item.ShowComment)
-                    {
-                        <MudCardContent Style="border-top:1px solid var(--mud-palette-lines-default)">
-                            <Comment Node="CommentNode.Mumble" Relation="@item.Id"></Comment>
-                        </MudCardContent>
-                    }
-                </MudCard>
-            }
-            
-            
-            <div style="margin: 20px auto;text-align: center">
-                <MudPagination
-                    Rectangular="true"
-                    Variant="Variant.Filled"
-                    Count="_source.TotalPageCount"
-                    BoundaryCount="0"
-                    MiddleCount="2"
-                    Selected="(PageIndex == 0 ? 1 : PageIndex)"
-                    SelectedChanged="ToPageAsync"/>
-            </div>
-        }
-    </div>
-    <div class="sidebar">
-        <div class="about">
-            <p class="avatar">
-                <img src="https://cdn.dpangzi.com/images/avatar/64685599731755a4b271f147.png" alt="被打断的狗腿">
-            </p>
-            <p class="author-name">dpagnzi | 彭迁</p>
-            <p class="author-position">Professional asp.net developer.</p>
-            <div class="about-text">
-                <p>彭氏胖纸者，名迁，江陵人，诞于夏。少聪慧，敏于学。</p>
-                <p>古人有言，曰：趋于地，就于时。迁者诞于炎炎之夏，故活泼而好动。</p>
-                <p>江陵者襟江带河，集日月精华，文人骚客多出于此，迁虽芸芸之其一，实粹粹然也。</p>
-                <p>迁之性，稳而健，平而滑。若得于古，不可为刺客而说客也夫刺客，静若处子，动若蛇蝎。偏安于角落，偶然爆发。而说客者，平滑婉转，若流水，或缓或急，然不可断绝也。</p>
-                <p>迁者，柔弱如水，暴怒如江。遏飞舟击巉石曲回肠终归海。</p>
+
+        <Pagination Source="@_source" LinkTemplate="/mumble/{0}"/>
+    </main>
+
+    <aside class="mumble-layout__sidebar">
+        <div class="history-widget">
+            <h3 class="history-widget__title">忆往昔</h3>
+            <div class="history-widget__list">
+                @foreach (var item in _histories)
+                {
+                    <div class="history-item">
+                        <div class="history-item__content markdown-body">
+                            <MarkdownPreview Markdown="@item.Markdown"></MarkdownPreview>
+                        </div>
+                        <ShowDateTime Class="history-item__time timeago" DateTime="@item.CreateTime"></ShowDateTime>
+                    </div>
+                }
             </div>
         </div>
-        <Tags></Tags>
-        <Like></Like>
-        <News></News>
-    </div>
+    </aside>
 </div>
