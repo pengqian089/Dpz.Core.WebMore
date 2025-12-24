@@ -7,5 +7,5 @@ namespace Dpz.Core.WebMore.Shared.Components;
 public partial class ArticleItems : ComponentBase
 {
     [Parameter]
-    public required List<ArticleMiniModel> Articles { get; set; }
+    public required IEnumerable<ArticleMiniModel> Articles { get; set; }
 }

@@ -3,36 +3,25 @@
 @page "/article/list/{PageIndex:int}"
 @page "/article/list/tag/{Tag}/{PageIndex:int}"
 @page "/article/list/tag/{Tag}"
-@using Dpz.Core.WebMore.Pages.ArticleComponent
+
+@using Dpz.Core.WebMore.Shared.Components
 <PageTitle>文章列表 - 个人文章分享</PageTitle>
 
-<div class="pagebg sh"></div>
 <div class="container">
-    <h1 class="nav-map">
-        <span>
-            药不医穷病，烟不解万难，酒不醉思愁，情不如金，人不如故，聚散不由你我，万般皆是命，半点不由人
-        </span>
-        <a href="/" class="n1">网站首页</a>
-        <a href="/article/list" class="n2">文章列表</a>
-        @if (!string.IsNullOrEmpty(Tag))
-        {
-            <a href="/article/list/tag/@Tag" class="n3">@Tag</a>
-        }
-    </h1>
-    <div class="blogsbox">
-        <ArticleShow IsLoading="_loading" Source="_source.ToList()"></ArticleShow>
-        <div style="margin: 20px auto;text-align: center">
-            <MudPagination
-                Rectangular="true"
-                Variant="Variant.Filled"
-                Count="_source.TotalPageCount"
-                BoundaryCount="0"
-                MiddleCount="2"
-                Selected="(PageIndex == 0 ? 1 : PageIndex)"
-                SelectedChanged="ToPageAsync"
-                @ref="_mudPagination"/>
+    <div class="page-layout">
+        <div class="page-content" id="article-list">
+            <div class="article-grid">
+                <ArticleItems Articles="_source"></ArticleItems>
+            </div>
+            @* TODO 分页组件 *@
         </div>
 
+        <!-- Sidebar -->
+        <aside class="page-sidebar">
+            <SearchBox></SearchBox>
+            <TagCloud Tag="@Tag"></TagCloud>
+            <ArticleNews></ArticleNews>
+            <ArticleLikes></ArticleLikes>
+        </aside>
     </div>
-    <RightComponent></RightComponent>
 </div>

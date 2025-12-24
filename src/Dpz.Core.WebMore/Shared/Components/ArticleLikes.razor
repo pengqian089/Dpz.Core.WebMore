@@ -1,0 +1,20 @@
+﻿<div class="widget card">
+    <div class="card__header">
+        <h4 class="card__title">
+            <i class="fa-solid fa-heart"></i> 或许喜欢
+        </h4>
+    </div>
+    <div class="card__body">
+        <ul class="sidebar-list">
+            @foreach (var item in _source)
+            {
+                <li class="sidebar-list__item">
+                    <a asp-action="Read" asp-controller="Article" asp-route-id="@item.Id" 
+                       class="sidebar-list__link" data-pjax title="@item.Title">
+                        @item.Title
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
