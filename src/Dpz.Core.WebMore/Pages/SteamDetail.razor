@@ -1,0 +1,186 @@
+﻿@page "/steam/{Id:int}"
+
+@if (_isLoading || _model == null)
+{
+    
+}
+else
+{
+    <PageTitle>@_model.Name - 游戏成就 - 个人文章分享</PageTitle>
+    <div class="steam-container">
+    <a asp-action="Index" data-pjax class="steam-back-btn">
+        <i class="fa fa-arrow-left"></i> 返回游戏列表
+    </a>
+
+    @if (_model.Achievements.Count == 0)
+    {
+        <div class="steam-empty">
+            <i class="fa fa-frown-o steam-empty__icon"></i>
+            <h3>暂无成就数据</h3>
+            <p>该游戏可能暂不支持成就系统，或数据尚未同步。</p>
+        </div>
+    }
+    else
+    {
+        var unlockedAchievements = _model.Achievements.Where(x => x.UnlockTime.HasValue).ToList();
+        var lockedAchievements = _model.Achievements.Where(x => !x.Hidden && x.UnlockTime == null).ToList();
+        var hiddenAchievements = _model.Achievements.Where(x => x.Hidden && x.UnlockTime == null).ToList();
+        
+        var totalCount = _model.Achievements.Count;
+        var unlockedCount = unlockedAchievements.Count;
+        var percent = totalCount > 0 ? ((decimal)unlockedCount / totalCount * 100).ToString("F1") : "0";
+        var time = TimeSpan.FromMinutes(_model.PlayTime);
+
+        <div class="steam-detail-header">
+            <img src="@_model.ImageLogo" alt="@_model.Name" class="steam-detail-header__cover"/>
+            <div class="steam-detail-header__info">
+                <h1 class="steam-detail-header__title">@_model.Name</h1>
+                
+                <div class="steam-detail-header__meta">
+                    <div class="steam-detail-header__meta-item">
+                        <i class="fa fa-clock-o"></i>
+                        <span>游戏时长：@($"{time.TotalHours:0} 小时")</span>
+                    </div>
+                    <div class="steam-detail-header__meta-item">
+                        <i class="fa fa-trophy"></i>
+                        <span>总成就：@totalCount</span>
+                    </div>
+                </div>
+
+                <div class="steam-summary">
+                    <div class="steam-summary__stats">
+                        <span>总体进度</span>
+                        <span>@unlockedCount / @totalCount (@percent%)</span>
+                    </div>
+                    <div class="steam-summary__progress-track">
+                        <div class="steam-summary__progress-bar" style="width: 0" data-width="@percent%"></div>
+                    </div>
+                </div>
+
+                <div class="steam-stats-grid">
+                    <div class="steam-stat-box">
+                        <span class="steam-stat-box__value" style="color: #10b981">@unlockedCount</span>
+                        <span class="steam-stat-box__label">已解锁</span>
+                    </div>
+                    <div class="steam-stat-box">
+                        <span class="steam-stat-box__value" style="color: var(--color-text-secondary)">@lockedAchievements.Count</span>
+                        <span class="steam-stat-box__label">未解锁</span>
+                    </div>
+                    @if (hiddenAchievements.Any())
+                    {
+                        <div class="steam-stat-box">
+                            <span class="steam-stat-box__value" style="color: #6366f1">@hiddenAchievements.Count</span>
+                            <span class="steam-stat-box__label">隐藏</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @if (unlockedAchievements.Any())
+        {
+            <div class="steam-group" data-group-id="unlocked-@_model.Id">
+                <div class="steam-group__header">
+                    <h2 class="steam-group__title">
+                        <i class="fa fa-check-circle" style="color: #10b981;"></i>
+                        已解锁成就 (@unlockedCount)
+                    </h2>
+                    <i class="fa fa-chevron-down steam-group__icon"></i>
+                </div>
+                <div class="steam-group__content">
+                    @foreach (var item in unlockedAchievements.OrderByDescending(x => x.UnlockTime))
+                    {
+                        <div class="steam-achievement">
+                            <div class="steam-achievement__icon">
+                                <img src="@item.Icon" alt="@item.DisplayName" loading="lazy"/>
+                            </div>
+                            <div class="steam-achievement__info">
+                                <div class="steam-achievement__name">@item.DisplayName</div>
+                                <div class="steam-achievement__desc">@item.Description</div>
+                            </div>
+                            <div class="steam-achievement__status">
+                                <span class="steam-status-badge steam-status-badge--unlocked">
+                                    <i class="fa fa-check"></i> 已解锁
+                                </span>
+                                <small style="margin-top: 4px;">@item.UnlockTime?.ToString("yyyy-MM-dd HH:mm:ss")</small>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (lockedAchievements.Any())
+        {
+            <div class="steam-group steam-is-collapsed" data-group-id="locked-@_model.Id">
+                <div class="steam-group__header">
+                    <h2 class="steam-group__title">
+                        <i class="fa-regular fa-circle" style="color: var(--color-text-muted);"></i>
+                        待解锁成就 (@lockedAchievements.Count)
+                    </h2>
+                    <i class="fa fa-chevron-down steam-group__icon"></i>
+                </div>
+                <div class="steam-group__content">
+                    @foreach (var item in lockedAchievements)
+                    {
+                        <div class="steam-achievement">
+                            <div class="steam-achievement__icon" style="opacity: 0.5; filter: grayscale(1);">
+                                <img src="@item.Icon" alt="@item.DisplayName" loading="lazy"/>
+                            </div>
+                            <div class="steam-achievement__info">
+                                <div class="steam-achievement__name">@item.DisplayName</div>
+                                <div class="steam-achievement__desc">@item.Description</div>
+                            </div>
+                            <div class="steam-achievement__status">
+                                <span class="steam-status-badge steam-status-badge--locked">
+                                    <i class="fa fa-lock"></i> 未解锁
+                                </span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (hiddenAchievements.Any())
+        {
+            <div class="steam-group steam-is-collapsed" data-group-id="hidden-@_model.Id">
+                <div class="steam-group__header">
+                    <h2 class="steam-group__title">
+                        <i class="fa fa-eye-slash" style="color: #6366f1;"></i>
+                        隐藏成就 (@hiddenAchievements.Count)
+                    </h2>
+                    <i class="fa fa-chevron-down steam-group__icon"></i>
+                </div>
+                <div class="steam-group__content">
+                    @foreach (var item in hiddenAchievements)
+                    {
+                        <div class="steam-achievement">
+                            <div class="steam-achievement__icon" style="opacity: 0.5;">
+                                <img src="@item.Icon" alt="隐藏成就" loading="lazy"/>
+                            </div>
+                            <div class="steam-achievement__info">
+                                <div class="steam-achievement__name">隐藏成就</div>
+                                <div class="steam-achievement__desc">继续探索以发现此成就...</div>
+                            </div>
+                            <div class="steam-achievement__status">
+                                <span class="steam-status-badge steam-status-badge--hidden">
+                                    <i class="fa fa-eye-slash"></i> 隐藏
+                                </span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        
+        @* <div style="margin-top: var(--spacing-xl);"> *@
+        @*     @{ *@
+        @*         var commentModel = (CommentNode.Steam, _model.Id.ToString()); *@
+        @*     } *@
+        @*     <partial name="_GlobalCommentPartial" model="@commentModel"/> *@
+        @* </div> *@
+    }
+</div>
+}

@@ -8,5 +8,5 @@ public interface ISteamService
 {
     Task<List<SteamModel>> GetSteamLibrariesAsync();
 
-    Task<SteamModel> GetLibraryAsync(int id);
+    Task<SteamModel?> GetLibraryAsync(int id);
 }
