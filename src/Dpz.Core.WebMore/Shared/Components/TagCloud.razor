@@ -1,16 +1,23 @@
-﻿<div class="widget card">
-    <div class="card__header">
-        <h4 class="card__title">
-            <i class="fa-solid fa-tags"></i>标签
-        </h4>
-    </div>
-    <div class="card__body">
-        <div class="tag-cloud">
-            @foreach (var tag in _tags)
-            {
-                <a href="/article/list"
-                   class="article__tag @(Tag == tag ? "tag--active" : "")" data-pjax>@tag</a>
-            }
+﻿@if (_loading)
+{
+    <TagCloudSkeleton />
+}
+else
+{
+    <div class="widget card">
+        <div class="card__header">
+            <h4 class="card__title">
+                <i class="fa-solid fa-tags"></i>标签
+            </h4>
+        </div>
+        <div class="card__body">
+            <div class="tag-cloud">
+                @foreach (var tag in _tags)
+                {
+                    <a href="/article/list/tag/@tag"
+                       class="article__tag @(Tag == tag ? "tag--active" : "")" data-pjax>@tag</a>
+                }
+            </div>
         </div>
     </div>
-</div>
+}

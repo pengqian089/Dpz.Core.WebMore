@@ -1,6 +1,6 @@
 ﻿@foreach (var item in Articles)
 {
-    <article class="article-card">
+    <article class="article-card" @key="item.Id">
         @if (!string.IsNullOrEmpty(item.MainImage))
         {
             <div class="article-card__cover">

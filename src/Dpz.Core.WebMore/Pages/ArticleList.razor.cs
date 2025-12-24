@@ -3,14 +3,10 @@ using Dpz.Core.WebMore.Helper;
 using Dpz.Core.WebMore.Models;
 using Dpz.Core.WebMore.Service;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 
 namespace Dpz.Core.WebMore.Pages;
 
-public partial class ArticleList(
-    IArticleService articleService,
-    NavigationManager navigation
-)
+public partial class ArticleList(IArticleService articleService, NavigationManager navigation)
 {
     [Parameter]
     public int PageIndex { get; set; } = 1;
@@ -32,19 +28,13 @@ public partial class ArticleList(
         await base.OnInitializedAsync();
     }
 
-    private void ToPageAsync(int page)
+    private string LinkTemplate()
     {
-        PageIndex = page;
-        var tagPath = string.IsNullOrEmpty(Tag) ? "" : $"/Tag/{Tag}";
-        var path = $"/article/list{tagPath}";
-        if (page == 1)
+        if (string.IsNullOrWhiteSpace(Tag))
         {
-            navigation.NavigateTo((path));
+            return "/article/list/{0}";
         }
-        else
-        {
-            navigation.NavigateTo($"{path}/" + PageIndex);
-        }
+        return "/article/list/Tag/{Tag}/{0}";
     }
 
     protected override async Task OnParametersSetAsync()

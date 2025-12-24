@@ -15,16 +15,16 @@ public class ArticleService(HttpClient httpClient, ILogger<ArticleService> logge
     public async Task<IPagedList<ArticleMiniModel>> GetPageAsync(
         int pageIndex,
         int pageSize,
-        string tags,
-        string title
+        string? tag,
+        string? title
     )
     {
         var parameter = new Dictionary<string, string>
         {
             { nameof(pageIndex), pageIndex.ToString() },
             { nameof(pageSize), pageSize.ToString() },
-            { nameof(tags), tags },
-            { nameof(title), title },
+            { nameof(tag), tag ?? "" },
+            { nameof(title), title ?? "" },
         };
         return await httpClient.ToPagedListAsync<ArticleMiniModel>("/api/Article", parameter);
     }

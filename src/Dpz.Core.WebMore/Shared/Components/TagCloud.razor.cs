@@ -11,12 +11,15 @@ public partial class TagCloud(IArticleService articleService) : ComponentBase
     public string? Tag { get; set; }
     
     private string[] _tags = [];
+    private bool _loading = true;
 
     protected override async Task OnInitializedAsync()
     {
         if (_tags.Length == 0)
         {
+            _loading = true;
             _tags = await articleService.GetTagsAsync();
+            _loading = false;
         }
         await base.OnInitializedAsync();
     }

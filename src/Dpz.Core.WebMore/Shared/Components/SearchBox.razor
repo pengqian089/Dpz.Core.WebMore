@@ -1,6 +1,15 @@
 ﻿<div class="search-box">
-    <form class="search-box__form">
-        <input type="text" name="keyword" value="@Keyword" required placeholder="搜索文章..." class="search-box__input" autocomplete="off">
-        <button @onclick="OnSearch" type="button" class="search-box__button" aria-label="搜索"><i class="fa fa-search"></i></button>
-    </form>
+    @if (_loading)
+    {
+        <div class="search-box__form" style="pointer-events: none; border: none; padding: 0;">
+            <div class="skeleton skeleton--button skeleton--w-100" style="height: 42px;"></div>
+        </div>
+    }
+    else
+    {
+        <form class="search-box__form">
+            <input type="text" name="keyword" value="@Keyword" required placeholder="搜索文章..." class="search-box__input" autocomplete="off">
+            <button @onclick="OnSearch" type="button" class="search-box__button" aria-label="搜索"><i class="fa fa-search"></i></button>
+        </form>
+    }
 </div>

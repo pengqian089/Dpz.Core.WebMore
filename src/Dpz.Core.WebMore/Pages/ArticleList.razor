@@ -11,9 +11,22 @@
     <div class="page-layout">
         <div class="page-content" id="article-list">
             <div class="article-grid">
-                <ArticleItems Articles="_source"></ArticleItems>
+                @if (_loading)
+                {
+                    @for (var i = 0; i < 6; i++)
+                    {
+                        <ArticleSkeleton />
+                    }
+                }
+                else
+                {
+                    <ArticleItems Articles="_source"></ArticleItems>
+                }
             </div>
-            @* TODO 分页组件 *@
+            @if (!_loading)
+            {
+                <Pagination Source="@_source" LinkTemplate="@LinkTemplate()" />
+            }
         </div>
 
         <!-- Sidebar -->

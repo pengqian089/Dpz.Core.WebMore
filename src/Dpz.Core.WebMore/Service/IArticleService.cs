@@ -12,10 +12,15 @@ public interface IArticleService
     /// </summary>
     /// <param name="pageIndex"></param>
     /// <param name="pageSize"></param>
-    /// <param name="tags"></param>
+    /// <param name="tag"></param>
     /// <param name="title"></param>
     /// <returns></returns>
-    Task<IPagedList<ArticleMiniModel>> GetPageAsync(int pageIndex,int pageSize,string tags,string title);
+    Task<IPagedList<ArticleMiniModel>> GetPageAsync(
+        int pageIndex,
+        int pageSize,
+        string? tag,
+        string? title
+    );
 
     /// <summary>
     /// 获取文章详情
