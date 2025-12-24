@@ -1,0 +1,56 @@
+/* Pagination Styles */
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-xl);
+}
+
+/* 
+   Adapt to legacy HTML structure where <a> tags are generated without classes 
+   or with classes we can't easily control from server-side.
+   So we target children directly.
+*/
+
+.pagination a, 
+.pagination span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 var(--spacing-sm);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-surface);
+    color: var(--color-text-main);
+    border: 1px solid var(--color-border);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all var(--transition-fast);
+    cursor: pointer;
+    text-decoration: none; /* Ensure no underline on links */
+}
+
+/* Hover state for links */
+.pagination a:hover {
+    background-color: var(--color-bg-surface-alt);
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+/* Active state (usually a span) */
+.pagination .pagination__item--active {
+    background-color: var(--color-primary);
+    color: #ffffff;
+    border-color: var(--color-primary);
+    pointer-events: none;
+}
+
+/* Disabled state (usually a span) */
+.pagination .pagination__item--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: var(--color-bg-surface-alt);
+}

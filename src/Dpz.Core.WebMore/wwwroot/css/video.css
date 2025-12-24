@@ -1,0 +1,181 @@
+/* Video List Page */
+.video-container {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: var(--spacing-lg);
+}
+
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.video-card {
+    background-color: var(--color-bg-surface);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px var(--color-shadow), 0 2px 4px -1px var(--color-shadow);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+}
+
+.video-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px var(--color-shadow), 0 4px 6px -2px var(--color-shadow);
+}
+
+.video-card__cover {
+    position: relative;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    background-color: var(--color-bg-surface-alt);
+    overflow: hidden;
+}
+
+.video-card__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-normal);
+}
+
+.video-card:hover .video-card__image {
+    transform: scale(1.05);
+}
+
+.video-card__info {
+    padding: var(--spacing-md);
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.video-card__title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-main);
+    margin-bottom: var(--spacing-xs);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.4;
+}
+
+.video-card__meta {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+
+.video-card__stats {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.video-card__stat {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Video Watch Page */
+.video-watch {
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: var(--spacing-lg);
+}
+
+.video-player-wrapper {
+    width: 100%;
+    background-color: #000;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    margin-bottom: var(--spacing-lg);
+    position: relative;
+    /* Aspect ratio fallback if needed, but Artplayer usually handles height */
+    aspect-ratio: 16/9; 
+}
+
+.video-player {
+    width: 100%;
+    height: 100%;
+}
+
+.video-info {
+    background-color: var(--color-bg-surface);
+    padding: var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 1px 3px 0 var(--color-shadow);
+}
+
+.video-info__header {
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.video-info__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.3;
+}
+
+.video-info__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+}
+
+.video-info__meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.video-info__description {
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    font-size: 1rem;
+    white-space: pre-wrap;
+}
+
+.video-comments {
+    margin-top: var(--spacing-lg);
+}
+
+/* Icons styling (if using SVGs or font icons) */
+.icon {
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+}
+
+@media (max-width: 768px) {
+    .video-container, .video-watch {
+        padding: var(--spacing-md);
+    }
+    
+    .video-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+        gap: var(--spacing-md);
+    }
+
+    .video-info__title {
+        font-size: 1.25rem;
+    }
+}
+

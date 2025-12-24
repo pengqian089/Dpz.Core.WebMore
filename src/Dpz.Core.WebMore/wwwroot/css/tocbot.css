@@ -1,0 +1,136 @@
+/* Tocbot Styles */
+.toc {
+    position: fixed;
+    top: 100px; /* Adjust based on header height */
+    right: 20px;
+    width: 250px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    padding: var(--spacing-md);
+    background-color: var(--color-bg-surface);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 4px 6px var(--color-shadow);
+    z-index: 90;
+    display: none; /* Hidden by default, shown by JS if content exists */
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity var(--transition-normal), transform var(--transition-normal);
+}
+
+.toc.is-visible {
+    display: block;
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Mobile Responsive Styles */
+.toc-fab {
+    display: none;
+    position: fixed;
+    top: calc(var(--header-height) + 1rem); /* Below header */
+    right: 1rem;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background-color: var(--color-bg-surface);
+    color: var(--color-text-main);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 4px 12px var(--color-shadow);
+    z-index: 95;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-normal);
+}
+
+.toc-fab:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px var(--color-shadow);
+    color: var(--color-primary);
+}
+
+.toc-fab:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 1200px) {
+    /* Show FAB when TOC is active (content exists) */
+    .toc.is-visible ~ .toc-fab {
+        display: flex;
+    }
+
+    .toc {
+        display: none !important;
+        position: fixed;
+        top: calc(var(--header-height) + 4.5rem); /* Below FAB */
+        right: 1rem;
+        left: auto;
+        width: 250px;
+        max-width: 80vw;
+        max-height: 60vh;
+        height: auto;
+        margin: 0;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--color-border);
+        transform: none;
+        background-color: var(--color-bg-surface);
+        box-shadow: 0 4px 20px var(--color-shadow);
+        z-index: 94;
+    }
+
+    .toc.is-open-mobile {
+        display: block !important;
+        animation: tocFadeIn 0.2s ease forwards;
+    }
+}
+
+@keyframes tocFadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.toc-list .toc-list {
+    padding-left: var(--spacing-md);
+    margin-top: var(--spacing-xs);
+}
+
+.toc-link {
+    display: block;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 2px 0;
+    transition: color var(--transition-fast);
+    line-height: 1.4;
+}
+
+.toc-link:hover {
+    color: var(--color-primary);
+}
+
+.is-active-link {
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+.is-collapsed {
+    max-height: 0;
+    overflow: hidden;
+}
+
+/* Custom Scrollbar for TOC */
+.toc::-webkit-scrollbar {
+    width: 4px;
+}
+
+.toc::-webkit-scrollbar-thumb {
+    background-color: var(--color-border);
+    border-radius: 2px;
+}

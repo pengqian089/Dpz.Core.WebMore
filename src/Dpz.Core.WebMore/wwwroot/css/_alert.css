@@ -1,0 +1,18 @@
+/* Alerts */
+.alert {
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-md);
+    border: 1px solid transparent;
+}
+
+.alert--info {
+    background-color: var(--color-bg-surface-alt);
+    border-color: var(--color-border);
+    color: var(--color-text-secondary);
+}
+
+.alert--info strong {
+    color: var(--color-primary);
+}
+

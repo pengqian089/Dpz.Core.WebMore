@@ -1,0 +1,534 @@
+/* Dialog & Toast System */
+
+/* Overlay */
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-fast);
+    backdrop-filter: blur(2px);
+}
+
+.dialog-overlay--visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Dialog Box */
+.dialog {
+    background-color: var(--color-bg-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 400px;
+    transform: scale(0.95);
+    opacity: 0;
+    transition: all var(--transition-normal);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+}
+
+.dialog-overlay--visible .dialog {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* Header */
+.dialog__header {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border);
+    font-weight: 600;
+    font-size: 1.125rem;
+    color: var(--color-text-main);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.dialog__close {
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: color var(--transition-fast);
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    padding: 0;
+    line-height: 1;
+}
+
+.dialog__close:hover {
+    color: var(--color-text-main);
+}
+
+/* Body */
+.dialog__body {
+    padding: var(--spacing-lg);
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.dialog__input-wrapper {
+    margin-top: var(--spacing-md);
+}
+
+.dialog__input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-bg-body);
+    color: var(--color-text-main);
+    font-size: 1rem;
+    transition: border-color var(--transition-fast);
+}
+
+.dialog__input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1); /* Using primary color with opacity */
+}
+
+/* Footer */
+.dialog__footer {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-sm);
+    background-color: var(--color-bg-surface-alt);
+}
+
+/* Buttons */
+.dialog__btn {
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border: 1px solid transparent;
+}
+
+.dialog__btn--primary {
+    background-color: var(--color-primary);
+    color: #ffffff;
+}
+
+.dialog__btn--primary:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.dialog__btn--default {
+    background-color: var(--color-bg-surface);
+    border-color: var(--color-border);
+    color: var(--color-text-secondary);
+}
+
+.dialog__btn--default:hover {
+    background-color: var(--color-bg-body);
+    color: var(--color-text-main);
+}
+
+/* Toast (Non-modal) */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none; /* Allow clicking through container */
+}
+
+.toast {
+    background-color: var(--color-bg-surface);
+    color: var(--color-text-main);
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 200px;
+    max-width: 90vw;
+    animation: toast-enter 0.3s ease forwards;
+    pointer-events: auto; /* Enable clicks on toast itself */
+    border: 1px solid var(--color-border);
+}
+
+.toast--info {
+    border-left: 4px solid var(--color-primary);
+}
+
+.toast--success {
+    border-left: 4px solid #10b981; /* Green */
+}
+
+.toast--warning {
+    border-left: 4px solid #f59e0b; /* Amber */
+}
+
+.toast--error {
+    border-left: 4px solid #ef4444; /* Red */
+}
+
+.toast__icon {
+    font-size: 1.25rem;
+}
+
+.toast--success .toast__icon { color: #10b981; }
+.toast--warning .toast__icon { color: #f59e0b; }
+.toast--error .toast__icon { color: #ef4444; }
+.toast--info .toast__icon { color: var(--color-primary); }
+
+.toast.is-leaving {
+    animation: toast-exit 0.3s ease forwards;
+}
+
+@keyframes toast-enter {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes toast-exit {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+/* Tooltip */
+.dialog-tooltip {
+    position: fixed;
+    z-index: 10000;
+    padding: 6px 10px;
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    border-radius: 4px;
+    font-size: 13px;
+    line-height: 1.4;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    max-width: 300px;
+    word-wrap: break-word;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    backdrop-filter: blur(4px);
+    transform: translateY(5px); /* Animation start pos */
+}
+
+.dialog-tooltip.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Tooltip Arrow */
+.dialog-tooltip::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Arrow for Top (default) position */
+.dialog-tooltip:not(.is-bottom)::after {
+    bottom: -6px;
+    border-width: 6px 6px 0 6px;
+    border-color: rgba(0, 0, 0, 0.85) transparent transparent transparent;
+}
+
+/* Arrow for Bottom position */
+.dialog-tooltip.is-bottom::after {
+    top: -6px;
+    border-width: 0 6px 6px 6px;
+    border-color: transparent transparent rgba(0, 0, 0, 0.85) transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+    .dialog-tooltip {
+        background: rgba(60, 60, 60, 0.95);
+        color: #f5f5f5;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Arrow Color Dark Mode */
+    .dialog-tooltip:not(.is-bottom)::after {
+        border-color: rgba(60, 60, 60, 0.95) transparent transparent transparent;
+    }
+
+    .dialog-tooltip.is-bottom::after {
+        border-color: transparent transparent rgba(60, 60, 60, 0.95) transparent;
+    }
+}
+
+/* Mobile Adaptation */
+@media (max-width: 640px) {
+    .dialog {
+        width: 95%;
+        margin: 0 auto;
+    }
+    
+    .toast-container {
+        width: 100%;
+        padding: 0 1rem;
+        top: auto;
+        bottom: 2rem; /* Show at bottom on mobile */
+        transform: none;
+        left: 0;
+    }
+    
+    .toast {
+        width: 100%;
+        animation: toast-enter-mobile 0.3s ease forwards;
+    }
+    
+    .toast.is-leaving {
+        animation: toast-exit-mobile 0.3s ease forwards;
+    }
+    
+    @keyframes toast-enter-mobile {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes toast-exit-mobile {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(20px); }
+    }
+}
+
+/* ========== 通知框样式 ========== */
+
+/* 通知框容器 */
+.notification-box {
+    position: fixed;
+    right: 20px;
+    top: 15px;
+    width: 350px;
+    background-color: var(--color-bg-surface);
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--color-border);
+    z-index: 1500;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: opacity var(--transition-normal), transform var(--transition-normal);
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.notification-box--enter {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification-box--exit {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+/* 通知框类型修饰符 */
+.notification-box--info {
+    border-left: 4px solid var(--color-primary);
+}
+
+.notification-box--success {
+    border-left: 4px solid #10b981;
+}
+
+.notification-box--warning {
+    border-left: 4px solid #f59e0b;
+}
+
+.notification-box--error {
+    border-left: 4px solid #ef4444;
+}
+
+/* 通知框标题 */
+.notification-box__title {
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-text-main);
+    border-bottom: 1px solid var(--color-border);
+}
+
+/* 通知框内容容器 */
+.notification-box__content-container {
+    padding: var(--spacing-md) var(--spacing-lg);
+}
+
+/* 通知框内容 */
+.notification-box__content {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    word-wrap: break-word;
+}
+
+/* 通知框进度条容器 */
+.notification-box__progress {
+    margin-top: var(--spacing-sm);
+    height: 26px;
+    background-color: var(--color-bg-surface-alt);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 通知框进度条背景 */
+.notification-box__progress-track {
+    flex: 1;
+    height: 100%;
+    background-color: var(--color-bg-surface-alt);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    position: relative;
+}
+
+/* 通知框进度条 */
+.notification-box__progress-bar {
+    height: 100%;
+    background-color: var(--color-primary);
+    border-radius: var(--radius-md);
+    transition: width var(--transition-normal);
+    position: absolute;
+    top: 0;
+    left: 0;
+    min-width: 0;
+    width: 0;
+}
+
+/* 当进度为0时完全隐藏 */
+.notification-box__progress-bar[style*="width: 0%"],
+.notification-box__progress-bar[style*="width:0%"] {
+    display: none;
+}
+
+.notification-box--success .notification-box__progress-bar {
+    background-color: #10b981;
+}
+
+.notification-box--warning .notification-box__progress-bar {
+    background-color: #f59e0b;
+}
+
+.notification-box--error .notification-box__progress-bar {
+    background-color: #ef4444;
+}
+
+/* 通知框进度条文本（固定在进度条轨道中间） */
+.notification-box__progress-text {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    white-space: nowrap;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    z-index: 1;
+    pointer-events: none;
+    color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* 当进度条为0或隐藏时，文字颜色改为深色以便在浅色背景上可见 */
+.notification-box__progress-bar[style*="display: none"] ~ .notification-box__progress-text,
+.notification-box__progress-bar[style*="display:none"] ~ .notification-box__progress-text {
+    color: var(--color-text-secondary);
+    text-shadow: none;
+}
+
+/* 通知框进度条文本（外部，当进度太小时显示在右侧） */
+.notification-box__progress-text--external {
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    white-space: nowrap;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    min-width: 50px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+/* 通知框关闭按钮 */
+.notification-box__close {
+    position: absolute;
+    top: var(--spacing-sm);
+    right: var(--spacing-sm);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    font-size: 1.25rem;
+    line-height: 1;
+    padding: 0;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+}
+
+.notification-box__close:hover {
+    color: var(--color-text-main);
+    background-color: var(--color-bg-surface-alt);
+}
+
+.notification-box__close:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* 深色模式适配 */
+@media (prefers-color-scheme: dark) {
+    .notification-box {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+    }
+}
+
+/* 移动端适配 */
+@media (max-width: 640px) {
+    .notification-box {
+        right: 10px;
+        left: 10px;
+        width: calc(100% - 20px);
+        max-width: none;
+    }
+}

@@ -1,0 +1,500 @@
+/* Code Explorer Module */
+
+:root {
+    --code-sidebar-width: 320px;
+    --code-header-height: 56px;
+    --code-tree-indent: 20px;
+    --code-line-color: var(--color-border);
+    --code-line-style: dashed 1px;
+}
+
+.code-explorer {
+    display: flex;
+    align-items: flex-start; /* Required for sticky sidebar */
+    position: relative;
+    /* height: auto; Default */
+    /* overflow: visible; Default */
+    background-color: var(--color-bg-body);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--color-text-main);
+    border-top: 1px solid var(--color-border);
+    min-height: 600px; /* Min height to look good on short content */
+}
+
+/* ==========================================================================
+   Sidebar
+   ========================================================================== */
+
+.code-explorer__sidebar {
+    width: var(--code-sidebar-width);
+    background-color: var(--color-bg-surface);
+    border-right: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    z-index: 10;
+    
+    /* Sticky Positioning */
+    position: sticky;
+    top: var(--header-height, 64px);
+    height: calc(100vh - var(--header-height, 64px));
+    max-height: 100vh;
+    overflow: hidden; /* Internal scroll handled by __tree */
+}
+
+.code-explorer__search {
+    height: var(--code-header-height);
+    padding: 0 var(--spacing-md);
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    background-color: var(--color-bg-surface);
+    flex-shrink: 0;
+}
+
+.code-explorer__search input {
+    flex: 1;
+    width: auto;
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-surface-alt);
+    color: var(--color-text-main);
+    outline: none;
+    font-size: 0.9rem;
+    transition: all var(--transition-fast);
+}
+
+.code-explorer__search input:focus {
+    border-color: var(--color-primary);
+    background-color: var(--color-bg-surface);
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+.code-explorer__search .btn-search {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    padding: 8px;
+    margin-left: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    transition: background-color var(--transition-fast);
+}
+
+.code-explorer__search .btn-search:hover {
+    background-color: var(--color-bg-surface-alt);
+    color: var(--color-primary);
+}
+
+.code-explorer__tree {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--spacing-sm) 0;
+    /* Custom Scrollbar for tree */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-text-muted) transparent;
+}
+
+/* ==========================================================================
+   Tree Nodes (Dotted Line Implementation)
+   ========================================================================== */
+
+.code-tree__node {
+    position: relative;
+    line-height: 1.5;
+}
+
+.code-tree__content {
+    display: flex;
+    align-items: center;
+    padding: 6px var(--spacing-sm) 6px 0;
+    cursor: pointer;
+    user-select: none;
+    color: var(--color-text-secondary);
+    transition: background-color var(--transition-fast);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    margin-right: var(--spacing-xs);
+    position: relative;
+}
+
+.code-tree__content:hover {
+    background-color: var(--color-bg-surface-alt);
+    color: var(--color-text-main);
+}
+
+.code-tree__content.is-active {
+    background-color: rgba(37, 99, 235, 0.1); /* Primary color with opacity */
+    color: var(--color-primary);
+    font-weight: 500;
+}
+
+/* Dark mode adjustment for active state */
+@media (prefers-color-scheme: dark) {
+    .code-tree__content.is-active {
+        background-color: rgba(59, 130, 246, 0.15);
+    }
+}
+
+.code-tree__toggle {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-muted);
+    transition: transform var(--transition-fast), color var(--transition-fast);
+    flex-shrink: 0;
+    z-index: 2; /* Above lines */
+}
+
+.code-tree__toggle:hover {
+    color: var(--color-text-main);
+}
+
+.code-tree__node.is-expanded > .code-tree__content > .code-tree__toggle {
+    transform: rotate(90deg);
+}
+
+.code-tree__toggle.is-hidden {
+    visibility: hidden;
+}
+
+.code-tree__icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    z-index: 2;
+}
+
+.code-tree__icon img,
+.code-tree__icon svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.code-tree__label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: inherit;
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+/* Tree Structure Lines */
+.code-tree__children {
+    display: none;
+    margin-left: 11px; /* Center of toggle icon (24px/2 - 1px border) */
+    padding-left: 11px;
+    border-left: var(--code-line-style);
+    border-left-color: var(--code-text-muted); /* Fallback */
+    border-left-color: rgba(148, 163, 184, 0.4); /* Lighter line */
+}
+
+.code-tree__node.is-expanded > .code-tree__children {
+    display: block;
+}
+
+/* Horizontal line for nodes inside children */
+.code-tree__children > .code-tree__node::before {
+    content: "";
+    position: absolute;
+    top: 18px; /* Half of content height approx */
+    left: -12px; /* Connect to parent's border */
+    width: 12px;
+    height: 1px;
+    border-top: var(--code-line-style);
+    border-top-color: rgba(148, 163, 184, 0.4);
+}
+
+/* Hide line for top level */
+.code-explorer__tree > .code-tree__node::before {
+    display: none;
+}
+
+/* Re-implementing lines using node-based borders for perfect trees */
+.code-tree__children {
+    border-left: none;
+    margin-left: 12px;
+    padding-left: 0;
+}
+
+.code-tree__children > .code-tree__node {
+    padding-left: 12px; /* Indent content */
+}
+
+/* Vertical line */
+.code-tree__children > .code-tree__node::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    border-left: var(--code-line-style);
+    border-color: rgba(148, 163, 184, 0.4);
+    width: 1px;
+    height: auto;
+}
+
+/* Horizontal connector */
+.code-tree__children > .code-tree__node::after {
+    content: "";
+    position: absolute;
+    top: 18px; /* Middle of 36px height row */
+    left: 0;
+    width: 12px;
+    height: 1px;
+    border-top: var(--code-line-style);
+    border-color: rgba(148, 163, 184, 0.4);
+}
+
+/* Hide vertical line bottom half for last child */
+.code-tree__children > .code-tree__node:last-child::before {
+    height: 19px; /* Stop at middle */
+}
+
+/* Loading State */
+.code-tree__node.is-loading > .code-tree__content {
+    cursor: wait;
+    opacity: 0.7;
+}
+
+/* Highlight */
+.code-tree__label mark {
+    background-color: var(--color-mark-bg);
+    color: var(--color-mark-text);
+    border-radius: 2px;
+    padding: 0 2px;
+}
+
+/* ==========================================================================
+   Main Content Area
+   ========================================================================== */
+
+.code-explorer__main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    /* overflow: hidden; Removed to allow body scroll */
+    background-color: var(--color-bg-body);
+    min-width: 0; /* Prevent flex overflow */
+}
+
+.code-explorer__breadcrumbs {
+    height: var(--code-header-height);
+    padding: 0 var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border);
+    background-color: var(--color-bg-surface);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    
+    /* Sticky header for content */
+    position: sticky;
+    top: var(--header-height, 64px);
+    z-index: 5;
+}
+
+.code-explorer__breadcrumbs a {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+}
+
+.code-explorer__breadcrumbs a:hover {
+    background-color: var(--color-bg-surface-alt);
+    color: var(--color-primary);
+}
+
+.code-explorer__breadcrumbs span {
+    color: var(--color-text-muted);
+}
+
+.code-explorer__content {
+    /* flex: 1; Removed */
+    /* overflow-y: auto; Removed */
+    padding: var(--spacing-lg);
+    max-width: 100%;
+}
+
+/* File List Rows (Right Pane) */
+.code-explorer__content .row {
+    display: flex;
+    align-items: center;
+    padding: 12px var(--spacing-md);
+    border-bottom: 1px solid var(--color-border);
+    background-color: var(--color-bg-surface);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    margin-bottom: -1px; /* Collapse borders */
+}
+
+.code-explorer__content .row:first-child {
+    border-top-left-radius: var(--radius-md);
+    border-top-right-radius: var(--radius-md);
+    border-top: 1px solid var(--color-border);
+}
+
+.code-explorer__content .row:last-child {
+    border-bottom-left-radius: var(--radius-md);
+    border-bottom-right-radius: var(--radius-md);
+}
+
+.code-explorer__content .row:hover {
+    background-color: var(--color-bg-surface-alt);
+    z-index: 1;
+    position: relative;
+}
+
+.code-explorer__content .row .icon {
+    width: 32px;
+    height: 32px;
+    margin-right: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.code-explorer__content .row .icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.code-explorer__content .row .header {
+    flex: 2;
+    min-width: 0;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.code-explorer__content .row .header a {
+    color: var(--color-text-main);
+    text-decoration: none;
+}
+
+.code-explorer__content .row .header a:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
+.code-explorer__content .row .desc {
+    flex: 3;
+    min-width: 0;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 var(--spacing-md);
+}
+
+.code-explorer__content .row .time {
+    flex: 1;
+    min-width: 120px;
+    text-align: right;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+}
+
+/* ==========================================================================
+   Code View & Readme
+   ========================================================================== */
+
+#codeView {
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-family: 'Fira Code', Consolas, Monaco, 'Andale Mono', monospace;
+}
+
+/* Fix for PrismJS line numbers alignment */
+#codeView {
+    position: relative;
+}
+
+#codeView code {
+    /* Force block display to avoid inline baseline shifts */
+    display: block !important;
+    /* Ensure font metrics match */
+    font-family: inherit !important;
+}
+
+.line-highlight.line-highlight{
+    margin-top: 16px !important;
+}
+
+
+.readme-main {
+    background-color: var(--color-bg-surface);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 1px 3px var(--color-shadow);
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    /* Hide Sidebar Completely */
+    .code-explorer__sidebar {
+        display: none;
+    }
+    
+    /* 
+    .code-explorer.sidebar-open .code-explorer__sidebar {
+        transform: translateX(0);
+    }
+    */
+
+    .code-explorer__content {
+        padding: var(--spacing-sm);
+    }
+
+    /* Optimized Mobile List Row */
+    .code-explorer__content .row {
+        padding: 12px 8px; /* Increase touch target */
+        gap: 8px;
+    }
+
+    .code-explorer__content .row .icon {
+        width: 24px; /* Slightly smaller icon */
+        height: 24px;
+        margin-right: 4px;
+    }
+
+    .code-explorer__content .row .header {
+        font-size: 0.95rem;
+        /* Allow multiline filename if too long? Or truncate? */
+        /* Currently flex: 2, min-width: 0 handles truncation */
+        flex: 1; /* Take all available space */
+    }
+    
+    /* Hide secondary info on mobile */
+    .code-explorer__content .row .desc {
+        display: none;
+    }
+
+    .code-explorer__content .row .time {
+        display: none; /* Hide time to simplify */
+    }
+}

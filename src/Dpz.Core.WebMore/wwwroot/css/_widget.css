@@ -1,0 +1,107 @@
+/* Sidebar Widgets & Common Components */
+
+.widget {
+    background-color: var(--color-bg-surface);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 1px 3px var(--color-shadow);
+}
+
+/* Header Styles */
+.widget__header,
+.card__header {
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-xs);
+    border-bottom: 1px solid var(--color-border);
+}
+
+/* Title Styles */
+.widget__title,
+.card__title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    margin: 0;
+}
+
+/* Body Styles */
+.widget__body,
+.card__body {
+    /* Container for widget content */
+}
+
+/* Intro Text Style */
+.widget__intro {
+    font-size: 0.95rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+}
+
+.widget__intro p {
+    margin-bottom: var(--spacing-sm);
+    text-indent: 2em;
+}
+
+.widget__intro p:last-child {
+    margin-bottom: 0;
+}
+
+/* Sidebar List (for Articles, Links, etc.) */
+.sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-list__item {
+    margin-bottom: var(--spacing-sm);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px dashed var(--color-border);
+}
+
+.sidebar-list__item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.sidebar-list__link {
+    display: block;
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    transition: color var(--transition-fast), transform var(--transition-fast);
+    text-decoration: none;
+}
+
+.sidebar-list__link:hover {
+    color: var(--color-primary);
+    transform: translateX(4px);
+}
+
+/* Tag Cloud Widget specific styles */
+.tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+}
+
+.tag-cloud .tag {
+    display: inline-block;
+    padding: 4px 10px;
+    background-color: var(--color-bg-surface-alt);
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+    text-decoration: none;
+}
+
+.tag-cloud .tag:hover,
+.tag--active {
+    background-color: var(--color-primary);
+    color: #fff;
+    transform: translateY(-2px);
+}

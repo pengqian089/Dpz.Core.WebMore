@@ -1,0 +1,362 @@
+/* Homepage Styles */
+
+/* Hero Section */
+.hero {
+    position: relative;
+    height: 500px;
+    overflow: hidden;
+    margin-bottom: var(--spacing-xl);
+    background-color: var(--color-bg-surface-alt);
+}
+
+.hero__bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    filter: blur(4px);
+    transform: scale(1.1);
+    z-index: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+.hero__bg.active {
+    opacity: 1;
+}
+
+.hero__bg:not(.active) {
+    opacity: 0;
+}
+
+.hero__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6));
+    z-index: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+    .hero__overlay {
+        background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.8));
+    }
+}
+
+.hero__content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    color: #fff; /* Always white on hero */
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero__title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: var(--spacing-sm);
+    letter-spacing: -0.02em;
+}
+
+.hero__subtitle {
+    font-size: 1.25rem;
+    opacity: 0.9;
+    margin-bottom: var(--spacing-lg);
+    min-height: 1.8rem; /* Prevent layout shift when empty */
+}
+
+.btn {
+    display: inline-block;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn--primary {
+    background-color: var(--color-primary);
+    color: #fff;
+    border: none;
+}
+
+.btn--primary:hover {
+    background-color: var(--color-primary-hover);
+    transform: translateY(-2px);
+}
+
+/* Page Layout */
+.page-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xl);
+}
+
+@media (min-width: 992px) {
+    .page-layout {
+        grid-template-columns: 3fr 1fr;
+    }
+}
+
+/* Article List */
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--color-bg-surface-alt);
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    position: relative;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px; /* Adjust based on padding of section-header */
+    left: 0;
+    width: 60px;
+    height: 2px;
+    background-color: var(--color-primary);
+}
+
+.section-more {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+}
+
+.article-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+/* Sidebar Widgets moved to _widget.css */
+.avatar--lg {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto;
+    object-fit: cover;
+    border: 3px solid var(--color-bg-surface-alt);
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-md);
+}
+
+.social-links a {
+    font-size: 1.25rem;
+    color: var(--color-text-secondary);
+}
+
+.social-links a:hover {
+    color: var(--color-primary);
+}
+
+/* Tag Cloud */
+.tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+}
+
+.tag-cloud .tag--active {
+    background-color: var(--color-primary);
+    color: #fff;
+}
+
+/* Daily Briefing / Today News */
+.daily-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.daily-date__day {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    line-height: 1;
+    margin-bottom: var(--spacing-xs);
+}
+
+.daily-date__sub {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.tag--success {
+    background-color: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.daily-weather {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    text-align: right;
+}
+
+.daily-weather__icon {
+    font-size: 2rem;
+    color: var(--color-primary);
+}
+
+.daily-weather__temp {
+    font-weight: 700;
+    color: var(--color-text-main);
+}
+
+.daily-weather__location {
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+/* PC Sidebar Optimization for Daily News */
+@media (min-width: 992px) {
+    .daily-header {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+
+    .daily-date {
+        width: 100%;
+        padding-bottom: var(--spacing-sm);
+        border-bottom: 1px dashed var(--color-border);
+    }
+
+    .daily-weather {
+        width: 100%;
+        text-align: left;
+        justify-content: flex-start;
+    }
+
+    .daily-weather__temp {
+        font-size: 1.1em;
+    }
+}
+
+/* News List */
+.list-unstyled {
+    list-style: none;
+}
+
+.news-list__item {
+    margin-bottom: var(--spacing-sm);
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px dashed var(--color-bg-surface-alt);
+}
+
+.news-list__item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.news-list__link {
+    display: block;
+    font-size: 0.95rem;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+}
+
+.news-list__link:hover {
+    color: var(--color-primary);
+}
+
+.history-list__item {
+    margin-bottom: var(--spacing-sm);
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.history-list__item::before {
+    content: '•';
+    color: var(--color-primary);
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+    .hero {
+        height: 300px;
+    }
+    
+    .hero__title {
+        font-size: 2rem;
+    }
+    
+    .section-header {
+        margin-bottom: var(--spacing-md);
+        padding-bottom: var(--spacing-xs);
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+    }
+    
+    .page-layout {
+        gap: var(--spacing-lg);
+    }
+}
+
+/* Solar Term Component (BEM) */
+.solar-term {
+    --term-bg-start: var(--color-primary);
+    --term-bg-end: var(--color-primary-hover);
+    
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.5;
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--term-bg-start), var(--term-bg-end));
+    border-radius: 9999px; /* Pill shape */
+    box-shadow: 0 2px 4px var(--color-shadow);
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+    transition: all var(--transition-fast);
+    cursor: default;
+    user-select: none;
+    vertical-align: middle;
+}
+
+.solar-term:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    filter: brightness(1.1);
+}
+
+@media (prefers-color-scheme: dark) {
+    .solar-term {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+    .solar-term:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    }
+}
