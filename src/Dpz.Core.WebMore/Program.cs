@@ -86,11 +86,16 @@ static void RegisterInject(WebAssemblyHostBuilder builder)
     // builder.Services.AddScoped<HttpClient>();
     var allTypes = Assembly.GetExecutingAssembly().GetTypes();
     var injectTypes = allTypes.Where(x =>
-        x.Namespace == "Dpz.Core.WebMore.Service" && x.IsInterface
+        x is { Namespace: "Dpz.Core.WebMore.Service", IsInterface: true }
     );
     var implementAssembly = allTypes
         .Where(x =>
-            x.Namespace == "Dpz.Core.WebMore.Service.Impl" && !x.IsAbstract && !x.IsInterface
+            x
+                is {
+                    Namespace: "Dpz.Core.WebMore.Service.Impl",
+                    IsAbstract: false,
+                    IsInterface: false
+                }
         )
         .ToList();
     foreach (var injectType in injectTypes)
