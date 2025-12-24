@@ -8,67 +8,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AngleSharp" Version="1.2.0" />
+    <PackageReference Include="AngleSharp" Version="1.4.0" />
     <PackageReference Include="BlazorMonaco" Version="3.3.0" />
     <PackageReference Include="dpz.core.enumlibrary" Version="1.0.1.4" />
-    <PackageReference Include="Markdig" Version="0.39.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.0" />
-    <PackageReference Include="MongoDB.Bson" Version="3.1.0" />
+    <PackageReference Include="Markdig" Version="0.44.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.1" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.1" />
+    <PackageReference Include="Microsoft.DotNet.HotReload.WebAssembly.Browser" Version="10.0.101" />
+    <PackageReference Include="MongoDB.Bson" Version="3.5.2" />
     <PackageReference Include="MudBlazor" Version="7.15.0" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.2" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
-    <PackageReference Include="System.Net.Http.Json" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
+    <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageReference Include="System.Net.Http.Json" Version="10.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.1" />
   </ItemGroup>
-
-  <ItemGroup>
-    <_ContentIncludedByDefault Remove="wwwroot\images\photoswipe\default-skin\default-skin.css" />
-    <_ContentIncludedByDefault Remove="wwwroot\images\photoswipe\default-skin\default-skin.png" />
-    <_ContentIncludedByDefault Remove="wwwroot\images\photoswipe\default-skin\default-skin.svg" />
-    <_ContentIncludedByDefault Remove="wwwroot\images\photoswipe\default-skin\preloader.gif" />
-    <_ContentIncludedByDefault Remove="wwwroot\images\photoswipe\photoswipe-ui-default.js" />
-    <_ContentIncludedByDefault Remove="wwwroot\images\photoswipe\photoswipe-ui-default.min.js" />
-    <_ContentIncludedByDefault Remove="wwwroot\images\photoswipe\photoswipe.css" />
-    <_ContentIncludedByDefault Remove="wwwroot\images\photoswipe\photoswipe.js" />
-    <_ContentIncludedByDefault Remove="wwwroot\images\photoswipe\photoswipe.min.js" />
-    <_ContentIncludedByDefault Remove="Shared\Article\ArticleShow.razor" />
-    <_ContentIncludedByDefault Remove="Shared\Article\Like.razor" />
-    <_ContentIncludedByDefault Remove="Shared\Article\News.razor" />
-    <_ContentIncludedByDefault Remove="Shared\MainLayout.razor" />
-    <_ContentIncludedByDefault Remove="Shared\NavMenu.razor" />
-    <_ContentIncludedByDefault Remove="Shared\RightComponent.razor" />
-    <_ContentIncludedByDefault Remove="Shared\SurveyPrompt.razor" />
-    <_ContentIncludedByDefault Remove="Shared\Tags.razor" />
-    <_ContentIncludedByDefault Remove="Shared\WeChatPay.razor" />
-    <_ContentIncludedByDefault Remove="wwwroot\sample-data\weather.json" />
-    <_ContentIncludedByDefault Remove="Shared\Mumble\CommentContent.razor" />
-    <_ContentIncludedByDefault Remove="Shared\Mumble\CommentPage.razor" />
-    <_ContentIncludedByDefault Remove="Shared\Mumble\Handle.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <AdditionalFiles Include="Pages\ArticleComponent\ArticleShow.razor" />
-    <AdditionalFiles Include="Pages\ArticleComponent\Like.razor" />
-    <AdditionalFiles Include="Pages\ArticleComponent\News.razor" />
-    <AdditionalFiles Include="Pages\CodeComponent\Expand.razor" />
-    <AdditionalFiles Include="Pages\CodeComponent\ItemIcon.razor" />
-    <AdditionalFiles Include="Pages\CodeComponent\Tree.razor" />
-    <AdditionalFiles Include="Pages\CodeComponent\TreeNode.razor" />
-    <AdditionalFiles Include="Pages\MumbleComponent\CommentContent.razor" />
-    <AdditionalFiles Include="Pages\MumbleComponent\CommentPage.razor" />
-    <AdditionalFiles Include="Pages\MumbleComponent\Handle.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <UpToDateCheckInput Remove="Shared\Article\ArticleShow.razor" />
-    <UpToDateCheckInput Remove="Shared\Article\Like.razor" />
-    <UpToDateCheckInput Remove="Shared\Article\News.razor" />
-  </ItemGroup>
-
-
 
 </Project>

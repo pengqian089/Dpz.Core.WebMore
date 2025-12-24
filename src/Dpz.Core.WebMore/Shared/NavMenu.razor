@@ -1,13 +1,9 @@
-﻿@inject ISnackbar _snackbar;
-
-
-
-<header class="site-header">
+﻿<header class="site-header">
     <div class="container site-header__inner">
 
         <!-- 1. Left: Logo -->
         <div class="header-left">
-            <a class="site-logo" href="/" data-pjax>
+            <a class="site-logo" href="/">
                 <img src="~/favicon.png" alt="logo" class="site-logo__img"/>
                 <span class="site-logo__text">叫我阿胖</span>
             </a>
@@ -18,7 +14,7 @@
             <nav class="nav-container">
                 <ul class="nav-menu">
                     <li class="nav-menu__item @IsActive(MenuItem.Steam)">
-                        <NavLink href="/" Match="NavLinkMatch.All" class="nav-menu__link" >
+                        <NavLink href="/" Match="NavLinkMatch.All" class="nav-menu__link">
                             <i class="fa fa-home fa-fw"></i>
                             <span class="nav-menu__text">
                                 首页
@@ -34,7 +30,7 @@
                         </NavLink>
                     </li>
                     <li class="nav-menu__item @IsActive(MenuItem.Steam)">
-                        <NavLink href="/mumble" class="nav-menu__link" data-pjax>
+                        <NavLink href="/mumble" class="nav-menu__link">
                             <i class="fa fa-bullhorn fa-fw"></i>
                             <span class="nav-menu__text">
                                 碎碎念
@@ -42,7 +38,7 @@
                         </NavLink>
                     </li>
                     <li class="nav-menu__item @IsActive(MenuItem.Steam)">
-                        <NavLink href="/steam" class="nav-menu__link" data-pjax>
+                        <NavLink href="/steam" class="nav-menu__link">
                             <i class="fa-brands fa-steam"></i>
                             <span class="nav-menu__text">
                                 Steam
@@ -50,7 +46,7 @@
                         </NavLink>
                     </li>
                     <li class="nav-menu__item @IsActive(MenuItem.Bookmark)">
-                        <NavLink href="/bookmark" class="nav-menu__link" data-pjax>
+                        <NavLink href="/bookmark" class="nav-menu__link">
                             <i class="fa fa-bookmark fa-fw"></i>
                             <span class="nav-menu__text">
                                 书签
@@ -66,19 +62,19 @@
                         </span>
                         <div class="nav-dropdown">
                             <NavLink href="/albums"
-                               class="nav-dropdown__item  @SubActive(MenuItem.Albums)" data-pjax>
+                                     class="@SubActive(MenuItem.Albums)">
                                 <i class="fa-solid fa-photo-film"></i> 相册
                             </NavLink>
-                            <NavLink href="/code" asp-route-path=""
-                               class="nav-dropdown__item  @SubActive(MenuItem.Code)" data-pjax>
+                            <NavLink href="/code"
+                                     class="@SubActive(MenuItem.Albums)">
                                 <i class="fa fa-code"></i> 网站源码
                             </NavLink>
                             <NavLink href="/timeline"
-                               class="nav-dropdown__item  @SubActive(MenuItem.Timeline)" data-pjax>
+                                     class="@SubActive(MenuItem.Albums)">
                                 <i class="fa fa-calendar"></i> 时间轴
                             </NavLink>
                             <NavLink href="/friends"
-                               class="nav-dropdown__item  @SubActive(MenuItem.Friends)" data-pjax>
+                                     class="@SubActive(MenuItem.Albums)">
                                 <i class="fa fa-address-book"></i> 友链
                             </NavLink>
                         </div>
@@ -109,15 +105,16 @@
 
 
 @code {
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
     }
 
-    private MenuItem _menu;
-    
+    private readonly MenuItem _menu = MenuItem.Home;
+
     private string IsActive(MenuItem item) => _menu == item ? "nav-menu__item--active" : "";
-    string SubActive(MenuItem item) => _menu == item ? "active" : "";
+    string SubActive(MenuItem item) => _menu == item ? "nav-dropdown__item active" : "nav-dropdown__item";
     string MoreActive() => _menu is MenuItem.Albums or MenuItem.Code or MenuItem.Timeline or MenuItem.Friends ? "nav-menu__item--active" : "";
 
 }
