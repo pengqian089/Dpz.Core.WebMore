@@ -1,12 +1,12 @@
 ﻿@page "/article/read/{Id}"
-@using Dpz.Core.WebMore.Shared.Components
 
 @if (_loading || _article == null)
 {
-    // TODO 骨架屏
+    <ArticleDetailSkeleton />
 }
 else
 {
+    <PageTitle>@_article.Title - 个人文章分享</PageTitle>
     <div class="container article-container">
 
         <div class="article-layout">
