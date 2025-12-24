@@ -1,0 +1,8 @@
+﻿@if (!string.IsNullOrEmpty(Style))
+{
+    <div class="@Class" style="@Style"> @((MarkupString)_htmlContent)</div>
+}
+else
+{
+    <div class="@Class"> @((MarkupString)_htmlContent)</div>
+}

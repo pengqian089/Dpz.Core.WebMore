@@ -9,12 +9,12 @@ namespace Dpz.Core.WebMore.Models
         /// <summary>
         /// 账号
         /// </summary>
-        public string Id { get; set; }
+        public required string Id { get; set; }
 
         /// <summary>
         /// 昵称
         /// </summary>
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
         /// <summary>
         /// 最后访问时间
@@ -24,12 +24,12 @@ namespace Dpz.Core.WebMore.Models
         /// <summary>
         /// 个性签名
         /// </summary>
-        public string Sign { get; set; }
+        public string? Sign { get; set; }
 
         /// <summary>
         /// 头像
         /// </summary>
-        public string Avatar { get; set; }
+        public required string Avatar { get; set; }
 
         /// <summary>
         /// 性别
@@ -45,6 +45,6 @@ namespace Dpz.Core.WebMore.Models
         /// </summary>
         public bool? Enable { get; set; }
 
-        public string Key { get; set; }
+        public required string Key { get; set; }
     }
 }
