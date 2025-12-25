@@ -8,7 +8,7 @@ else
 {
     <PageTitle>@_model.Name - 游戏成就 - 个人文章分享</PageTitle>
     <div class="steam-container">
-    <a asp-action="Index" data-pjax class="steam-back-btn">
+    <a href="/steam" class="steam-back-btn">
         <i class="fa fa-arrow-left"></i> 返回游戏列表
     </a>
 
@@ -53,7 +53,7 @@ else
                         <span>@unlockedCount / @totalCount (@percent%)</span>
                     </div>
                     <div class="steam-summary__progress-track">
-                        <div class="steam-summary__progress-bar" style="width: 0" data-width="@percent%"></div>
+                        <div class="steam-summary__progress-bar" style="width: @(_animate ? percent : "0")%"></div>
                     </div>
                 </div>
 
@@ -79,8 +79,8 @@ else
 
         @if (unlockedAchievements.Any())
         {
-            <div class="steam-group" data-group-id="unlocked-@_model.Id">
-                <div class="steam-group__header">
+            <div class="steam-group @(IsCollapsed($"unlocked-{_model.Id}", false) ? "steam-is-collapsed" : "")">
+                <div class="steam-group__header" @onclick="@(() => ToggleGroup($"unlocked-{_model.Id}", false))" @onclick:stopPropagation>
                     <h2 class="steam-group__title">
                         <i class="fa fa-check-circle" style="color: #10b981;"></i>
                         已解锁成就 (@unlockedCount)
@@ -112,8 +112,8 @@ else
 
         @if (lockedAchievements.Any())
         {
-            <div class="steam-group steam-is-collapsed" data-group-id="locked-@_model.Id">
-                <div class="steam-group__header">
+            <div class="steam-group @(IsCollapsed($"locked-{_model.Id}", true) ? "steam-is-collapsed" : "")">
+                <div class="steam-group__header" @onclick="@(() => ToggleGroup($"locked-{_model.Id}", true))" @onclick:stopPropagation>
                     <h2 class="steam-group__title">
                         <i class="fa-regular fa-circle" style="color: var(--color-text-muted);"></i>
                         待解锁成就 (@lockedAchievements.Count)
@@ -144,8 +144,8 @@ else
 
         @if (hiddenAchievements.Any())
         {
-            <div class="steam-group steam-is-collapsed" data-group-id="hidden-@_model.Id">
-                <div class="steam-group__header">
+            <div class="steam-group @(IsCollapsed($"hidden-{_model.Id}", true) ? "steam-is-collapsed" : "")">
+                <div class="steam-group__header" @onclick="@(() => ToggleGroup($"hidden-{_model.Id}", true))" @onclick:stopPropagation>
                     <h2 class="steam-group__title">
                         <i class="fa fa-eye-slash" style="color: #6366f1;"></i>
                         隐藏成就 (@hiddenAchievements.Count)

@@ -48,8 +48,7 @@ else
                                             <span>@percent%</span>
                                         </div>
                                         <div class="steam-summary__progress-track">
-                                            <div class="steam-summary__progress-bar" style="width: 0"
-                                                 data-width="@percent%"></div>
+                                            <div class="steam-summary__progress-bar" style="width: @(_animate ? percent : "0")%"></div>
                                         </div>
                                         <div class="steam-summary__icons">
                                             @foreach (var achievement in item.Achievements.Where(x => x.UnlockTime.HasValue).OrderByDescending(x => x.UnlockTime).Take(10))
