@@ -6,11 +6,8 @@ using MudBlazor;
 
 namespace Dpz.Core.WebMore.Shared;
 
-public partial class MainLayout(
-    IMusicService musicService,
-    INotificationService notificationService,
-    ISnackbar snackbar
-) : IDisposable
+public partial class MainLayout(INotificationService notificationService, ISnackbar snackbar)
+    : IDisposable
 {
     private ConnectionStatus _connectionStatus = new("", "连接状态：未连接");
 
@@ -79,27 +76,6 @@ public partial class MainLayout(
         notificationService.OnReconnected -= HandleReconnected;
         notificationService.OnClosed -= HandleClosed;
         notificationService.OnReady -= HandleReady;
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        //await JsRuntime.InvokeVoidAsync("appInit");
-        if (firstRender)
-        {
-            //await JsRuntime.InvokeVoidAsync("playerInit");
-            var musics = await musicService.GetMusicPageAsync(1, 50);
-            var list = musics.Select(x => new
-            {
-                artist = x.Artist,
-                cover = x.CoverUrl,
-                lrc = x.LyricUrl,
-                name = x.Title,
-                url = x.MusicUrl,
-            });
-            //await JsRuntime.InvokeVoidAsync("playerAddList", list);
-            StateHasChanged();
-        }
-        await base.OnAfterRenderAsync(firstRender);
     }
 
     private readonly record struct ConnectionStatus(string Class, string Title);
