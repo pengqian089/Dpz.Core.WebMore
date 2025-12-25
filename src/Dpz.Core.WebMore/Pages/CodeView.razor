@@ -71,9 +71,12 @@
                                 Rounded 
                                 ApplyEffectsToContainer>
                     <MudTabPanel ID="@("README.md")" Text="README.md" ShowCloseIcon="@false">
-                        <div class="readme-main">
-                            <MarkdownPreview Markdown="@_treeData.ReadmeContent"></MarkdownPreview>    
-                        </div>
+                        @if (!string.IsNullOrEmpty(_treeData.ReadmeContent))
+                        {
+                            <div class="readme-main">
+                                <MarkdownPreview Markdown="@_treeData.ReadmeContent"></MarkdownPreview>    
+                            </div>
+                        }
                     </MudTabPanel>
 
                     @foreach (var tab in _tabs)
