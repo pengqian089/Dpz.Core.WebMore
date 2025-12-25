@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Dpz.Core.WebMore.Service;
-using MudBlazor;
 
 namespace Dpz.Core.WebMore.Shared;
 
-public partial class MainLayout(INotificationService notificationService, ISnackbar snackbar)
-    : IDisposable
+public partial class MainLayout(
+    INotificationService notificationService,
+    IAppDialogService dialogService
+) : IDisposable
 {
     private ConnectionStatus _connectionStatus = new("", "连接状态：未连接");
 
@@ -25,7 +25,7 @@ public partial class MainLayout(INotificationService notificationService, ISnack
 
     private void HandleSystemNotification(string msg)
     {
-        snackbar.Add(msg);
+        dialogService.Toast(msg);
         StateHasChanged();
     }
 
