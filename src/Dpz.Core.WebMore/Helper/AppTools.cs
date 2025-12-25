@@ -28,8 +28,6 @@ public static class AppTools
     /// </summary>
     public const long MaxFileSize = 1024 * 1024 * 100;
 
-    public static bool IsDark;
-
     private static string HandleParameter(string url, Dictionary<string, string>? parameters)
     {
         if (parameters is not { Count: > 0 })

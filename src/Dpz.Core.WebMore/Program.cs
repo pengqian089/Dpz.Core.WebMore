@@ -2,16 +2,10 @@ using System;
 using System.Linq;
 using System.Net.Http;
 using System.Reflection;
-using System.Threading.Tasks;
 using Dpz.Core.WebMore;
-using Dpz.Core.WebMore.Helper;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.AspNetCore.Http.Connections;
-using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using MudBlazor;
 using MudBlazor.Services;
 using Serilog;
@@ -43,33 +37,8 @@ LibraryHost =
     configuration["LibraryHost"]
     ?? throw new Exception("configuration node LibraryHost is null or empty");
 
-Connection = new HubConnectionBuilder()
-    .WithUrl(
-        $"{WebHost}/notification",
-        x =>
-        {
-            x.SkipNegotiation = true;
-            x.Transports = HttpTransportType.WebSockets;
-        }
-    )
-    .WithAutomaticReconnect()
-    .Build();
-try
-{
-    await Connection.StartAsync();
-}
-catch (Exception e)
-{
-    Console.WriteLine(e);
-}
 
-Connection.Closed += error =>
-{
-    Console.WriteLine(error);
-    return Task.CompletedTask;
-};
-
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(BaseAddress) });
+builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(BaseAddress) });
 
 RegisterInject(builder);
 
@@ -123,10 +92,6 @@ public partial class Program
     /// </summary>
     public static string BaseAddress { get; private set; } = "";
 
-    /// <summary>
-    /// SignalR connection
-    /// </summary>
-    public static HubConnection Connection { get; private set; }
 
     /// <summary>
     /// CDN base address
