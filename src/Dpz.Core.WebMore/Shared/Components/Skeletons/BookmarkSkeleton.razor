@@ -1,0 +1,34 @@
+@namespace Dpz.Core.WebMore.Shared.Components.Skeletons
+
+@foreach (var height in _heights)
+{
+    <div class="bookmark-card">
+        <div class="bookmark-card__link">
+            <!-- Image Skeleton -->
+            <div class="skeleton" style="width: 100%; height: @(height)px;"></div>
+            
+            <div class="bookmark-card__content">
+                <!-- Icon Skeleton -->
+                <div class="skeleton skeleton--circle" style="width: 24px; height: 24px; flex-shrink: 0;"></div>
+                
+                <!-- Title Skeleton -->
+                <div style="flex-grow: 1;">
+                    <div class="skeleton skeleton--text skeleton--w-80"></div>
+                    <div class="skeleton skeleton--text skeleton--w-40"></div>
+                </div>
+            </div>
+        </div>
+        <div class="bookmark-card__footer">
+            <div class="bookmark-card__tags">
+                <div class="skeleton" style="width: 40px; height: 20px; border-radius: 4px;"></div>
+                <div class="skeleton" style="width: 60px; height: 20px; border-radius: 4px;"></div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    // Fixed heights to create a masonry look without hydration mismatches
+    private readonly int[] _heights = [200, 150, 280, 180, 220, 160, 240, 190, 260, 170, 210, 230];
+}
+

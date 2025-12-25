@@ -1,88 +1,89 @@
 ﻿@page "/bookmark"
-<PageTitle>书签 - 个人文章分享</PageTitle>
 
+@if (string.IsNullOrWhiteSpace(Title))
+{
+    <PageTitle>书签 - 个人文章分享</PageTitle>    
+}
+else
+{
+    <PageTitle>@Title - 搜索 - 个人文章分享</PageTitle>
+}
 
 <div class="bookmark">
-    <div class="search-box">
-        @* <input type="search" id="search-bookmark" title="搜索书签" placeholder="搜索书签" value="" autocomplete="off"/> *@
-
-        <Autocomplete
-            T="string"
-            Label="搜索书签"
-            @bind-Value="_title"
-            SearchFunc="@SearchAsync"
-            ResetValueOnEmptyText="false"
-            CoerceText="false"
-            CoerceValue="false"
-            OnAdornmentClick="@LoadDataAsync"
-            Variant="Variant.Outlined"
-            AdornmentIcon="@Icons.Material.Filled.Search"
-            ShowProgressIndicator="true"
-            AdornmentColor="Color.Primary">
-            <ProgressIndicatorTemplate>
-                <MudProgressLinear Size="Size.Small" Indeterminate="true" Color="Color.Info"/>
-            </ProgressIndicatorTemplate>
-        </Autocomplete>
-    </div>
-    <div class="category-box">
-        @if (_loading)
+    <div class="bookmark__search">
+        <div class="bookmark__search-wrapper">
+            <input type="search" class="bookmark__search-input" placeholder="搜索书签..."
+                   value="@_searchText" @oninput="OnSearchInput" autocomplete="off" 
+                   @onkeydown="OnKeyDown"/>
+            <button type="button" class="bookmark__search-btn" @onclick="NavigateToSearch">
+                <i class="fa fa-search"></i>
+            </button>
+        </div>
+        @if (_suggestions.Count > 0)
         {
-            for (var i = 0; i < 10; i++)
-            {
-                <MudSkeleton Class="category" SkeletonType="SkeletonType.Rectangle" Width="32px"/>
-            }
-        }
-        else
-        {
-            foreach (var item in _categories)
-            {
-                <MudButton Class="category" Variant="Variant.Filled" OnClick="async () => await UnSelectCategoryAsync(item)">@item</MudButton>
-            }
-
-            foreach (var item in _source.SelectMany(x => x.Categories).Where(x => !_categories.Contains(x)).Distinct())
-            {
-                <MudButton Class="category" Variant="Variant.Filled" Color="Color.Secondary" OnClick="async () => await SelectCategoryAsync(item)">@item</MudButton>
-            }
+            <div class="bookmark__search-results" style="display: block;">
+                <ul class="bookmark__search-list">
+                    @for (var i = 0; i < _suggestions.Count; i++)
+                    {
+                        var item = _suggestions[i];
+                        var index = i;
+                        var isActive = index == _selectedIndex ? "bookmark__search-item--active" : "";
+                        <li class="bookmark__search-item @isActive" @onclick="@(() => SelectSuggestion(item))">@item</li>
+                    }
+                </ul>
+            </div>
         }
     </div>
-    <div class="bookmark-container">
+
+    <div class="bookmark__categories">
+        @foreach (var item in Categories)
+        {
+            var isActive = SelectedCategories.Contains(item);
+            var cssClass = isActive ? "bookmark__category bookmark__category--active" : "bookmark__category";
+            var url = GetCategoryUrl(item);
+            
+            <a href="@url" class="@cssClass">@item</a>
+        }
+    </div>
+
+
+    <div class="bookmark__grid">
         @if (_loading)
         {
-            var random = new Random();
-            for (var i = 0; i < 50; i++)
-            {
-                <div class="bookmark-item">
-                    <div class="bookmark-card">
-                        <MudSkeleton Width="100%" Height="@(random.Next(30, 500) + "px")"/>
-                        <div class="bookmark-info">
-                            <MudSkeleton Class="bookmark-icon" SkeletonType="SkeletonType.Rectangle" Height="32px"/>
-                            <MudSkeleton Class="bookmark-title" Width="100%"/>
-                        </div>
-                    </div>
-
-                </div>
-            }
+            <BookmarkSkeleton />
+        }
+        else if (_source.Count == 0)
+        {
+            <div class="bookmark__empty">暂无书签</div>
         }
         else
         {
             foreach (var item in _source)
             {
-                <div class="bookmark-item">
-                    <a href="@item.Url" target="_blank">
-                        <div class="bookmark-card">
-                            @if (!string.IsNullOrEmpty(item.Image))
+                <div class="bookmark-card">
+                    <a href="@item.Url" target="_blank" class="bookmark-card__link">
+                        @if (!string.IsNullOrEmpty(item.Image))
+                        {
+                            <img class="bookmark-card__preview lazy" data-src="@(item.Image + "!bookmark")" src="@Program.LibraryHost/loaders/puff.svg" alt="@item.Title" loading="lazy" />
+                        }
+                        <div class="bookmark-card__content">
+                            @if (!string.IsNullOrEmpty(item.Icon))
                             {
-                                <img data-src="@(item.Image + "!bookmark")" alt="@item.Title" class="lazy" src="@(Program.CdnBaseAddress)/core/loaders/puff.svg"/>
+                                <img class="bookmark-card__icon" src="@item.Icon" alt="icon" />
                             }
-                            <div class="bookmark-info">
-                                @if (!string.IsNullOrEmpty(item.Icon))
-                                {
-                                    <img class="bookmark-icon" src="@item.Icon" alt="icon"/>
-                                }
-                                <span class="bookmark-title" title="@item.Title">@item.Title</span>
-                            </div>
+                            <h3 class="bookmark-card__title">@item.Title</h3>
                         </div>
                     </a>
+                    <div class="bookmark-card__footer">
+                        <div class="bookmark-card__tags">
+                            @foreach (var category in item.Categories)
+                            {
+                                <span class="bookmark-card__tag">
+                                    @category
+                                </span>
+                            }
+                        </div>
+                    </div>
                 </div>
             }
         }
