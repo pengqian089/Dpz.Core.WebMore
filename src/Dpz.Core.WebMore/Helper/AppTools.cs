@@ -22,7 +22,6 @@ namespace Dpz.Core.WebMore.Helper;
 public static class AppTools
 {
     private static readonly Dictionary<string, object> ClientCache = new();
-    public static ILogger<Program> ProgramLogger { get; set; }
 
     /// <summary>
     /// 客户端最大读取文件大小 unit byte

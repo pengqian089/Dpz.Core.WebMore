@@ -3,71 +3,78 @@
 <PageTitle>碎碎念 - 个人文章分享</PageTitle>
 
 
-<div class="mumble-layout">
-    <main class="mumble-layout__main">
-        @foreach (var item in _source)
-        {
-            <article class="mumble-card" id="mumble-@item.Id">
-                <div class="mumble-card__header">
-                    <img class="mumble-card__avatar" src="@item.Author.Avatar" alt="@item.Author.Name" loading="lazy">
-                    <div class="mumble-card__meta">
-                        <div class="mumble-card__author">
-                            @item.Author.Name
-                            <span
-                                class="mumble-card__role">@(item.Author.Permissions?.HasFlag(Permissions.System) == true ? "管理员" : "成员")</span>
+@if (_loading)
+{
+    <MumbleSkeleton />
+}
+else
+{
+    <div class="mumble-layout">
+        <main class="mumble-layout__main">
+            @foreach (var item in _source)
+            {
+                <article class="mumble-card" id="mumble-@item.Id">
+                    <div class="mumble-card__header">
+                        <img class="mumble-card__avatar" src="@item.Author.Avatar" alt="@item.Author.Name" loading="lazy">
+                        <div class="mumble-card__meta">
+                            <div class="mumble-card__author">
+                                @item.Author.Name
+                                <span
+                                    class="mumble-card__role">@(item.Author.Permissions?.HasFlag(Permissions.System) == true ? "管理员" : "成员")</span>
+                            </div>
+                            <ShowDateTime Class="mumble-card__time timeago" DateTime="@item.CreateTime"></ShowDateTime>
                         </div>
-                        <ShowDateTime Class="mumble-card__time timeago" DateTime="@item.CreateTime"></ShowDateTime>
                     </div>
-                </div>
 
-                <div class="mumble-card__content markdown-body">
-                    <MarkdownPreview Markdown="@item.Markdown"></MarkdownPreview>
-                </div>
-
-                <div class="mumble-card__footer">
-                    <a href="/mumble-comment" class="mumble-action" title="详情" data-pjax>
-                        <i class="fa fa-info-circle"></i>
-                        <span>详情</span>
-                    </a>
-
-                    <button class="mumble-action" data-comment-toggle="@item.Id" title="评论">
-                        <i class="fa fa-commenting"></i>
-                        <span data-comment-count>@item.CommentCount</span>
-                    </button>
-
-                    <button type="button" class="mumble-action" @onclick="() => LikeAsync(item.Id)" title="点赞">
-                        <i class="fa fa-thumbs-up"></i>
-                        <span data-like-count>@item.Like</span>
-                    </button>
-                </div>
-
-                <!-- Comments Container -->
-                <div class="mumble-comments is-hidden" id="comments-@item.Id">
-                    <!-- Content loaded via JS -->
-                    <div class="text-center text-muted p-3">
-                        <i class="fa fa-spinner fa-spin"></i> 加载评论中...
+                    <div class="mumble-card__content markdown-body">
+                        <MarkdownPreview Markdown="@item.Markdown"></MarkdownPreview>
                     </div>
-                </div>
-            </article>
-        }
 
-        <Pagination Source="@_source" LinkTemplate="/mumble/{0}"/>
-    </main>
+                    <div class="mumble-card__footer">
+                        <a href="/mumble-comment" class="mumble-action" title="详情" data-pjax>
+                            <i class="fa fa-info-circle"></i>
+                            <span>详情</span>
+                        </a>
 
-    <aside class="mumble-layout__sidebar">
-        <div class="history-widget">
-            <h3 class="history-widget__title">忆往昔</h3>
-            <div class="history-widget__list">
-                @foreach (var item in _histories)
-                {
-                    <div class="history-item">
-                        <div class="history-item__content markdown-body">
-                            <MarkdownPreview Markdown="@item.Markdown"></MarkdownPreview>
+                        <button class="mumble-action" data-comment-toggle="@item.Id" title="评论">
+                            <i class="fa fa-commenting"></i>
+                            <span data-comment-count>@item.CommentCount</span>
+                        </button>
+
+                        <button type="button" class="mumble-action" @onclick="() => LikeAsync(item.Id)" title="点赞">
+                            <i class="fa fa-thumbs-up"></i>
+                            <span data-like-count>@item.Like</span>
+                        </button>
+                    </div>
+
+                    <!-- Comments Container -->
+                    <div class="mumble-comments is-hidden" id="comments-@item.Id">
+                        <!-- Content loaded via JS -->
+                        <div class="text-center text-muted p-3">
+                            <i class="fa fa-spinner fa-spin"></i> 加载评论中...
                         </div>
-                        <ShowDateTime Class="history-item__time timeago" DateTime="@item.CreateTime"></ShowDateTime>
                     </div>
-                }
+                </article>
+            }
+
+            <Pagination Source="@_source" LinkTemplate="/mumble/{0}"/>
+        </main>
+
+        <aside class="mumble-layout__sidebar">
+            <div class="history-widget">
+                <h3 class="history-widget__title">忆往昔</h3>
+                <div class="history-widget__list">
+                    @foreach (var item in _histories)
+                    {
+                        <div class="history-item">
+                            <div class="history-item__content markdown-body">
+                                <MarkdownPreview Markdown="@item.Markdown"></MarkdownPreview>
+                            </div>
+                            <ShowDateTime Class="history-item__time timeago" DateTime="@item.CreateTime"></ShowDateTime>
+                        </div>
+                    }
+                </div>
             </div>
-        </div>
-    </aside>
-</div>
+        </aside>
+    </div>
+}

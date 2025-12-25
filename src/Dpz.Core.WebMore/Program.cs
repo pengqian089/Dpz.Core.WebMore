@@ -29,9 +29,13 @@ builder.Services.AddMudServices(config =>
     config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
 });
 var configuration = builder.Configuration;
-BaseAddress = configuration.GetSection("BaseAddress").Get<string>();
+BaseAddress =
+    configuration["BaseAddress"]
+    ?? throw new Exception("configuration node BaseAddress is null or empty");
 CdnBaseAddress = configuration["CDNBaseAddress"];
-WebHost = configuration["SourceSite"];
+WebHost =
+    configuration["SourceSite"]
+    ?? throw new Exception("configuration node SourceSite is null or empty");
 AssetsHost =
     configuration["AssetsHost"]
     ?? throw new Exception("configuration node AssetsHost is null or empty");
@@ -68,9 +72,6 @@ Connection.Closed += error =>
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(BaseAddress) });
 
 RegisterInject(builder);
-AppTools.ProgramLogger =
-    builder.Services.BuildServiceProvider().GetService(typeof(ILogger<Program>))
-    as ILogger<Program>;
 
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
@@ -115,12 +116,12 @@ public partial class Program
     /// <summary>
     /// web host
     /// </summary>
-    public static string WebHost { get; private set; }
+    public static string WebHost { get; private set; } = "";
 
     /// <summary>
     /// API base address
     /// </summary>
-    public static string BaseAddress { get; private set; }
+    public static string BaseAddress { get; private set; } = "";
 
     /// <summary>
     /// SignalR connection
@@ -130,6 +131,7 @@ public partial class Program
     /// <summary>
     /// CDN base address
     /// </summary>
+    [Obsolete("Use AssetsHost or LibraryHost instead")]
     public static string CdnBaseAddress { get; set; }
 
     public static string Version =>

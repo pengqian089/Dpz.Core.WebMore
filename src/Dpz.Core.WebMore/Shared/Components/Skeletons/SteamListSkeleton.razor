@@ -1,0 +1,41 @@
+<div class="steam-container">
+    <div class="steam-header">
+        <h1 class="steam-header__title">
+            <div class="skeleton skeleton--text skeleton--w-30" style="height: 1.2em; display: inline-block;"></div>
+        </h1>
+    </div>
+
+    <div class="steam-game-grid">
+        @for (var i = 0; i < 8; i++)
+        {
+            <div class="steam-game-card">
+                <div class="steam-game-card__link" style="pointer-events: none;">
+                    <div class="steam-game-card__image-wrapper">
+                        <div class="skeleton skeleton--block"></div>
+                    </div>
+                    <div class="steam-game-card__content">
+                        <div class="steam-game-card__title">
+                            <div class="skeleton skeleton--text skeleton--w-80"></div>
+                        </div>
+                        <div class="steam-game-card__meta">
+                            <div class="skeleton skeleton--text skeleton--w-50"></div>
+                        </div>
+
+                        <div class="steam-game-card__achievements">
+                            <div class="steam-summary">
+                                <div class="steam-summary__stats">
+                                    <div class="skeleton skeleton--text skeleton--w-30"></div>
+                                    <div class="skeleton skeleton--text skeleton--w-20"></div>
+                                </div>
+                                <div class="steam-summary__progress-track">
+                                    <div class="skeleton skeleton--block" style="height: 100%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
