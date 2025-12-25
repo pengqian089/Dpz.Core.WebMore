@@ -79,13 +79,13 @@
                     @foreach (var tab in _tabs)
                     {
                         var expandName = "";
-                        var index = tab.FileName.LastIndexOf('.');
+                        var index = tab.FileName?.LastIndexOf('.') ?? -1;
                         if (index >= 0)
                         {
-                            expandName = "icon-" + tab.FileName[(index + 1)..].ToLower();
+                            expandName = "icon-" + tab.FileName?[(index + 1)..]?.ToLower();
                         }
                         <MudTabPanel
-                            Icon="@($"{expandName.Replace(".",string.Empty)} icon-{tab.FileName.ToLower().Replace(".",string.Empty)}")"
+                            Icon="@($"{expandName.Replace(".",string.Empty)} icon-{tab.FileName?.ToLower().Replace(".",string.Empty)}")"
                             ID="@string.Join("-", tab.CurrentPaths)"
                             Text="@tab.FileName"
                             ToolTip="@string.Join("/", tab.CurrentPaths)"

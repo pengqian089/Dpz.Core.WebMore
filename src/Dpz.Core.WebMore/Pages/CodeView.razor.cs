@@ -15,20 +15,16 @@ using MudBlazor;
 
 namespace Dpz.Core.WebMore.Pages;
 
-public partial class CodeView
+public partial class CodeView(
+    ICodeService codeService,
+    NavigationManager navigationManager,
+    IAppDialogService dialogService,
+    ILogger<CodeView> logger
+)
 {
     [SupplyParameterFromQuery]
     [Parameter]
-    public string Path { get; set; }
-
-    [Inject]
-    private ICodeService CodeService { get; set; }
-
-    [Inject]
-    private NavigationManager NavigationManager { get; set; }
-
-    [Inject]
-    private ILogger<CodeView> Logger { get; set; }
+    public string? Path { get; set; }
 
     private CodeNoteTree _treeData = new();
 
@@ -38,9 +34,9 @@ public partial class CodeView
 
     protected override async Task OnInitializedAsync()
     {
-        Logger.LogInformation("组件初始化开始");
+        logger.LogInformation("组件初始化开始");
         await LoadTreeData(null);
-        Logger.LogInformation(
+        logger.LogInformation(
             "组件初始化完成，树数据: {TreeData}",
             JsonSerializer.Serialize(_treeData)
         );
@@ -49,7 +45,7 @@ public partial class CodeView
 
     protected override async Task OnParametersSetAsync()
     {
-        Logger.LogInformation(
+        logger.LogInformation(
             "参数设置开始，当前路径: {CurrentPath}, 新路径: {NewPath}",
             string.Join("/", _currentPath),
             Path
@@ -60,7 +56,7 @@ public partial class CodeView
             && !string.Equals(path, Path, StringComparison.InvariantCulture)
         )
         {
-            Logger.LogInformation("路径发生变化，开始处理");
+            logger.LogInformation("路径发生变化，开始处理");
             var paths = Path.Split('/', StringSplitOptions.RemoveEmptyEntries);
             var index = _tabs.FindIndex(x => x.CurrentPaths.SequenceEqual(paths));
             if (index >= 0)
@@ -73,7 +69,7 @@ public partial class CodeView
             // 等待根目录加载完成
             if (_treeData.Type == FileSystemType.NoExists || _isLoading)
             {
-                Logger.LogInformation(
+                logger.LogInformation(
                     "等待根目录加载，当前状态: TreeData={HasTreeData}, IsLoading={IsLoading}",
                     _treeData.Type,
                     _isLoading
@@ -86,31 +82,31 @@ public partial class CodeView
             foreach (var item in paths)
             {
                 tempPaths.Add(item);
-                Logger.LogInformation("处理路径: {Path}", string.Join("/", tempPaths));
-                var tree = await CodeService.GetTreeAsync(tempPaths.ToArray());
-                Logger.LogInformation("获取到树数据: {TreeData}", JsonSerializer.Serialize(tree));
+                logger.LogInformation("处理路径: {Path}", string.Join("/", tempPaths));
+                var tree = await codeService.GetTreeAsync(tempPaths.ToArray());
+                logger.LogInformation("获取到树数据: {TreeData}", JsonSerializer.Serialize(tree));
 
                 // 找到当前层级的节点
                 var node = _treeComponent.FindNodeByPath(tempPaths);
-                Logger.LogInformation("查找节点结果: {Result}", node != null ? "找到" : "未找到");
+                logger.LogInformation("查找节点结果: {Result}", node != null ? "找到" : "未找到");
 
                 if (node == null)
                 {
                     // 如果找不到节点，说明父节点没有展开
                     // 找到父节点并展开
                     var parentPaths = tempPaths.Take(tempPaths.Count - 1).ToList();
-                    Logger.LogInformation(
+                    logger.LogInformation(
                         "尝试查找父节点: {ParentPath}",
                         string.Join("/", parentPaths)
                     );
                     var parentNode = _treeComponent.FindNodeByPath(parentPaths);
                     if (parentNode != null)
                     {
-                        Logger.LogInformation("找到父节点，开始展开");
+                        logger.LogInformation("找到父节点，开始展开");
                         await parentNode.ExpandNodeAsync();
                         // 重新查找当前节点
                         node = _treeComponent.FindNodeByPath(tempPaths);
-                        Logger.LogInformation(
+                        logger.LogInformation(
                             "重新查找节点结果: {Result}",
                             node != null ? "找到" : "未找到"
                         );
@@ -121,12 +117,12 @@ public partial class CodeView
                 {
                     if (tree.IsDirectory)
                     {
-                        Logger.LogInformation("展开目录节点");
+                        logger.LogInformation("展开目录节点");
                         await node.ExpandNodeAsync();
                     }
                     else
                     {
-                        Logger.LogInformation("选择文件节点");
+                        logger.LogInformation("选择文件节点");
                         await node.SelectFileAsync();
                     }
                 }
@@ -134,48 +130,44 @@ public partial class CodeView
             }
         }
         await base.OnParametersSetAsync();
-        Logger.LogInformation("参数设置完成");
+        logger.LogInformation("参数设置完成");
     }
 
-    private string _homeReadmeContent;
+    private string? _homeReadmeContent;
 
-    private async Task LoadTreeData(IEnumerable<string> path)
+    private async Task LoadTreeData(IEnumerable<string>? path)
     {
-        Logger.LogInformation("开始加载树数据，路径: {Path}", string.Join("/", path ?? []));
+        logger.LogInformation("开始加载树数据，路径: {Path}", string.Join("/", path ?? []));
         _isLoading = true;
         path ??= [];
         var currentPath = path.ToArray();
-        _treeData = await CodeService.GetTreeAsync(currentPath);
-        Logger.LogInformation("树数据加载完成: {TreeData}", JsonSerializer.Serialize(_treeData));
+        _treeData = await codeService.GetTreeAsync(currentPath);
+        logger.LogInformation("树数据加载完成: {TreeData}", JsonSerializer.Serialize(_treeData));
         _homeReadmeContent = _treeData.ReadmeContent;
         _currentPath = currentPath;
         _isLoading = false;
     }
 
-    private string _search;
-    private string _tempSearch;
-
-    [Inject]
-    private ISnackbar Snackbar { get; set; }
+    private string? _search;
+    private string? _tempSearch;
 
     private async Task SearchAsync()
     {
-        Logger.LogInformation(
+        logger.LogInformation(
             "开始搜索，关键字: {Search}, 临时关键字: {TempSearch}",
             _search,
             _tempSearch
         );
         if (string.IsNullOrEmpty(_search) && string.IsNullOrEmpty(_tempSearch))
         {
-            Logger.LogWarning("搜索关键字为空");
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-            Snackbar.Add("请输入关键字！", Severity.Warning);
+            logger.LogWarning("搜索关键字为空");
+            dialogService.Toast("请输入关键字！", ToastType.Warning);
             return;
         }
 
         if (_search == _tempSearch)
         {
-            Logger.LogInformation("搜索关键字未变化");
+            logger.LogInformation("搜索关键字未变化");
             return;
         }
 
@@ -184,38 +176,38 @@ public partial class CodeView
         {
             if (string.IsNullOrEmpty(_search))
             {
-                Logger.LogInformation("执行空搜索");
+                logger.LogInformation("执行空搜索");
                 await HandleEmptySearch();
             }
             else
             {
-                Logger.LogInformation("执行关键字搜索");
+                logger.LogInformation("执行关键字搜索");
                 await HandleSearchWithKeyword();
             }
         }
         finally
         {
             _isLoading = false;
-            Logger.LogInformation("搜索完成");
+            logger.LogInformation("搜索完成");
         }
     }
 
     private async Task HandleEmptySearch()
     {
         _tempSearch = null;
-        _treeData = await CodeService.GetTreeAsync(null);
-        Logger.LogInformation(
+        _treeData = await codeService.GetTreeAsync(null);
+        logger.LogInformation(
             "空搜索完成，树数据: {TreeData}",
             JsonSerializer.Serialize(_treeData)
         );
         _dynamicTabs.ActivatePanel(0);
-        NavigationManager.NavigateTo("/code");
+        navigationManager.NavigateTo("/code");
     }
 
     private async Task HandleSearchWithKeyword()
     {
-        _treeData = await CodeService.SearchAsync(_search);
-        Logger.LogInformation(
+        _treeData = await codeService.SearchAsync(_search);
+        logger.LogInformation(
             "关键字搜索完成，树数据: {TreeData}",
             JsonSerializer.Serialize(_treeData)
         );
@@ -227,29 +219,29 @@ public partial class CodeView
     {
         if (args.Key == "Enter")
         {
-            Logger.LogInformation("触发回车搜索");
+            logger.LogInformation("触发回车搜索");
             await SearchAsync();
         }
     }
 
     private Task SelectedFile(CodeNoteTree arg)
     {
-        Logger.LogInformation("选择文件: {FileData}", JsonSerializer.Serialize(arg));
+        logger.LogInformation("选择文件: {FileData}", JsonSerializer.Serialize(arg));
         if (arg?.CodeContainer == null)
         {
-            Logger.LogWarning("文件内容为空");
+            logger.LogWarning("文件内容为空");
             return Task.CompletedTask;
         }
         _currentPath = arg.CurrentPaths;
         var tabIndex = _tabs.FindIndex(x => x.CurrentPaths.SequenceEqual(arg.CurrentPaths));
         if (tabIndex == -1)
         {
-            Logger.LogInformation("添加新标签页");
+            logger.LogInformation("添加新标签页");
             AddTab(arg);
         }
         else
         {
-            Logger.LogInformation("激活已有标签页");
+            logger.LogInformation("激活已有标签页");
             ActiveTabIndex = tabIndex + 1;
         }
         return Task.CompletedTask;
@@ -257,12 +249,12 @@ public partial class CodeView
 
     private void ExpandFolder(CodeNoteTree obj)
     {
-        Logger.LogInformation("展开文件夹: {FolderData}", JsonSerializer.Serialize(obj));
+        logger.LogInformation("展开文件夹: {FolderData}", JsonSerializer.Serialize(obj));
         _currentPath = obj.CurrentPaths;
         _readmePath = obj.CurrentPaths;
         if (!string.IsNullOrEmpty(obj.ReadmeContent))
         {
-            Logger.LogInformation("更新 README 内容");
+            logger.LogInformation("更新 README 内容");
             _treeData.ReadmeContent = obj.ReadmeContent;
             ActiveTabIndex = 0;
         }
@@ -275,12 +267,12 @@ public partial class CodeView
     private void UpdateUrl(IEnumerable<string> paths)
     {
         var path = string.Join("/", paths);
-        Logger.LogInformation("更新 URL，当前路径: {CurrentPath}, 新路径: {NewPath}", path, Path);
+        logger.LogInformation("更新 URL，当前路径: {CurrentPath}, 新路径: {NewPath}", path, Path);
         if (!string.Equals(path, Path, StringComparison.InvariantCulture))
         {
             var newUrl = $"/code?path={UrlEncoder.Create().Encode(path)}";
-            Logger.LogInformation("导航到新 URL: {NewUrl}", newUrl);
-            NavigationManager.NavigateTo(newUrl);
+            logger.LogInformation("导航到新 URL: {NewUrl}", newUrl);
+            navigationManager.NavigateTo(newUrl);
         }
     }
 
@@ -302,7 +294,7 @@ public partial class CodeView
             {
                 return;
             }
-            Logger.LogInformation(
+            logger.LogInformation(
                 "标签页切换，旧索引: {OldIndex}, 新索引: {NewIndex}",
                 _activeTabIndex,
                 value
@@ -328,7 +320,7 @@ public partial class CodeView
         await base.OnAfterRenderAsync(firstRender);
         if (_stateHasChanged)
         {
-            Logger.LogInformation("触发状态更新");
+            logger.LogInformation("触发状态更新");
             _stateHasChanged = false;
             StateHasChanged();
         }
@@ -336,7 +328,7 @@ public partial class CodeView
 
     private void AddTab(CodeNoteTree node)
     {
-        Logger.LogInformation("添加标签页: {TabData}", JsonSerializer.Serialize(node));
+        logger.LogInformation("添加标签页: {TabData}", JsonSerializer.Serialize(node));
         _tabs.Add(node);
         ActiveTabIndex = _tabs.Count;
         _stateHasChanged = true;
@@ -344,7 +336,7 @@ public partial class CodeView
 
     private void RemoveTab(object id)
     {
-        Logger.LogInformation("移除标签页: {TabId}", id);
+        logger.LogInformation("移除标签页: {TabId}", id);
         var tabView = _tabs.SingleOrDefault(
             (x) => id is string ids && string.Join("-", x.CurrentPaths) == ids
         );

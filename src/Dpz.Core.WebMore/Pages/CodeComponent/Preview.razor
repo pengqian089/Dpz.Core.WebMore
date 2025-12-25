@@ -1,48 +1,52 @@
-﻿@using BlazorMonaco.Editor
-
-<StandaloneCodeEditor
-    @ref="_editor"
-    Id = "@string.Join("/",Node.CurrentPaths)"
-    CssClass="editor"
-    ConstructionOptions="EditorConstructionOptions"/>
+﻿@if (Node?.CodeContainer == null)
+{
+    <pre><code>没有内容</code></pre>
+}
+else
+{
+    @if (string.IsNullOrEmpty(Node.CodeContainer.Language))
+    {
+        <pre><code>@Node.CodeContainer.CodeContent</code></pre>
+    }
+    else if (string.Equals(Node.CodeContainer.Language, "markdown", StringComparison.CurrentCultureIgnoreCase))
+    {
+        <MarkdownPreview Markdown="@Node.CodeContainer.CodeContent"></MarkdownPreview>
+    }
+    else
+    {
+        <pre
+            data-start="1"
+            class="linkable-line-numbers">
+            <code 
+                class="language-@Node.CodeContainer.Language">
+                @Node.CodeContainer.CodeContent
+            </code>
+        </pre>
+    }
+}
 
 @code {
 
-    [Parameter]
-    public CodeNoteTree Node { get; set; }
-    
-    StandaloneCodeEditor _editor;
-    public StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
-    {
-        var options = new StandaloneEditorConstructionOptions
-        {
-            Language = Node.CodeContainer.Language,
-            GlyphMargin = true,
-            Value = Node.CodeContainer.CodeContent,
-            AutomaticLayout = true,
-            ReadOnly = true,
-            //Model = model
-        };
-
-        return options;
-    }
+    [Parameter] public CodeNoteTree? Node { get; set; }
 
 
     static string GetLanguage(string language)
     {
         if (string.IsNullOrEmpty(language))
             return "text";
-        
+
         switch (language)
         {
             case "ignore":
                 return "gitignore";
         }
+
         var languages = new[] { "sln", "docker", "git" };
         if (languages.Contains(language))
         {
             return "text";
         }
+
         return language;
     }
 

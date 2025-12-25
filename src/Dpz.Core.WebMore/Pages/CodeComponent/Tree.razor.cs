@@ -17,7 +17,7 @@ public partial class Tree
     public EventCallback<CodeNoteTree> OnExpandFolder { get; set; }
 
     [Parameter]
-    public string Keyword { get; set; }
+    public string? Keyword { get; set; }
 
     private readonly List<TreeNode> _nodes = [];
 
@@ -27,7 +27,7 @@ public partial class Tree
         base.OnInitialized();
     }
 
-    public void RegisterNode(TreeNode node)
+    public void RegisterNode(TreeNode? node)
     {
         if (node is not null && !_nodes.Contains(node))
         {
@@ -40,7 +40,7 @@ public partial class Tree
         _nodes.Remove(node);
     }
 
-    public TreeNode FindNodeByPath(List<string> path)
+    public TreeNode? FindNodeByPath(List<string> path)
     {
         var directChild = _nodes.FirstOrDefault(n => n.Path.SequenceEqual(path));
         if (directChild != null)

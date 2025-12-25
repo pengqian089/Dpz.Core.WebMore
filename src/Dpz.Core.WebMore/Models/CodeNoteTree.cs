@@ -30,27 +30,27 @@ public class CodeNoteTree
     /// <summary>
     /// 上一页路径
     /// </summary>
-    public List<string> ParentPaths { get; set; }
+    public List<string> ParentPaths { get; set; } = [];
 
     /// <summary>
     /// README内容
     /// </summary>
-    public string ReadmeContent { get; set; }
+    public string? ReadmeContent { get; set; }
 
     /// <summary>
     /// 当前页路径
     /// </summary>
-    public List<string> CurrentPaths { get; set; }
+    public List<string> CurrentPaths { get; set; } = [];
 
     /// <summary>
     /// 文件内容
     /// </summary>
-    public CodeContainer CodeContainer { get; set; }
+    public CodeContainer? CodeContainer { get; set; }
 
     /// <summary>
     /// 文件名称
     /// </summary>
-    public string FileName { get; set; }
+    public string? FileName { get; set; }
 
     /// <summary>
     /// 目录、文件类型
@@ -67,7 +67,7 @@ public class ChildrenTree
     /// <summary>
     /// 当前目录或文件的名称
     /// </summary>
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
     /// <summary>
     /// 最后修改时间
@@ -77,12 +77,12 @@ public class ChildrenTree
     /// <summary>
     /// 说明
     /// </summary>
-    public string Note { get; set; }
+    public string? Note { get; set; }
 
     /// <summary>
     /// 当前路径
     /// </summary>
-    public List<string> CurrentPath { get; set; }
+    public List<string> CurrentPath { get; set; } = [];
 }
 
 /// <summary>
@@ -93,17 +93,17 @@ public class CodeContainer
     /// <summary>
     /// 代码语言
     /// </summary>
-    public string Language { get; set; }
+    public string? Language { get; set; }
 
     /// <summary>
     /// 代码内容
     /// </summary>
-    public string CodeContent { get; set; }
+    public string? CodeContent { get; set; }
 
     public bool IsPreview { get; set; }
 
     /// <summary>
     /// AI分析结果
     /// </summary>
-    public string AiAnalyzeResult { get; set; }
+    public string? AiAnalyzeResult { get; set; }
 }
