@@ -23,6 +23,11 @@ public partial class MarkdownPreview : ComponentBase
 
     protected override async Task OnParametersSetAsync()
     {
+        if (string.IsNullOrWhiteSpace(Markdown))
+        {
+            _htmlContent = "";
+            return;
+        }
         var pipeline = new MarkdownPipelineBuilder()
             .UseAutoLinks()
             .UsePipeTables()
