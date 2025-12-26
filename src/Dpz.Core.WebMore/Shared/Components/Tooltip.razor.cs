@@ -6,11 +6,8 @@ using Microsoft.JSInterop;
 
 namespace Dpz.Core.WebMore.Shared.Components;
 
-public partial class Tooltip : ComponentBase, IAsyncDisposable
+public partial class Tooltip(IJSRuntime jsRuntime) : ComponentBase, IAsyncDisposable
 {
-    [Inject]
-    private IJSRuntime Js { get; set; } = default!;
-
     [Parameter]
     [EditorRequired]
     public required RenderFragment ChildContent { get; set; }
@@ -35,7 +32,10 @@ public partial class Tooltip : ComponentBase, IAsyncDisposable
     {
         if (firstRender)
         {
-            _module = await Js.InvokeAsync<IJSObjectReference>("import", "./Shared/Components/Tooltip.razor.js");
+            _module = await jsRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./Shared/Components/Tooltip.razor.js"
+            );
         }
     }
 
@@ -43,7 +43,12 @@ public partial class Tooltip : ComponentBase, IAsyncDisposable
     {
         if (_module is not null && !string.IsNullOrEmpty(Text))
         {
-            await _module.InvokeVoidAsync("show", _triggerElement, _contentElement, Placement?.ToString());
+            await _module.InvokeVoidAsync(
+                "show",
+                _triggerElement,
+                _contentElement,
+                Placement?.ToString()
+            );
         }
     }
 
