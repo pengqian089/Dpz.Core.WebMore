@@ -23,27 +23,26 @@
                         <ShowIcon IsFolder="@IsFolder" Filename="@Name"></ShowIcon>
                     </div>
                 </div>
-                <span class="item-content">
-                    @{
-                        var (first,keyword,end) = MatchKeyword(Name);
-                    }
-                    @if (keyword == null || end == null)
-                    {
-                        <MudTooltip Text="@string.Join("/", Path)">
-                            <span>@Name</span>
-                        </MudTooltip>
-                    }
-                    else
-                    {
-                        <MudTooltip Text="@string.Join("/", Path)">
-                            <span class="show-name">
+                
+                <Tooltip Text="@string.Join("/", Path)" Placement="TooltipPlacement.Bottom" style="flex: 1 1 auto; width: 0; min-width: 0;">
+                    <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;">
+                        @{
+                            var (first,keyword,end) = MatchKeyword(Name);
+                        }
+                        @if (keyword == null || end == null)
+                        {
+                            @Name
+                        }
+                        else
+                        {
+                            <span class="show-name" style="display: inline-flex;">
                                 <span>@first</span>
                                 <mark>@keyword</mark>
                                 <span>@end</span>
                             </span>
-                        </MudTooltip>
-                    }
-                </span>
+                        }
+                    </span>
+                </Tooltip>
             </div>
         </div>
         @if (_childrenNode != null && _expand)

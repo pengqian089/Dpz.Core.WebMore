@@ -1,0 +1,86 @@
+/* Tooltip Component */
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip__content {
+    /* Popover defaults */
+    position: fixed;
+    inset: auto; /* Reset popover default inset */
+    border: none;
+    margin: 0;
+    
+    /* Styling */
+    width: max-content;
+    max-width: 250px;
+    background-color: var(--color-bg-surface);
+    color: var(--color-text-main);
+    text-align: center;
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.875rem;
+    box-shadow: 0 4px 6px -1px var(--color-shadow), 0 2px 4px -1px var(--color-shadow);
+    border: 1px solid var(--color-border);
+    pointer-events: none;
+    
+    /* Transition Support */
+    opacity: 0;
+    transition: opacity var(--transition-fast), display var(--transition-fast) allow-discrete, overlay var(--transition-fast) allow-discrete;
+
+    /* Prevent scrollbars */
+    overflow: hidden;
+    white-space: normal; /* Ensure text wraps */
+    word-break: break-word; /* Prevent long words from overflowing */
+}
+/* ... rest of the file ... */
+.tooltip__content:popover-open {
+    opacity: 1;
+}
+
+/* Arrows - Refined matching background */
+.tooltip__content::before {
+    content: "";
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    transform: rotate(45deg);
+    z-index: -1;
+}
+
+/* Arrow Positioning based on Placement classes */
+/* Since we are using JS to position the box, these inner arrow positions remain relative to the box */
+
+.tooltip__content--top::before {
+    bottom: -5px;
+    left: 50%;
+    margin-left: -4px;
+    border-top: none;
+    border-left: none;
+}
+
+.tooltip__content--bottom::before {
+    top: -5px;
+    left: 50%;
+    margin-left: -4px;
+    border-bottom: none;
+    border-right: none;
+}
+
+.tooltip__content--left::before {
+    top: 50%;
+    right: -5px;
+    margin-top: -4px;
+    border-bottom: none;
+    border-left: none;
+}
+
+.tooltip__content--right::before {
+    top: 50%;
+    left: -5px;
+    margin-top: -4px;
+    border-top: none;
+    border-right: none;
+}

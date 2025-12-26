@@ -1,0 +1,15 @@
+@namespace Dpz.Core.WebMore.Shared.Components
+
+<div class="tooltip @Class" 
+     @attributes="AdditionalAttributes" 
+     @ref="_triggerElement"
+     @onmouseenter="Show" 
+     @onmouseleave="Hide">
+    @ChildContent
+    
+    <span @ref="_contentElement" 
+          popover="manual" 
+          class="tooltip__content">
+        @Text
+    </span>
+</div>

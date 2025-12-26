@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Dpz.Core.WebMore.Models;
 using Dpz.Core.WebMore.Service;
@@ -8,7 +7,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Dpz.Core.WebMore.Pages.CodeComponent;
 
-public partial class TreeNode : IDisposable
+public partial class TreeNode(ICodeService codeService) : IDisposable
 {
     [Parameter]
     public bool IsFolder { get; set; }
@@ -17,25 +16,22 @@ public partial class TreeNode : IDisposable
     public string Name { get; set; } = "";
 
     [Parameter]
-    public List<string> Path { get; set; }
+    public List<string> Path { get; set; } = [];
 
     [Parameter]
-    public string Keyword { get; set; }
-
-    [Inject]
-    private ICodeService CodeService { get; set; }
+    public string? Keyword { get; set; }
 
     [CascadingParameter]
-    private Tree ParentTree { get; set; }
+    private Tree? ParentTree { get; set; }
 
-    private bool _expand = false;
+    private bool _expand;
 
-    private CodeNoteTree _childrenNode;
+    private CodeNoteTree? _childrenNode;
 
-    private Tree _childTree;
+    private Tree? _childTree;
 
     private const string Active = "background-color: rgb(196 224 255 / 12%)";
-    private static List<string> _activePath = null;
+    private static List<string> _activePath = [];
 
     protected override void OnInitialized()
     {
@@ -60,7 +56,7 @@ public partial class TreeNode : IDisposable
         {
             _tempName = Name;
             Name = "loading...";
-            _childrenNode = await CodeService.GetTreeAsync(Path.ToArray());
+            _childrenNode = await codeService.GetTreeAsync(Path.ToArray());
             await OnExpandFolder.InvokeAsync(_childrenNode);
             Name = _tempName;
             _expand = true;
@@ -85,13 +81,13 @@ public partial class TreeNode : IDisposable
     {
         _tempName = Name;
         Name = "loading...";
-        var node = await CodeService.GetTreeAsync(Path.ToArray());
+        var node = await codeService.GetTreeAsync(Path.ToArray());
         await OnSelectedFile.InvokeAsync(node);
         Name = _tempName;
         StateHasChanged();
     }
 
-    private (string first, string keyword, string end) MatchKeyword(string name)
+    private (string first, string? keyword, string? end) MatchKeyword(string name)
     {
         if (string.IsNullOrEmpty(Keyword))
         {
@@ -122,15 +118,15 @@ public partial class TreeNode : IDisposable
     // }
     public void Dispose()
     {
-        if (_activePath != null)
+        if (_activePath.Count == 0)
         {
             Console.WriteLine("dispose");
-            _activePath = null;
+            _activePath = [];
         }
         ParentTree?.UnregisterNode(this);
     }
 
-    public TreeNode FindNodeByPath(List<string> path)
+    public TreeNode? FindNodeByPath(List<string> path)
     {
         return _childTree?.FindNodeByPath(path);
     }

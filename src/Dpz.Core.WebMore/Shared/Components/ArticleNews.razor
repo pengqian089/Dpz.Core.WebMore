@@ -15,10 +15,11 @@ else
                 @foreach (var item in _source)
                 {
                     <li class="sidebar-list__item">
-                        <a asp-action="Read" asp-controller="Article" asp-route-id="@item.Id" 
-                           class="sidebar-list__link" data-pjax title="@item.Title">
-                            @item.Title
-                        </a>
+                        <Tooltip Text="@item.Title">
+                            <a href="/article/read/@item.Id" class="sidebar-list__link">
+                                @item.Title
+                            </a>
+                        </Tooltip>
                     </li>
                 }
             </ul>

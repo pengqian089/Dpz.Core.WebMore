@@ -67,7 +67,7 @@ public class NotificationService : INotificationService
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error starting SignalR connection.");
+                _logger.LogWarning(e, "Error starting SignalR connection.");
             }
         }
     }
