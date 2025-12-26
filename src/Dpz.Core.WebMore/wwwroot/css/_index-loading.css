@@ -1,4 +1,4 @@
-/* Startup Loading Screen (BEM) */
+/* Cyberpunk Startup Loading Screen */
 
 .app-startup {
     position: fixed;
@@ -6,130 +6,203 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-color: var(--color-bg-body, #f8fafc);
+    background-color: #050505;
+    background-image: 
+        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 2px, 3px 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     z-index: 9999;
-    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    color: var(--color-text-main, #0f172a);
-    transition: opacity 0.5s ease-out;
+    font-family: 'Fira Code', monospace; /* Tech font */
+    color: #e0e0e0;
+    overflow: hidden;
 }
 
-/* Container for visual elements to ensure vertical centering accounts for footer */
+/* Scanline Effect */
+.app-startup::after {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: rgba(18, 16, 16, 0.1);
+    opacity: 0;
+    z-index: 2;
+    pointer-events: none;
+    animation: flicker 0.15s infinite;
+}
+
+/* Container */
 .app-startup__content {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-bottom: 60px; /* Offset for footer balance */
+    margin-bottom: 60px;
+    position: relative;
+    z-index: 3;
 }
 
-/* Animated Spinner/Logo Area */
+/* Animated Brand/Spinner */
 .app-startup__brand {
     position: relative;
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: 100px;
     margin-bottom: 2rem;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* Outer Ring */
+/* Outer Ring - Tech Hud Style */
 .app-startup__ring {
     position: absolute;
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    border: 3px solid transparent;
-    border-top-color: var(--color-primary, #2563eb);
-    animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+    border: 2px solid transparent;
+    border-top-color: #00f3ff;
+    border-bottom-color: #bc13fe;
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.5), 0 0 5px rgba(188, 19, 254, 0.5);
+    animation: spin 2s linear infinite;
 }
 
-/* Inner Ring */
 .app-startup__ring::before {
     content: "";
     position: absolute;
-    top: 5px;
-    left: 5px;
-    right: 5px;
-    bottom: 5px;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
     border-radius: 50%;
-    border: 3px solid transparent;
-    border-top-color: var(--color-primary-hover, #1d4ed8);
-    opacity: 0.6;
-    animation: spin 2s linear infinite reverse;
+    border: 2px solid transparent;
+    border-left-color: #00f3ff;
+    border-right-color: #bc13fe;
+    opacity: 0.5;
+    animation: spin 3s linear infinite reverse;
 }
 
-/* Inner Dot/Core */
-.app-startup__core {
-    width: 12px;
-    height: 12px;
-    background-color: var(--color-text-main, #0f172a);
+.app-startup__ring::after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
     border-radius: 50%;
-    animation: pulse 1.5s ease-in-out infinite;
-    box-shadow: 0 0 15px var(--color-primary, #2563eb);
+    border: 1px dashed rgba(255, 255, 255, 0.3);
+    animation: spin 10s linear infinite;
 }
+
+/* Inner Core */
+.app-startup__core {
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 20px solid #fff;
+    position: relative;
+    animation: pulse-triangle 1s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px #00f3ff);
+}
+
+.app-startup__core::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: -10px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 20px solid #fff;
+}
+
 
 /* Title Text */
 .app-startup__title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    letter-spacing: 0.05em;
+    font-size: 2.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
     margin-bottom: 0.5rem;
-    background: linear-gradient(135deg, var(--color-text-main, #0f172a) 0%, var(--color-text-secondary, #475569) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    opacity: 0;
-    animation: fadeUp 0.8s ease-out forwards 0.2s;
+    color: #fff;
+    text-shadow: 2px 2px 0px #bc13fe, -2px -2px 0px #00f3ff;
+    position: relative;
+    animation: glitch-text 3s infinite linear alternate-reverse;
 }
 
-/* Subtext / Description */
+/* Subtext */
 .app-startup__subtitle {
-    font-size: 0.875rem;
-    color: var(--color-text-secondary, #475569);
-    margin-bottom: 2rem;
-    opacity: 0;
-    animation: fadeUp 0.8s ease-out forwards 0.4s;
+    font-size: 1rem;
+    color: #00f3ff;
+    margin-bottom: 2.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    opacity: 0.8;
+    text-shadow: 0 0 5px rgba(0, 243, 255, 0.8);
 }
 
 /* Progress Bar Container */
 .app-startup__progress {
-    width: 240px;
-    height: 4px;
-    background-color: var(--color-bg-surface-alt, #e2e8f0);
-    border-radius: 4px;
-    overflow: hidden;
+    width: 300px;
+    height: 12px;
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    padding: 2px;
     position: relative;
-    opacity: 0;
-    animation: fadeIn 0.8s ease-out forwards 0.6s;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    clip-path: polygon(0 0, 100% 0, 100% 70%, 95% 100%, 0 100%); /* Slight angle cut */
 }
 
 /* Progress Bar Fill */
-/* Blazor WASM uses --blazor-load-percentage css variable (0% to 100%) */
 .app-startup__bar {
     height: 100%;
-    width: var(--blazor-load-percentage, 10%); /* Default to 10% to show something */
-    background: linear-gradient(90deg, var(--color-primary, #2563eb), var(--color-primary-hover, #1d4ed8));
-    border-radius: 4px;
-    transition: width 0.2s linear;
-    box-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
+    width: var(--blazor-load-percentage, 10%);
+    background: repeating-linear-gradient(
+        45deg,
+        #bc13fe,
+        #bc13fe 10px,
+        #9d00e0 10px,
+        #9d00e0 20px
+    );
+    box-shadow: 0 0 10px #bc13fe;
+    transition: width 0.1s ease-out;
+    position: relative;
+}
+
+.app-startup__bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: shine 1.5s infinite;
 }
 
 /* Progress Text */
 .app-startup__status {
-    margin-top: 0.75rem;
-    font-size: 0.75rem;
-    font-family: 'Fira Code', monospace;
-    color: var(--color-text-muted, #94a3b8);
-    opacity: 0;
-    animation: fadeIn 0.8s ease-out forwards 0.6s;
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: #00f3ff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.app-startup__status::before {
+    content: "> SYSTEM LOADING: ";
 }
 
 .app-startup__status::after {
-    content: var(--blazor-load-percentage-text, "Loading...");
+    content: var(--blazor-load-percentage-text, "INITIALIZING...");
+    font-weight: bold;
 }
 
 /* Footer (ICP Info) */
@@ -138,20 +211,25 @@
     bottom: 2rem;
     width: 100%;
     text-align: center;
-    font-size: 0.8rem;
-    color: var(--color-text-muted, #94a3b8);
-    opacity: 0.8;
+    font-size: 0.75rem;
+    color: #555;
+    z-index: 3;
+}
+
+.app-startup__footer p {
+    margin: 0;
 }
 
 .app-startup__footer a {
-    color: inherit;
+    color: #777;
     text-decoration: none;
     transition: color 0.2s;
+    text-transform: uppercase;
 }
 
 .app-startup__footer a:hover {
-    color: var(--color-primary, #2563eb);
-    text-decoration: underline;
+    color: #00f3ff;
+    text-shadow: 0 0 5px #00f3ff;
 }
 
 /* Animations */
@@ -160,32 +238,44 @@
     100% { transform: rotate(360deg); }
 }
 
-@keyframes pulse {
-    0% { transform: scale(0.95); opacity: 0.8; }
+@keyframes pulse-triangle {
+    0% { transform: scale(0.8); opacity: 0.7; }
     50% { transform: scale(1.1); opacity: 1; }
-    100% { transform: scale(0.95); opacity: 0.8; }
+    100% { transform: scale(0.8); opacity: 0.7; }
 }
 
-@keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+@keyframes flicker {
+    0% { opacity: 0.05; }
+    5% { opacity: 0.1; }
+    10% { opacity: 0.05; }
+    15% { opacity: 0.15; }
+    20% { opacity: 0.05; }
+    50% { opacity: 0.05; }
+    55% { opacity: 0.1; }
+    60% { opacity: 0.05; }
+    100% { opacity: 0.05; }
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+@keyframes glitch-text {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+    100% { transform: translate(0); }
 }
 
-/* Dark Mode Overrides for variables if not loaded yet (fallback) */
-@media (prefers-color-scheme: dark) {
-    .app-startup {
-        background-color: var(--color-bg-body, #0f172a);
-        color: var(--color-text-main, #f1f5f9);
-    }
-    
+@keyframes shine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Responsive adjustment */
+@media (max-width: 600px) {
     .app-startup__title {
-        background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        font-size: 2rem;
+    }
+    .app-startup__progress {
+        width: 80%;
     }
 }

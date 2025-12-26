@@ -50,13 +50,13 @@ public partial class Comment(ICommentService commentService, IAppDialogService d
         _loading = false;
     }
 
-    private async Task SendAsync(SendComment arg)
+    private async Task<bool> SendAsync(SendComment arg)
     {
         var result = await commentService.SendAsync(arg, PageSize);
         if (!result.Success || result.Data == null)
         {
             await dialogService.AlertAsync(result.Message);
-            return;
+            return false;
         }
 
         _comments = result.Data;
@@ -70,6 +70,7 @@ public partial class Comment(ICommentService commentService, IAppDialogService d
             );
         }
         CancelReply();
+        return true;
     }
 
     private async Task<(

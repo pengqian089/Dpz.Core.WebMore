@@ -170,6 +170,12 @@
     gap: var(--spacing-md);
 }
 
+.comment-form__submit-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
 .comment-form__action-btn {
     color: var(--color-text-muted);
     cursor: pointer;
@@ -216,7 +222,6 @@
     color: var(--color-text-muted);
     font-size: 0.9rem;
     cursor: pointer;
-    margin-right: var(--spacing-md);
     transition: color var(--transition-fast);
 }
 

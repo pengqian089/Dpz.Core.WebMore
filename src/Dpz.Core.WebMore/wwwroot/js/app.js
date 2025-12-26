@@ -1,4 +1,5 @@
 import {CodeArea} from "./modules/code-area.js";
+import {BackToTop} from "./modules/back-to-top.js";
 
 class App {
     constructor() {
@@ -20,6 +21,11 @@ class App {
             let hasNewNodes = false;
             let hasNewCodeBlocks = false;
             
+            // 尝试初始化返回顶部 (如果之前未成功)
+            if (!this.backToTopInstance) {
+                this.initBackToTop();
+            }
+
             for (const mutation of mutations) {
                 // 检查是否有新增节点
                 if (mutation.addedNodes.length > 0) {
@@ -71,6 +77,12 @@ class App {
         
         // 首次加载也运行一次
         new CodeArea();
+    }
+
+    initBackToTop() {
+        if (document.getElementById('back-to-top')) {
+            this.backToTopInstance = new BackToTop();
+        }
     }
 }
 

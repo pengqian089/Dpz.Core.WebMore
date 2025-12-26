@@ -23,7 +23,7 @@ public partial class CommentForm(IJSRuntime jsRuntime, IAppDialogService appDial
     public string? ReplyId { get; set; }
 
     [Parameter]
-    public Func<SendComment, Task>? SendCommentAsync { get; set; }
+    public Func<SendComment, Task<bool>>? SendCommentAsync { get; set; }
 
     [Parameter]
     public EventCallback OnCancelReply { get; set; }
@@ -75,14 +75,28 @@ public partial class CommentForm(IJSRuntime jsRuntime, IAppDialogService appDial
         }
 
         StateHasChanged();
-        if (arg.Model is SendComment sendComment)
+        var success = false;
+        try
         {
-            await SendCommentAsync?.Invoke(sendComment)!;
+            if (arg.Model is SendComment sendComment && SendCommentAsync != null)
+            {
+                success = await SendCommentAsync.Invoke(sendComment);
+            }
         }
-        await Task.CompletedTask;
-        _isSending = false;
+        catch (Exception ex)
+        {
+            appDialogService.Toast($"发送失败: {ex.Message}", ToastType.Error);
+        }
+        finally
+        {
+            _isSending = false;
+            StateHasChanged();
+        }
 
-        _model.CommentText = "";
+        if (success)
+        {
+            _model.CommentText = "";
+        }
     }
 
     private async Task ShowPicture()

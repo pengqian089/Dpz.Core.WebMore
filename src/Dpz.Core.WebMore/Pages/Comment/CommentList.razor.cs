@@ -25,7 +25,7 @@ public partial class CommentList
     >? ToNextPageAsync { get; set; }
 
     [Parameter]
-    public Func<SendComment, Task>? SendCommentAsync { get; set; }
+    public Func<SendComment, Task<bool>>? SendCommentAsync { get; set; }
 
     [Parameter]
     public EventCallback<string> OnReply { get; set; }
