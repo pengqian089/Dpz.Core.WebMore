@@ -42,6 +42,23 @@
     overflow: hidden; /* Internal scroll handled by __tree */
 }
 
+.code-explorer__resizer {
+    position: absolute;
+    top: 0;
+    right: -5px; /* Center over border */
+    width: 10px;
+    height: 100%;
+    cursor: col-resize;
+    z-index: 20;
+    background: transparent;
+    transition: background-color var(--transition-fast);
+}
+
+.code-explorer__resizer:hover,
+.code-explorer__resizer.is-resizing {
+    background-color: rgba(37, 99, 235, 0.2);
+}
+
 .code-explorer__search {
     height: var(--code-header-height);
     padding: 0 var(--spacing-md);

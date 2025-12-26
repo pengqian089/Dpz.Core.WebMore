@@ -30,7 +30,6 @@ public partial class TreeNode(ICodeService codeService) : IDisposable
 
     private Tree? _childTree;
 
-    private const string Active = "background-color: rgb(196 224 255 / 12%)";
     private static List<string> _activePath = [];
 
     protected override void OnInitialized()
@@ -39,33 +38,95 @@ public partial class TreeNode(ICodeService codeService) : IDisposable
         ParentTree?.RegisterNode(this);
     }
 
-    public async Task<bool> ExpandNodeAsync()
+    private async Task ToggleNodeAsync()
     {
-        if (Name == "loading...")
+        if (!IsFolder || Name == "loading...")
         {
-            return false;
-        }
-        _activePath = Path;
-        if (!IsFolder)
-        {
-            await SelectFileAsync();
-            return true;
+            return;
         }
 
         if (!_expand)
         {
-            _tempName = Name;
-            Name = "loading...";
-            _childrenNode = await codeService.GetTreeAsync(Path.ToArray());
-            await OnExpandFolder.InvokeAsync(_childrenNode);
-            Name = _tempName;
-            _expand = true;
-            return true;
+            await ExpandNodeAsync();
         }
         else
         {
             _expand = false;
-            return true;
+        }
+    }
+
+    private async Task OnContentClickAsync()
+    {
+        if (Name == "loading...")
+        {
+            return;
+        }
+
+        // Always update active path on click
+        _activePath = Path;
+
+        if (IsFolder)
+        {
+            if (!_expand)
+            {
+                await ExpandNodeAsync();
+            }
+            else
+            {
+                // Already expanded, just notify parent to update view (e.g. breadcrumbs, folder content)
+                if (_childrenNode != null && OnExpandFolder.HasDelegate)
+                {
+                    await OnExpandFolder.InvokeAsync(_childrenNode);
+                }
+            }
+        }
+        else
+        {
+            await SelectFileAsync();
+        }
+    }
+
+    public async Task ExpandNodeAsync()
+    {
+        if (Name == "loading...")
+        {
+            return;
+        }
+
+        _activePath = Path;
+
+        if (!IsFolder)
+        {
+            await SelectFileAsync();
+            return;
+        }
+
+        // Only load if not already expanded or children not loaded
+        if (!_expand || _childrenNode == null)
+        {
+            _tempName = Name;
+            Name = "loading...";
+            try
+            {
+                _childrenNode = await codeService.GetTreeAsync(Path.ToArray());
+                if (OnExpandFolder.HasDelegate)
+                {
+                    await OnExpandFolder.InvokeAsync(_childrenNode);
+                }
+            }
+            finally
+            {
+                Name = _tempName;
+            }
+            _expand = true;
+            return;
+        }
+
+        // If already expanded and loaded, just ensure it stays expanded
+        _expand = true;
+        if (OnExpandFolder.HasDelegate && _childrenNode != null)
+        {
+            await OnExpandFolder.InvokeAsync(_childrenNode);
         }
     }
 
@@ -77,14 +138,23 @@ public partial class TreeNode(ICodeService codeService) : IDisposable
 
     private string _tempName = "";
 
-    public async Task SelectFileAsync()
+    private async Task SelectFileAsync()
     {
         _tempName = Name;
         Name = "loading...";
-        var node = await codeService.GetTreeAsync(Path.ToArray());
-        await OnSelectedFile.InvokeAsync(node);
-        Name = _tempName;
-        StateHasChanged();
+        try
+        {
+            var node = await codeService.GetTreeAsync(Path.ToArray());
+            if (OnSelectedFile.HasDelegate)
+            {
+                await OnSelectedFile.InvokeAsync(node);
+            }
+        }
+        finally
+        {
+            Name = _tempName;
+            StateHasChanged();
+        }
     }
 
     private (string first, string? keyword, string? end) MatchKeyword(string name)
@@ -104,25 +174,8 @@ public partial class TreeNode(ICodeService codeService) : IDisposable
         return (name, null, null);
     }
 
-    // private bool _select = false;
-    // private async Task SelectNodeAsync()
-    // {
-    //     if (!IsFolder)
-    //         return;
-    //     if(!_expand)
-    //         _childrenNode = await CodeService.GetTreeAsync(Path.ToArray());
-    //     else
-    //         _childrenNode = null;
-    //
-    //     _expand = !_expand;
-    // }
     public void Dispose()
     {
-        if (_activePath.Count == 0)
-        {
-            Console.WriteLine("dispose");
-            _activePath = [];
-        }
         ParentTree?.UnregisterNode(this);
     }
 

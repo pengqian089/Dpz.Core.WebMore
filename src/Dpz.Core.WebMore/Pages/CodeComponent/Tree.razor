@@ -1,5 +1,6 @@
 ﻿<CascadingValue Value="this">
-    <ul>
+    @if (Node.IsRoot)
+    {
         @foreach (var item in Node.Directories)
         {
             <TreeNode OnSelectedFile="OnSelectedFile"
@@ -19,5 +20,29 @@
                       OnExpandFolder="OnExpandFolder"
                       Keyword="@Keyword"/>
         }
-    </ul>
+    }
+    else
+    {
+        <div class="code-tree__children">
+            @foreach (var item in Node.Directories)
+            {
+                <TreeNode OnSelectedFile="OnSelectedFile"
+                          IsFolder="@(true)"
+                          Name="@item.Name"
+                          Path="item.CurrentPath"
+                          OnExpandFolder="OnExpandFolder"
+                          Keyword="@Keyword"/>
+            }
+
+            @foreach (var item in Node.Files)
+            {
+                <TreeNode OnSelectedFile="OnSelectedFile"
+                          IsFolder="@(false)"
+                          Name="@item.Name"
+                          Path="item.CurrentPath"
+                          OnExpandFolder="OnExpandFolder"
+                          Keyword="@Keyword"/>
+            }
+        </div>
+    }
 </CascadingValue>
