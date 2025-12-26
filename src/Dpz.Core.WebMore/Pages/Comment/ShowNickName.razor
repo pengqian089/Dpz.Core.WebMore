@@ -1,22 +1,35 @@
-﻿@if (Commenter is MemberCommenter memberCommenter)
-{
-    <span class="head-nickname">@Commenter.NickName</span><span class="identity">@memberCommenter.Identity</span>
-}
-else if(Commenter is GuestCommenter guestCommenter)
-{
-    if (!string.IsNullOrEmpty(guestCommenter.Site))
+﻿<span class="comment-item__user-info">
+    @if (Commenter is MemberCommenter memberCommenter)
     {
-        <a target="_blank" class="head-nickname" href="@ForceHttps(guestCommenter.Site)">@Commenter.NickName</a>
+        <span class="comment-item__author">@memberCommenter.NickName</span>
+        if (!string.IsNullOrEmpty(memberCommenter.Identity))
+        {
+            <span
+                class="comment-item__tag @(memberCommenter.Identity == "Admin" ? "comment-item__tag--admin" : "")">
+                @memberCommenter.Identity
+            </span>
+        }
     }
-    else
+    else if (Commenter is GuestCommenter guestCommenter)
     {
-        <span class="head-nickname">@Commenter.NickName</span>
+        if (!string.IsNullOrEmpty(guestCommenter.Site))
+        {
+            <a target="_blank" class="comment-item__author" href="@ForceHttps(guestCommenter.Site)">@guestCommenter.NickName</a>
+        }
+        else
+        {
+            <span class="comment-item__author">@guestCommenter.NickName</span>
+        }
     }
-}
+</span>
+
+
+
 
 @code {
     [Parameter]
-    public Commenter Commenter { get; set; }
+    [EditorRequired]
+    public required Commenter Commenter { get; set; }
     
     private static string ForceHttps(string url)
     {

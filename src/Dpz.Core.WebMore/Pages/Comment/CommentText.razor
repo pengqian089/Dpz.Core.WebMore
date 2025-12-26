@@ -2,17 +2,17 @@
 {
     <a href="javascript:">@@@(Content.ReplyNickName)</a>
 }
-@((MarkupString)_content)
+<MarkdownPreview Markdown="@_content" />
 
 @code {
     [Parameter]
-    public CommentContentModel Content { get; set; }
+    public CommentContentModel? Content { get; set; }
 
     string _content = "";
     
     protected override void OnParametersSet()
     {
-        _content = Content?.CommentText?.MarkdownToHtml() ?? "";
+        _content = Content?.CommentText ?? "";
         base.OnParametersSet();
     }
 

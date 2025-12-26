@@ -10,75 +10,51 @@ namespace Dpz.Core.WebMore.Pages.Comment;
 public partial class CommentList
 {
     [Parameter]
-    public List<CommentModel> Comments { get; set; }
-    
-    [Parameter]
-    public int CurrentPageIndex { get; set; }
-    
+    public List<CommentModel> Comments { get; set; } = [];
+
     [Parameter]
     public int TotalPageCount { get; set; }
-    
-    [Parameter]
-    public ToNextPage ToNextPageAsync { get; set; }
-    
-    [Parameter]
-    public Action OnReply { get; set; }
-    
-    [Parameter]
-    public Action OnCancelReply { get; set; }
-    
-    [Parameter]
-    public Func<SendComment,Task> SendCommentAsync { get; set; }
 
-    [Inject]
-    IJSRuntime JsRuntime { get; set; }
+    [Parameter]
+    public int CurrentPageIndex { get; set; }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    [Parameter]
+    public Func<
+        int,
+        Task<(List<CommentModel> comments, int currentPageIndex, int totalPageCount)>
+    > ToNextPageAsync { get; set; }
+
+    [Parameter]
+    public Func<SendComment, Task> SendCommentAsync { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnReply { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancelReply { get; set; }
+
+    [Parameter]
+    public string ReplyId { get; set; }
+
+    bool _loadNextPage;
+
+    public void Refresh(List<CommentModel> comments, int currentPageIndex, int totalPageCount)
     {
-        await JsRuntime.InvokeVoidAsync("Prism.highlightAll");
-        await base.OnAfterRenderAsync(firstRender);
-    }
-
-
-    public delegate Task<(List<CommentModel> comments,int currentPageIndex,int totalPageCount)> ToNextPage(int nextPageIndex);
-    
-    
-
-    public void Refresh(List<CommentModel> comments,int currentPageIndex,int totalPageCount)
-    {
+        Comments = comments;
         CurrentPageIndex = currentPageIndex;
         TotalPageCount = totalPageCount;
-        Comments = comments;
         StateHasChanged();
     }
 
-    bool _loadNextPage = false;
     private async Task NextAsync()
     {
-        if (ToNextPageAsync != null)
-        {
-            _loadNextPage = true;
-            var (comments,currentPageIndex,totalPageCount) = await ToNextPageAsync(CurrentPageIndex + 1);
-            Comments.AddRange(comments);
-            CurrentPageIndex = currentPageIndex;
-            TotalPageCount = totalPageCount;
-            _loadNextPage = false;
-            StateHasChanged();
-        }
-    }
-
-    private void Reply(dynamic comment)
-    {
-        OnReply?.Invoke();
-        foreach (var model in Comments)
-        {
-            model.ShowReply = false;
-            foreach (var child in model.Children)
-            {
-                child.ShowReply = false;
-            }
-        }
-        comment.ShowReply = true;
-        //StateHasChanged();
+        _loadNextPage = true;
+        var (comments, currentPageIndex, totalPageCount) = await ToNextPageAsync(
+            CurrentPageIndex + 1
+        );
+        Comments.AddRange(comments);
+        CurrentPageIndex = currentPageIndex;
+        TotalPageCount = totalPageCount;
+        _loadNextPage = false;
     }
 }
