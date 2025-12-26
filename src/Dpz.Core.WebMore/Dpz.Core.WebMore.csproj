@@ -26,4 +26,10 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Pages\ArticleComponent\ArticleShow.razor" />
+    <_ContentIncludedByDefault Remove="Pages\ArticleComponent\Like.razor" />
+    <_ContentIncludedByDefault Remove="Pages\ArticleComponent\News.razor" />
+  </ItemGroup>
+
 </Project>

@@ -1,160 +1,79 @@
 ﻿@page "/bson-to-json"
-@using System.IO
-@using BlazorMonaco.Editor
-@using MongoDB.Bson
-@using MongoDB.Bson.IO
-@using MongoDB.Bson.Serialization
 
 <PageTitle>显示BSON 转 JSON - 个人文章分享</PageTitle>
-<div style="margin: 80px auto 0">
-    <MudFileUpload T="IBrowserFile" FilesChanged="OnSelectedFile" Accept=".bson">
-        <ActivatorContent>
-            <MudButton Variant="Variant.Filled"
-                       Color="Color.Primary"
-                       StartIcon="@Icons.Material.Filled.CloudUpload">
-                选择BSON文件
-            </MudButton>
-        </ActivatorContent>
-    </MudFileUpload>
-    <div>file size : @_fileSize bytes</div>
-    <MudTextField
-        @bind-Value="_objectIdValue"
-        Label="查看ObjectId创建时间"
-        Variant="Variant.Outlined"
-        TextChanged="OnObjectIdValueChange"/>
-    @if (_parseObjectIdSuccess.HasValue)
-    {
-        <div>
+
+<div class="bson-tool">
+    <div class="bson-tool__header">
+        <h1 class="bson-tool__title">BSON 转 JSON 工具</h1>
+    </div>
+
+    <div class="bson-tool__section">
+        <div class="bson-tool__upload-area">
+            <InputFile OnChange="OnSelectedFile" class="bson-tool__file-input" accept=".bson" />
+            <div class="bson-tool__upload-content">
+                <i class="fa-solid fa-cloud-arrow-up bson-tool__upload-icon"></i>
+                <div class="bson-tool__upload-text">点击或拖拽 BSON 文件到此处</div>
+                <div class="bson-tool__upload-hint">支持 .bson 格式文件</div>
+            </div>
+        </div>
+        
+        @if (_fileSize > 0)
+        {
+            <div class="bson-tool__file-info">
+                <i class="fa-solid fa-file"></i>
+                <span>File size: @_fileSize bytes</span>
+            </div>
+        }
+
+        @if (!string.IsNullOrEmpty(_errorMessage))
+        {
+            <div class="bson-tool__error" style="margin-top: 1rem;">
+                <i class="fa-solid fa-circle-exclamation"></i> @_errorMessage
+            </div>
+        }
+    </div>
+
+    <div class="bson-tool__section">
+        <div class="bson-tool__input-group">
+            <label class="bson-tool__label">查看 ObjectId 创建时间</label>
+            <input type="text" 
+                   @bind="_objectIdValue" 
+                   @bind:event="oninput"
+                   @bind:after="OnObjectIdValueChange"
+                   class="bson-tool__input" 
+                   placeholder="输入 ObjectId..." />
+        </div>
+
+        @if (_parseObjectIdSuccess.HasValue)
+        {
             @if (_parseObjectIdSuccess == true && _objectId != null)
             {
-                <div>ObjectId created UTC time:
-                    <span style="color: #00ce64">
-                        @_objectId.Value.CreationTime.ToUniversalTime().ToString("yyyy/MM/dd HH:mm:ss")
-                    </span>
-                </div>
-                <div>ObjectId created local
-                    time:
-                    <span
-                        style="color: #00ce64">
-                        @_objectId.Value.CreationTime.ToLocalTime().ToString("yyyy/MM/dd HH:mm:ss")
-                    </span>
-                </div>
-                <div>ObjectId timestamp:
-                    <span style="color: #00ce64">
-                        @_objectId.Value.Timestamp.ToString("N")
-                    </span>
+                <div class="bson-tool__result-card">
+                    <div class="bson-tool__result-row">
+                        <span class="bson-tool__result-label">UTC Time</span>
+                        <span class="bson-tool__result-value">@_objectId.Value.CreationTime.ToUniversalTime().ToString("yyyy/MM/dd HH:mm:ss")</span>
+                    </div>
+                    <div class="bson-tool__result-row">
+                        <span class="bson-tool__result-label">Local Time</span>
+                        <span class="bson-tool__result-value">@_objectId.Value.CreationTime.ToLocalTime().ToString("yyyy/MM/dd HH:mm:ss")</span>
+                    </div>
+                    <div class="bson-tool__result-row">
+                        <span class="bson-tool__result-label">Timestamp</span>
+                        <span class="bson-tool__result-value">@_objectId.Value.Timestamp.ToString("N")</span>
+                    </div>
                 </div>
             }
             else if (_parseObjectIdSuccess == false)
             {
-                <span>ObjectId 无效</span>
+                <div class="bson-tool__error">
+                    <i class="fa-solid fa-triangle-exclamation"></i> ObjectId 无效
+                </div>
             }
-        </div>
-    }
-    <StandaloneCodeEditor
-        @ref="_editor"
-        Id="show-bson-editor"
-        CssClass="editor"
-        ConstructionOptions="EditorConstructionOptions"/>
+        }
+    </div>
+
+    <div class="bson-tool__code-container">
+        @* 使用 @key 强制 Blazor 在内容更新时重新创建 DOM 元素，防止 Prism.js 修改 DOM 后导致的渲染冲突 *@
+        <pre @key="@_renderKey"><code class="language-json">@_bsonValue</code></pre>
+    </div>
 </div>
-
-@code {
-    [Inject] private ISnackbar Snackbar { get; set; }
-
-    private long _fileSize = 0;
-    private StandaloneCodeEditor _editor;
-    private string _objectIdValue = "";
-    private bool? _parseObjectIdSuccess = null;
-    private ObjectId? _objectId = null;
-
-    private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
-    {
-        var options = new StandaloneEditorConstructionOptions
-        {
-            Language = "json",
-            GlyphMargin = true,
-            Value = "{}",
-            AutomaticLayout = true,
-            ReadOnly = true,
-        };
-
-        return options;
-    }
-
-    private async Task OnSelectedFile(IBrowserFile arg)
-    {
-        if (arg == null)
-        {
-            return;
-        }
-
-        if (arg.Size > AppTools.MaxFileSize)
-        {
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-            Snackbar.Add($"文件过大，请选择小于 {AppTools.MaxFileSize / 1024d / 1024d} MB 的文件", Severity.Warning);
-            //await AppTools.ShowMessageBox();
-            return;
-        }
-
-        await using var stream = arg.OpenReadStream(AppTools.MaxFileSize);
-        using var memoryStream = new MemoryStream();
-        await stream.CopyToAsync(memoryStream);
-        _fileSize = memoryStream.Length;
-        memoryStream.Position = 0;
-
-        var data = ParseBson();
-
-        var json = data.ToJson(new JsonWriterSettings { Indent = true });
-        await _editor.SetValue(json);
-        return;
-
-        List<BsonDocument> ParseBson()
-        {
-            var list = new List<BsonDocument>();
-            try
-            {
-                using var reader = new BsonBinaryReader(memoryStream);
-                while (!reader.IsAtEndOfFile())
-                {
-                    var bsonType = reader.ReadBsonType();
-                    if (bsonType == BsonType.EndOfDocument)
-                    {
-                        break;
-                    }
-
-                    var document = ReadBsonDocument(reader);
-                    list.Add(document);
-                }
-            }
-            catch (Exception e)
-            {
-                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-                Snackbar.Add(e.ToString(), Severity.Warning);
-                return list;
-            }
-
-            return list;
-        }
-    }
-
-    private static BsonDocument ReadBsonDocument(BsonBinaryReader reader)
-    {
-        var context = BsonDeserializationContext.CreateRoot(reader);
-        var bsonDocumentSerializer = BsonSerializer.LookupSerializer<BsonDocument>();
-        return bsonDocumentSerializer.Deserialize(context);
-    }
-
-    private void OnObjectIdValueChange()
-    {
-        if (ObjectId.TryParse(_objectIdValue, out var oid))
-        {
-            _objectId = oid;
-            _parseObjectIdSuccess = true;
-        }
-        else
-        {
-            _parseObjectIdSuccess = false;
-        }
-    }
-
-}

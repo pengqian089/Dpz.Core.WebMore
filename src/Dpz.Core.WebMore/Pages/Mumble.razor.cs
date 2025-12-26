@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Dpz.Core.WebMore.Pages;
 
-public partial class Mumble(IMumbleService mumbleService)
+public partial class Mumble(IMumbleService mumbleService) : ComponentBase
 {
     [Parameter]
     public int PageIndex { get; set; } = 1;
