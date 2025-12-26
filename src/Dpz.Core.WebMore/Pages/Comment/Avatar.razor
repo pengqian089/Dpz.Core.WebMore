@@ -11,5 +11,6 @@
 
 @code {
     [Parameter]
-    public Commenter Commenter { get; set; }
+    [EditorRequired]
+    public required Commenter Commenter { get; set; }
 }

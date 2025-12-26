@@ -14,5 +14,8 @@ public interface ICommentService
         int pageSize = 10
     );
 
-    Task<IPagedList<CommentModel>> SendAsync(SendComment comment, int pageSize = 5);
+    Task<ResultInformation<IPagedList<CommentModel>>> SendAsync(
+        SendComment comment,
+        int pageSize = 5
+    );
 }

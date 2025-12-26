@@ -109,17 +109,17 @@ public partial class Albums(IPictureRecordService pictureRecordService, IJSRunti
         }
     }
 
-    private async Task DownloadImage(string url)
+    private async Task DownloadImage(string? url)
     {
-        if (_jsAlbums != null)
+        if (_jsAlbums != null && string.IsNullOrWhiteSpace(url))
         {
             await _jsAlbums.InvokeVoidAsync("downloadImage", url);
         }
     }
 
-    private async Task ShareImage(string url)
+    private async Task ShareImage(string? url)
     {
-        if (_jsAlbums != null)
+        if (_jsAlbums != null && string.IsNullOrWhiteSpace(url))
         {
             await _jsAlbums.InvokeVoidAsync("shareImage", url);
         }

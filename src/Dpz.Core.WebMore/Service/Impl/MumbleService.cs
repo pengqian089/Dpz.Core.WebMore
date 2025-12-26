@@ -41,24 +41,6 @@ public class MumbleService(HttpClient httpClient) : IMumbleService
         return await response.Content.ReadFromJsonAsync<MumbleModel>();
     }
 
-    public async Task<IPagedList<MumbleCommentModel>> GetCommentPageAsync(
-        string id,
-        int pageIndex,
-        int pageSize
-    )
-    {
-        var parameter = new Dictionary<string, string>
-        {
-            { nameof(pageIndex), pageIndex.ToString() },
-            { nameof(pageSize), pageSize.ToString() },
-            { "content", "" },
-        };
-        return await httpClient.ToPagedListAsync<MumbleCommentModel>(
-            $"/api/Mumble/comment/{id}",
-            parameter
-        );
-    }
-
     public async Task<List<MumbleModel>> GetHistories()
     {
         return await httpClient.GetFromJsonAsync<List<MumbleModel>>("/api/Mumble/history") ?? [];

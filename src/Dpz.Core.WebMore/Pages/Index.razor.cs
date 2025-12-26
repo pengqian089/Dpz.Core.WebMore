@@ -9,7 +9,7 @@ public partial class Index(IArticleService articleService, ICommunityService com
 {
     private List<ArticleMiniModel> _topArticles = [];
 
-    private List<PictureModel> _banners = [];
+    private List<PictureRecordModel> _banners = [];
 
     private bool _loading = true;
 

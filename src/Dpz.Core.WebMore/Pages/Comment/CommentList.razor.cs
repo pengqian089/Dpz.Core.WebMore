@@ -22,10 +22,10 @@ public partial class CommentList
     public Func<
         int,
         Task<(List<CommentModel> comments, int currentPageIndex, int totalPageCount)>
-    > ToNextPageAsync { get; set; }
+    >? ToNextPageAsync { get; set; }
 
     [Parameter]
-    public Func<SendComment, Task> SendCommentAsync { get; set; }
+    public Func<SendComment, Task>? SendCommentAsync { get; set; }
 
     [Parameter]
     public EventCallback<string> OnReply { get; set; }
@@ -34,7 +34,7 @@ public partial class CommentList
     public EventCallback OnCancelReply { get; set; }
 
     [Parameter]
-    public string ReplyId { get; set; }
+    public string? ReplyId { get; set; }
 
     bool _loadNextPage;
 
@@ -49,9 +49,9 @@ public partial class CommentList
     private async Task NextAsync()
     {
         _loadNextPage = true;
-        var (comments, currentPageIndex, totalPageCount) = await ToNextPageAsync(
+        var (comments, currentPageIndex, totalPageCount) = await ToNextPageAsync?.Invoke(
             CurrentPageIndex + 1
-        );
+        )!;
         Comments.AddRange(comments);
         CurrentPageIndex = currentPageIndex;
         TotalPageCount = totalPageCount;

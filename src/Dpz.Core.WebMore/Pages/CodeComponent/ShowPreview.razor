@@ -1,4 +1,4 @@
-﻿@if (Node?.CodeContainer?.Language == "markdown" || !string.IsNullOrEmpty(Node.ReadmeContent))
+﻿@if (Node?.CodeContainer?.Language == "markdown" || !string.IsNullOrEmpty(Node?.ReadmeContent))
 {
     var markdown = Node.CodeContainer?.Language == "markdown" ? Node.CodeContainer.CodeContent : Node.ReadmeContent;
     <div class="readme-main">
@@ -9,7 +9,7 @@ else
 {
     <Preview Node="Node"></Preview>
 }
-@if (!string.IsNullOrWhiteSpace(Node.CodeContainer?.AiAnalyzeResult))
+@if (!string.IsNullOrWhiteSpace(Node?.CodeContainer?.AiAnalyzeResult))
 {
     <div class="readme-main">
         <MarkdownPreview Markdown="@Node.CodeContainer.AiAnalyzeResult"></MarkdownPreview>

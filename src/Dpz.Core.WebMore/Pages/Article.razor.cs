@@ -6,7 +6,7 @@ using Microsoft.JSInterop;
 
 namespace Dpz.Core.WebMore.Pages;
 
-public partial class Article(IArticleService articleService, IJSRuntime jsRuntime)
+public partial class Article(IArticleService articleService)
 {
     [Parameter]
     [EditorRequired]

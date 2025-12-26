@@ -8,10 +8,11 @@ namespace Dpz.Core.WebMore.Service.Impl;
 
 public class CommunityService(HttpClient httpClient) : ICommunityService
 {
-    public async Task<List<PictureModel>> GetBannersAsync()
+    public async Task<List<PictureRecordModel>> GetBannersAsync()
     {
-        return await httpClient.GetFromJsonAsync<List<PictureModel>>("/api/Community/getBanners")
-            ?? [];
+        return await httpClient.GetFromJsonAsync<List<PictureRecordModel>>(
+                "/api/Community/getBanners"
+            ) ?? [];
     }
 
     public async Task<List<FriendModel>> GetFriendsAsync()

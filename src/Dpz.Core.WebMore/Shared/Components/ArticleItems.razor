@@ -40,7 +40,7 @@
                 <a href="/article/read/@item.Id">@item.Title</a>
             </h3>
             <div class="article-card__excerpt">
-                @((MarkupString)item.Introduction)
+                @((MarkupString)(item.Introduction ?? ""))
             </div>
             <div class="article-card__footer">
                 <div class="article-card__tags">

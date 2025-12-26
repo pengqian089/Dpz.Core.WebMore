@@ -26,7 +26,7 @@
             </button>
         </div>
 
-        @if (Node != null && !string.IsNullOrEmpty(Relation) && string.IsNullOrEmpty(_replyId))
+        @if (!string.IsNullOrEmpty(Relation) && string.IsNullOrEmpty(_replyId))
         {
             <div class="comment-form-wrapper">
                 <CommentForm Node="@Node" Relation="@Relation" SendCommentAsync="SendAsync"></CommentForm>

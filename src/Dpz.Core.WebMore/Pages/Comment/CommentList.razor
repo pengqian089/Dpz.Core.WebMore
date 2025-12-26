@@ -50,7 +50,7 @@ else
                         <CommentForm Node="@item.Node" Relation="@item.Relation" ReplyId="@item.Id" SendCommentAsync="SendCommentAsync" OnCancelReply="OnCancelReply"></CommentForm>
                     }
 
-                    @if (item.Children != null && item.Children.Any())
+                    @if (item.Children.Count > 0)
                     {
                         <div class="comment-replies">
                             @foreach (var reply in item.Children)

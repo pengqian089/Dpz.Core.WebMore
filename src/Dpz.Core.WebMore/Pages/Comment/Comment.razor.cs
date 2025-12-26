@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Dpz.Core.WebMore.Pages.Comment;
 
-public partial class Comment(ICommentService commentService)
+public partial class Comment(ICommentService commentService, IAppDialogService dialogService)
 {
     [Parameter]
     [EditorRequired]
@@ -52,7 +52,15 @@ public partial class Comment(ICommentService commentService)
 
     private async Task SendAsync(SendComment arg)
     {
-        _comments = await commentService.SendAsync(arg, PageSize);
+        var result = await commentService.SendAsync(arg, PageSize);
+        if (!result.Success || result.Data == null)
+        {
+            await dialogService.AlertAsync(result.Message);
+            return;
+        }
+
+        _comments = result.Data;
+        ;
         if (_commentList != null)
         {
             _commentList.Refresh(

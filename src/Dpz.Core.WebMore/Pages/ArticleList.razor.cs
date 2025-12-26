@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Dpz.Core.WebMore.Pages;
 
-public partial class ArticleList(IArticleService articleService, NavigationManager navigation)
+public partial class ArticleList(IArticleService articleService)
 {
     [Parameter]
     public int PageIndex { get; set; } = 1;
