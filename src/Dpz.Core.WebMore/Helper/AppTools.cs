@@ -4,8 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
@@ -15,7 +13,6 @@ using Markdig.Renderers.Html;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Logging;
 
 namespace Dpz.Core.WebMore.Helper;
 
@@ -28,9 +25,13 @@ public static class AppTools
     /// </summary>
     public const long MaxFileSize = 1024 * 1024 * 100;
 
-    private static string HandleParameter(string url, Dictionary<string, string>? parameters)
+    private static string HandleParameter(
+        string url,
+        IEnumerable<KeyValuePair<string, string>>? parameters
+    )
     {
-        if (parameters is not { Count: > 0 })
+        var queryStringResult = parameters?.ToList() ?? [];
+        if (queryStringResult.Count == 0)
         {
             return url;
         }
@@ -38,14 +39,14 @@ public static class AppTools
         var index = url.IndexOf("?", StringComparison.CurrentCultureIgnoreCase);
         var query = index >= 0 ? url.Substring(index) : "";
         var queryString = HttpUtility.ParseQueryString(query);
-        foreach (var item in parameters)
+        foreach (var item in queryStringResult)
         {
             queryString.Add(item.Key, item.Value);
         }
 
         if (index >= 0)
         {
-            url = url.Substring(0, index + 1) + queryString;
+            url = url[..(index + 1)] + queryString;
         }
         else
         {
@@ -58,7 +59,7 @@ public static class AppTools
     public static async Task<IPagedList<T>> ToPagedListAsync<T>(
         this HttpClient client,
         string url,
-        Dictionary<string, string>? parameters = null,
+        IEnumerable<KeyValuePair<string, string>>? parameters = null,
         JsonConverter? converter = null
     )
     {
