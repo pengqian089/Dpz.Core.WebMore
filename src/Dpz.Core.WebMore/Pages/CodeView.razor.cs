@@ -5,7 +5,6 @@ using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using Dpz.Core.EnumLibrary;
 using Dpz.Core.WebMore.Models;
-using Dpz.Core.WebMore.Pages.CodeComponent;
 using Dpz.Core.WebMore.Service;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -34,11 +33,12 @@ public partial class CodeView(
     private bool _isRestoringPath;
 
     private IEnumerable<string> _currentPath = [];
+    private List<string> _activePath = [];
+    private readonly Dictionary<string, CodeNoteTree> _expandedNodes = new();
 
     private ElementReference _sidebarElement;
     private ElementReference _resizerElement;
     private IJSObjectReference? _module;
-    private Tree _treeComponent = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -73,19 +73,27 @@ public partial class CodeView(
     protected override async Task OnParametersSetAsync()
     {
         var path = string.Join("/", _currentPath);
+
         if (
             !string.IsNullOrEmpty(Path)
             && !string.Equals(path, Path, StringComparison.InvariantCulture)
         )
         {
+            if (!string.IsNullOrEmpty(_tempSearch))
+            {
+                _search = null;
+                _tempSearch = null;
+                _treeData = await codeService.GetTreeAsync(null);
+                _currentFolderNode = _treeData;
+                _expandedNodes.Clear();
+            }
+
             var paths = Path.Split('/', StringSplitOptions.RemoveEmptyEntries);
 
-            // If paths match current selected node, do nothing
             if (_selectedNode != null && _selectedNode.CurrentPaths.SequenceEqual(paths))
             {
                 return;
             }
-            // If paths match current folder node, do nothing
             if (
                 _selectedNode == null
                 && _currentFolderNode != null
@@ -99,8 +107,6 @@ public partial class CodeView(
             _isRestoringPath = true;
             try
             {
-                var tempPaths = new List<string>();
-
                 // 等待根目录加载完成
                 if (_treeData.Type == FileSystemType.NoExists || _isLoading)
                 {
@@ -110,29 +116,61 @@ public partial class CodeView(
                     return;
                 }
 
-                foreach (var item in paths)
+                // Data-driven loading:
+                // 1. Identify all parent paths
+                // 2. Fetch missing data in parallel/sequence
+                // 3. Populate _expandedNodes
+
+                var currentScanPath = new List<string>();
+                foreach (var segment in paths)
                 {
-                    tempPaths.Add(item);
-                    // 找到当前层级的节点
-                    var node = _treeComponent.FindNodeByPath(tempPaths);
-                    if (node == null)
+                    currentScanPath.Add(segment);
+
+                    // Don't expand the very last item if it's potentially a file?
+                    // But we don't know if it's a file or folder yet easily without loading.
+                    // We'll fetch it. If it has children (IsDirectory), we add to expanded.
+
+                    var pathKey = string.Join("/", currentScanPath);
+                    if (!_expandedNodes.ContainsKey(pathKey))
                     {
-                        var parentPaths = tempPaths.Take(tempPaths.Count - 1).ToList();
-                        var parentNode = _treeComponent.FindNodeByPath(parentPaths);
-                        if (parentNode != null)
+                        var nodeData = await codeService.GetTreeAsync(currentScanPath.ToArray());
+                        if (nodeData.IsDirectory)
                         {
-                            await parentNode.ExpandNodeAsync();
-                            node = _treeComponent.FindNodeByPath(tempPaths);
+                            _expandedNodes[pathKey] = nodeData;
+                        }
+
+                        // If this is the final path
+                        if (currentScanPath.Count == paths.Length)
+                        {
+                            if (nodeData.IsDirectory)
+                            {
+                                _currentFolderNode = nodeData;
+                                _selectedNode = null;
+                            }
+                            else
+                            {
+                                _selectedNode = nodeData;
+                                // We don't expand files, but we need to set ActivePath
+                            }
                         }
                     }
-
-                    if (node != null)
+                    else
                     {
-                        // Always expand/select to ensure highlighting
-                        await node.ExpandNodeAsync();
+                        // Already in cache, just verify if final
+                        if (currentScanPath.Count == paths.Length)
+                        {
+                            var node = _expandedNodes[pathKey]; // This is a dir
+                            _currentFolderNode = node;
+                            _selectedNode = null;
+                        }
                     }
-                    StateHasChanged();
                 }
+
+                // Set active path for highlighting
+                _activePath = paths.ToList();
+                _currentPath = paths;
+
+                StateHasChanged();
 
                 // Scroll to active element after restoration
                 if (_module != null)
@@ -203,6 +241,7 @@ public partial class CodeView(
         _treeData = await codeService.GetTreeAsync(null);
         _selectedNode = null;
         _currentFolderNode = _treeData;
+        _expandedNodes.Clear();
         navigationManager.NavigateTo("/code");
     }
 
@@ -229,6 +268,7 @@ public partial class CodeView(
             return Task.CompletedTask;
         }
         _currentPath = arg.CurrentPaths;
+        _activePath = arg.CurrentPaths;
         _selectedNode = arg;
         UpdateUrl(arg.CurrentPaths);
         StateHasChanged();
@@ -238,14 +278,18 @@ public partial class CodeView(
     private void ExpandFolder(CodeNoteTree obj)
     {
         _currentPath = obj.CurrentPaths;
+        _activePath = obj.CurrentPaths;
         _currentFolderNode = obj;
-        // 切换到文件夹视图
         _selectedNode = null;
 
         if (!string.IsNullOrEmpty(obj.ReadmeContent))
         {
             _treeData.ReadmeContent = obj.ReadmeContent;
         }
+
+        // Add to expanded state to persist if we re-visit
+        var pathKey = string.Join("/", obj.CurrentPaths);
+        _expandedNodes.TryAdd(pathKey, obj);
 
         UpdateUrl(obj.CurrentPaths);
         StateHasChanged();

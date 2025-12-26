@@ -1,25 +1,26 @@
-﻿@if (!string.IsNullOrEmpty(Name))
+﻿@using Dpz.Core.WebMore.Pages.CodeComponent
+
+@if (!string.IsNullOrEmpty(Name))
 {
-    var isActive = _activePath.Count > 0 && _activePath.SequenceEqual(Path);
+    var isActive = ActivePath.SequenceEqual(Path);
     <div class="code-tree__node @(_expand ? "is-expanded" : "")">
         <div class="code-tree__content @(isActive ? "is-active" : "")" @onclick="OnContentClickAsync">
             <!-- Toggle Icon -->
-            <div class="code-tree__toggle @(IsFolder ? "" : "is-hidden")" @onclick="ToggleNodeAsync"
-                 @onclick:stopPropagation>
+            <div class="code-tree__toggle @(IsFolder ? "" : "is-hidden")" @onclick="ToggleNodeAsync" @onclick:stopPropagation>
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                     <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
                 </svg>
             </div>
-
+            
             <!-- Icon -->
             <div class="code-tree__icon">
                 <ShowIcon IsFolder="@IsFolder" Filename="@Name"></ShowIcon>
             </div>
-
+            
             <!-- Label -->
             <div class="code-tree__label" title="@string.Join("/", Path)">
                 @{
-                    var (first, keyword, end) = MatchKeyword(Name);
+                    var (first,keyword,end) = MatchKeyword(Name);
                 }
                 @if (keyword == null || end == null)
                 {
@@ -33,11 +34,10 @@
                 }
             </div>
         </div>
-
+        
         @if (_childrenNode != null && _expand)
         {
-            <Tree @ref="_childTree" OnSelectedFile="OnSelectedFile" Node="_childrenNode"
-                  OnExpandFolder="OnExpandFolder"></Tree>
+            <Tree @ref="_childTree" OnSelectedFile="OnSelectedFile" Node="_childrenNode" OnExpandFolder="OnExpandFolder"></Tree>
         }
     </div>
 }

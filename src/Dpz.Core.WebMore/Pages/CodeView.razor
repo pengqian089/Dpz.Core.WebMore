@@ -2,156 +2,159 @@
 @using Dpz.Core.WebMore.Pages.CodeComponent
 <PageTitle>网站源码 - 个人文章分享</PageTitle>
 
-<div class="code-explorer">
-    <div class="code-explorer__sidebar" @ref="_sidebarElement">
-        <div class="code-explorer__resizer" @ref="_resizerElement"></div>
-        <div class="code-explorer__search">
-            <input type="text" placeholder="搜索文件..." @bind="_search" @bind:event="oninput"
-                   @onkeyup="SearchKeyUpAsync"/>
-            <button type="button" class="btn-search" title="搜索" @onclick="SearchAsync">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                    <path
-                        d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                </svg>
-            </button>
-        </div>
-        <div class="code-explorer__tree" data-loaded="@(!_isLoading)">
-            @if (_isLoading)
-            {
-                <div style="padding: 0 12px;">
-                    @foreach (var w in new[] { 60, 40, 70, 50, 65, 45, 55, 35 })
+<CascadingValue Value="_expandedNodes" Name="ExpandedNodes">
+    <CascadingValue Value="_activePath" Name="ActivePath">
+        <div class="code-explorer">
+            <div class="code-explorer__sidebar" @ref="_sidebarElement">
+                <div class="code-explorer__resizer" @ref="_resizerElement"></div>
+                <div class="code-explorer__search">
+                    <input type="text" placeholder="搜索文件..." @bind="_search" @bind:event="oninput"
+                           @onkeyup="SearchKeyUpAsync"/>
+                    <button type="button" class="btn-search" title="搜索" @onclick="SearchAsync">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                            <path
+                                d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="code-explorer__tree" data-loaded="@(!_isLoading)">
+                    @if (_isLoading)
                     {
-                        <div style="display: flex; align-items: center; padding: 8px 0;">
-                            <div class="skeleton"
-                                 style="width: 16px; height: 16px; margin-right: 8px; border-radius: 2px; flex-shrink: 0;"></div>
-                            <div class="skeleton skeleton--text" style="width: @w%; margin-bottom: 0;"></div>
+                        <div style="padding: 0 12px;">
+                            @foreach (var w in new[] { 60, 40, 70, 50, 65, 45, 55, 35 })
+                            {
+                                <div style="display: flex; align-items: center; padding: 8px 0;">
+                                    <div class="skeleton"
+                                         style="width: 16px; height: 16px; margin-right: 8px; border-radius: 2px; flex-shrink: 0;"></div>
+                                    <div class="skeleton skeleton--text" style="width: @w%; margin-bottom: 0;"></div>
+                                </div>
+                            }
                         </div>
+                    }
+                    else
+                    {
+                        <Tree
+                            OnSelectedFile="SelectedFile"
+                            Node="_treeData"
+                            Keyword="@_search"
+                            OnExpandFolder="ExpandFolder"/>
                     }
                 </div>
-            }
-            else
-            {
-                <Tree
-                    @ref="_treeComponent"
-                    OnSelectedFile="SelectedFile"
-                    Node="_treeData"
-                    Keyword="@_search"
-                    OnExpandFolder="ExpandFolder"/>
-            }
-        </div>
-    </div>
+            </div>
 
-    <div class="code-explorer__main">
-        <div class="code-explorer__breadcrumbs">
-            <a href="javascript:void(0)" @onclick="@(() => NavigateToPath(""))">Root</a>
-            @{
-                var steps = new List<string>();
-                // Determine which paths to show in breadcrumbs.
-                var displayPaths = _selectedNode?.CurrentPaths ?? _currentPath;
-            }
-            @foreach (var item in displayPaths)
-            {
-                steps.Add(item);
-                var currentStepPath = string.Join("/", steps);
-                <span>/</span>
-                <a href="javascript:void(0)" @onclick="@(() => NavigateToPath(currentStepPath))">@item</a>
-            }
-        </div>
-
-        <div class="code-explorer__content">
-            @if (_selectedNode != null)
-            {
-                <ShowPreview @key="_selectedNode" Node="_selectedNode"/>
-            }
-            else
-            {
-                var folderNode = _currentFolderNode ?? _treeData;
-
-                @if (folderNode.Directories.Count > 0)
-                {
-                    foreach (var item in folderNode.Directories)
-                    {
-                        var fullPath = string.Join("/", item.CurrentPath);
-                        <div class="row" @onclick="@(() => NavigateToPath(fullPath))" style="cursor: pointer;">
-                            <div class="icon">
-                                <ShowIcon IsFolder="@true" Filename="@item.Name"/>
-                            </div>
-                            <div class="header">
-                                <a href="javascript:void(0)">
-                                    @{
-                                        var (first, keyword, end) = MatchKeyword(item.Name ?? "");
-                                    }
-                                    @if (keyword == null || end == null)
-                                    {
-                                        @item.Name
-                                    }
-                                    else
-                                    {
-                                        <span>@first</span>
-                                        <mark>@keyword</mark>
-                                        <span>@end</span>
-                                    }
-                                </a>
-                            </div>
-                            <div class="desc">
-                                <span>@(item.Note)</span>
-                            </div>
-                            <div class="time">
-                                <ShowDateTime DateTime="@item.LastUpdateTime"/>
-                            </div>
-                        </div>
+            <div class="code-explorer__main">
+                <div class="code-explorer__breadcrumbs">
+                    <a href="javascript:void(0)" @onclick="@(() => NavigateToPath(""))">Root</a>
+                    @{
+                        var steps = new List<string>();
+                        // Determine which paths to show in breadcrumbs.
+                        var displayPaths = _selectedNode?.CurrentPaths ?? _currentPath;
                     }
-                }
-
-                @if (folderNode.Files.Count > 0)
-                {
-                    foreach (var item in folderNode.Files)
+                    @foreach (var item in displayPaths)
                     {
-                        var fullPath = string.Join("/", item.CurrentPath);
-                        <div class="row" @onclick="@(() => NavigateToPath(fullPath))" style="cursor: pointer;">
-                            <div class="icon">
-                                <ShowIcon IsFolder="@false" Filename="@item.Name"/>
-                            </div>
-                            <div class="header">
-                                <a href="javascript:void(0)">
-                                    @{
-                                        var (first, keyword, end) = MatchKeyword(item.Name ?? "");
-                                    }
-                                    @if (keyword == null || end == null)
-                                    {
-                                        @item.Name
-                                    }
-                                    else
-                                    {
-                                        <span>@first</span>
-                                        <mark>@keyword</mark>
-                                        <span>@end</span>
-                                    }
-                                </a>
-                            </div>
-                            <div class="desc">
-                                <span>@(item.Note)</span>
-                            </div>
-                            <div class="time">
-                                <ShowDateTime DateTime="@item.LastUpdateTime"/>
-                            </div>
-                        </div>
+                        steps.Add(item);
+                        var currentStepPath = string.Join("/", steps);
+                        <span>/</span>
+                        <a href="javascript:void(0)" @onclick="@(() => NavigateToPath(currentStepPath))">@item</a>
                     }
-                }
+                </div>
 
-                @if (!string.IsNullOrEmpty(folderNode.ReadmeContent))
-                {
-                    <div class="readme-main">
-                        <MarkdownPreview Markdown="@folderNode.ReadmeContent"></MarkdownPreview>
-                    </div>
-                }
-                else if (folderNode.Directories.Count == 0 && folderNode.Files.Count == 0)
-                {
-                    <div style="text-align: center; color: var(--color-text-muted); padding-top: 2rem;">
-                        没有文件
-                    </div>
-                }
-            }
+                <div class="code-explorer__content">
+                    @if (_selectedNode != null)
+                    {
+                        <ShowPreview @key="_selectedNode" Node="_selectedNode"/>
+                    }
+                    else
+                    {
+                        var folderNode = _currentFolderNode ?? _treeData;
+
+                        @if (folderNode.Directories.Count > 0)
+                        {
+                            foreach (var item in folderNode.Directories)
+                            {
+                                var fullPath = string.Join("/", item.CurrentPath);
+                                <div class="row" @onclick="@(() => NavigateToPath(fullPath))" style="cursor: pointer;">
+                                    <div class="icon">
+                                        <ShowIcon IsFolder="@true" Filename="@item.Name"/>
+                                    </div>
+                                    <div class="header">
+                                        <a href="javascript:void(0)">
+                                            @{
+                                                var (first, keyword, end) = MatchKeyword(item.Name ?? "");
+                                            }
+                                            @if (keyword == null || end == null)
+                                            {
+                                                @item.Name
+                                            }
+                                            else
+                                            {
+                                                <span>@first</span>
+                                                <mark>@keyword</mark>
+                                                <span>@end</span>
+                                            }
+                                        </a>
+                                    </div>
+                                    <div class="desc">
+                                        <span>@(item.Note)</span>
+                                    </div>
+                                    <div class="time">
+                                        <ShowDateTime DateTime="@item.LastUpdateTime"/>
+                                    </div>
+                                </div>
+                            }
+                        }
+
+                        @if (folderNode.Files.Count > 0)
+                        {
+                            foreach (var item in folderNode.Files)
+                            {
+                                var fullPath = string.Join("/", item.CurrentPath);
+                                <div class="row" @onclick="@(() => NavigateToPath(fullPath))" style="cursor: pointer;">
+                                    <div class="icon">
+                                        <ShowIcon IsFolder="@false" Filename="@item.Name"/>
+                                    </div>
+                                    <div class="header">
+                                        <a href="javascript:void(0)">
+                                            @{
+                                                var (first, keyword, end) = MatchKeyword(item.Name ?? "");
+                                            }
+                                            @if (keyword == null || end == null)
+                                            {
+                                                @item.Name
+                                            }
+                                            else
+                                            {
+                                                <span>@first</span>
+                                                <mark>@keyword</mark>
+                                                <span>@end</span>
+                                            }
+                                        </a>
+                                    </div>
+                                    <div class="desc">
+                                        <span>@(item.Note)</span>
+                                    </div>
+                                    <div class="time">
+                                        <ShowDateTime DateTime="@item.LastUpdateTime"/>
+                                    </div>
+                                </div>
+                            }
+                        }
+
+                        @if (!string.IsNullOrEmpty(folderNode.ReadmeContent))
+                        {
+                            <div class="readme-main">
+                                <MarkdownPreview Markdown="@folderNode.ReadmeContent"></MarkdownPreview>
+                            </div>
+                        }
+                        else if (folderNode.Directories.Count == 0 && folderNode.Files.Count > 0)
+                        {
+                            <div style="text-align: center; color: var(--color-text-muted); padding-top: 2rem;">
+                                No files found
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
         </div>
-    </div>
-</div>
+    </CascadingValue>
+</CascadingValue>

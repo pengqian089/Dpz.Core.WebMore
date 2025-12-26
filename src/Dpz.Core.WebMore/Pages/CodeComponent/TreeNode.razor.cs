@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Dpz.Core.WebMore.Models;
 using Dpz.Core.WebMore.Service;
@@ -24,13 +25,19 @@ public partial class TreeNode(ICodeService codeService) : IDisposable
     [CascadingParameter]
     private Tree? ParentTree { get; set; }
 
+    [CascadingParameter(Name = "ExpandedNodes")]
+    public Dictionary<string, CodeNoteTree>? ExpandedNodes { get; set; }
+
+    [CascadingParameter(Name = "ActivePath")]
+    public List<string> ActivePath { get; set; } = [];
+
     private bool _expand;
-
     private CodeNoteTree? _childrenNode;
-
     private Tree? _childTree;
+    private string _tempName = "";
 
-    private static List<string> _activePath = [];
+    // Keep track of which active path we have responded to
+    private List<string> _lastProcessedActivePath = [];
 
     protected override void OnInitialized()
     {
@@ -38,12 +45,25 @@ public partial class TreeNode(ICodeService codeService) : IDisposable
         ParentTree?.RegisterNode(this);
     }
 
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        // Check if we should auto-expand based on Cascading Value
+        if (ExpandedNodes != null && IsFolder && !_expand && _childrenNode == null)
+        {
+            var pathStr = string.Join("/", Path);
+            if (ExpandedNodes.TryGetValue(pathStr, out var node))
+            {
+                _childrenNode = node;
+                _expand = true;
+            }
+        }
+    }
+
     private async Task ToggleNodeAsync()
     {
-        if (!IsFolder || Name == "loading...")
-        {
-            return;
-        }
+        if (!IsFolder || Name == "loading...") return;
 
         if (!_expand)
         {
@@ -57,14 +77,11 @@ public partial class TreeNode(ICodeService codeService) : IDisposable
 
     private async Task OnContentClickAsync()
     {
-        if (Name == "loading...")
-        {
-            return;
-        }
-
-        // Always update active path on click
-        _activePath = Path;
-
+        if (Name == "loading...") return;
+        
+        // Notify parent (CodeView) about selection via callbacks
+        // The CodeView will update the ActivePath CascadingValue
+        
         if (IsFolder)
         {
             if (!_expand)
@@ -73,7 +90,6 @@ public partial class TreeNode(ICodeService codeService) : IDisposable
             }
             else
             {
-                // Already expanded, just notify parent to update view (e.g. breadcrumbs, folder content)
                 if (_childrenNode != null && OnExpandFolder.HasDelegate)
                 {
                     await OnExpandFolder.InvokeAsync(_childrenNode);
@@ -88,25 +104,19 @@ public partial class TreeNode(ICodeService codeService) : IDisposable
 
     public async Task ExpandNodeAsync()
     {
-        if (Name == "loading...")
-        {
-            return;
-        }
-
-        _activePath = Path;
-
+        if (Name == "loading...") return;
+        
         if (!IsFolder)
         {
             await SelectFileAsync();
             return;
         }
 
-        // Only load if not already expanded or children not loaded
         if (!_expand || _childrenNode == null)
         {
             _tempName = Name;
             Name = "loading...";
-            try
+            try 
             {
                 _childrenNode = await codeService.GetTreeAsync(Path.ToArray());
                 if (OnExpandFolder.HasDelegate)
@@ -121,8 +131,7 @@ public partial class TreeNode(ICodeService codeService) : IDisposable
             _expand = true;
             return;
         }
-
-        // If already expanded and loaded, just ensure it stays expanded
+        
         _expand = true;
         if (OnExpandFolder.HasDelegate && _childrenNode != null)
         {
@@ -135,8 +144,6 @@ public partial class TreeNode(ICodeService codeService) : IDisposable
 
     [Parameter]
     public EventCallback<CodeNoteTree> OnSelectedFile { get; set; }
-
-    private string _tempName = "";
 
     private async Task SelectFileAsync()
     {
