@@ -12,10 +12,9 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 var configuration = builder.Configuration;
-BaseAddress =
+var baseAddress =
     configuration["BaseAddress"]
     ?? throw new Exception("configuration node BaseAddress is null or empty");
-CdnBaseAddress = configuration["CDNBaseAddress"];
 WebHost =
     configuration["SourceSite"]
     ?? throw new Exception("configuration node SourceSite is null or empty");
@@ -27,7 +26,7 @@ LibraryHost =
     ?? throw new Exception("configuration node LibraryHost is null or empty");
 
 
-builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(BaseAddress) });
+builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(baseAddress) });
 
 RegisterInject(builder);
 
@@ -75,18 +74,6 @@ public partial class Program
     /// web host
     /// </summary>
     public static string WebHost { get; private set; } = "";
-
-    /// <summary>
-    /// API base address
-    /// </summary>
-    public static string BaseAddress { get; private set; } = "";
-
-
-    /// <summary>
-    /// CDN base address
-    /// </summary>
-    [Obsolete("Use AssetsHost or LibraryHost instead")]
-    public static string CdnBaseAddress { get; set; }
 
     public static string Version =>
         Assembly.GetEntryAssembly()?.GetName().Version?.ToString() ?? "_version";
