@@ -7,4 +7,6 @@ namespace Dpz.Core.WebMore.Service;
 public interface ICommunityService
 {
     Task<List<PictureModel>> GetBannersAsync();
+    
+    Task<List<FriendModel>> GetFriendsAsync();
 }

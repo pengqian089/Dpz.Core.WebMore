@@ -20,7 +20,7 @@ public class PagedList<T> : List<T>, IPagedList<T>
     {
         PageSize = pageSize;
         var items = allItems as IList<T> ?? allItems.ToList();
-        TotalItemCount = items.Count();
+        TotalItemCount = items.Count;
         CurrentPageIndex = pageIndex;
         AddRange(items.Skip(StartItemIndex - 1).Take(pageSize));
     }

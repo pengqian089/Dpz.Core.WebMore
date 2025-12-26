@@ -13,4 +13,9 @@ public class CommunityService(HttpClient httpClient) : ICommunityService
         return await httpClient.GetFromJsonAsync<List<PictureModel>>("/api/Community/getBanners")
             ?? [];
     }
+
+    public async Task<List<FriendModel>> GetFriendsAsync()
+    {
+        return await httpClient.GetFromJsonAsync<List<FriendModel>>("/api/Community/friends") ?? [];
+    }
 }
