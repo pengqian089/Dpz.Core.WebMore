@@ -1,12 +1,37 @@
-/* Sidebar Widgets & Common Components */
+/* Sidebar Widgets & Common Components - Wasteland Theme */
 
 .widget {
     background-color: var(--color-bg-surface);
-    border-radius: var(--radius-lg);
+    border: 2px solid var(--color-border);
     padding: var(--spacing-lg);
     margin-bottom: var(--spacing-lg);
-    border: 1px solid var(--color-border);
-    box-shadow: 0 1px 3px var(--color-shadow);
+    position: relative;
+    /* Corner Cut */
+    clip-path: polygon(
+        0 0, 
+        100% 0, 
+        100% calc(100% - 15px), 
+        calc(100% - 15px) 100%, 
+        0 100%
+    );
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
+    background-image: var(--noise-bg);
+}
+
+/* Decorative top bar */
+.widget::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background-image: var(--hazard-stripes);
+    background-size: 10px 10px;
+}
+
+.widget:hover {
+    border-color: var(--color-rust);
 }
 
 /* Header Styles */
@@ -14,41 +39,55 @@
 .card__header {
     margin-bottom: var(--spacing-md);
     padding-bottom: var(--spacing-xs);
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 2px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 /* Title Styles */
 .widget__title,
 .card__title {
-    font-size: 1.1rem;
+    font-family: var(--font-stack-display);
+    font-size: 1.25rem;
     font-weight: 700;
+    text-transform: uppercase;
     color: var(--color-text-main);
     margin: 0;
-}
-
-/* Body Styles */
-.widget__body,
-.card__body {
-    /* Container for widget content */
+    letter-spacing: 0.05em;
+    background-color: var(--color-bg-surface); /* Cover stripe */
+    padding-right: 10px;
 }
 
 /* Intro Text Style */
 .widget__intro {
-    font-size: 0.95rem;
+    font-family: var(--font-stack-mono);
+    font-size: 0.9rem;
     color: var(--color-text-secondary);
     line-height: 1.6;
 }
 
 .widget__intro p {
     margin-bottom: var(--spacing-sm);
-    text-indent: 2em;
+    text-indent: 0;
+    position: relative;
+    padding-left: 1rem;
+    border-left: 1px solid var(--color-border);
+}
+
+.widget__intro p::before {
+    content: '>';
+    position: absolute;
+    left: 2px;
+    color: var(--color-rust);
+    font-weight: bold;
 }
 
 .widget__intro p:last-child {
     margin-bottom: 0;
 }
 
-/* Sidebar List (for Articles, Links, etc.) */
+/* Sidebar List */
 .sidebar-list {
     list-style: none;
     padding: 0;
@@ -72,36 +111,45 @@
     color: var(--color-text-secondary);
     font-size: 0.95rem;
     line-height: 1.5;
-    transition: color var(--transition-fast), transform var(--transition-fast);
+    transition: all var(--transition-fast);
     text-decoration: none;
+    font-family: var(--font-stack-mono);
 }
 
 .sidebar-list__link:hover {
-    color: var(--color-primary);
-    transform: translateX(4px);
+    color: var(--color-rust);
+    padding-left: 5px;
+    background-color: rgba(0,0,0,0.05);
 }
 
 /* Tag Cloud Widget specific styles */
 .tag-cloud {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--spacing-xs);
+    gap: 0.5rem;
 }
 
 .tag-cloud .tag {
     display: inline-block;
-    padding: 4px 10px;
+    padding: 2px 8px;
     background-color: var(--color-bg-surface-alt);
     color: var(--color-text-secondary);
-    font-size: 0.85rem;
-    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-family: var(--font-stack-mono);
+    text-transform: uppercase;
+    border: 1px solid var(--color-border);
     transition: all var(--transition-fast);
     text-decoration: none;
+    position: relative;
+    
+    /* Jagged edge simulation using clip path is complex on small items, simple box is better */
 }
 
 .tag-cloud .tag:hover,
 .tag--active {
-    background-color: var(--color-primary);
+    background-color: var(--color-rust);
     color: #fff;
-    transform: translateY(-2px);
+    border-color: var(--color-rust);
+    box-shadow: 2px 2px 0 var(--color-text-main);
+    transform: translate(-1px, -1px);
 }

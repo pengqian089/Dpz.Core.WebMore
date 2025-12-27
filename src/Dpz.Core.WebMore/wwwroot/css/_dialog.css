@@ -153,24 +153,6 @@
     padding-right: var(--spacing-sm); /* Add padding for scrollbar space */
 }
 
-/* Custom scrollbar for webkit */
-.dialog__content::-webkit-scrollbar {
-    width: 8px;
-}
-
-.dialog__content::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.dialog__content::-webkit-scrollbar-thumb {
-    background-color: var(--color-border);
-    border-radius: 4px;
-}
-
-.dialog__content::-webkit-scrollbar-thumb:hover {
-    background-color: var(--color-text-muted);
-}
-
 /* Toast (Non-modal) */
 .toast-container {
     position: fixed;
