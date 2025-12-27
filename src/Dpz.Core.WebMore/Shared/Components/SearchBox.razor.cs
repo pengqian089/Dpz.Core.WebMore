@@ -1,32 +1,41 @@
-﻿using System.Threading.Tasks;
+﻿using System.Net;
+using System.Threading.Tasks;
+using Dpz.Core.WebMore.Service;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace Dpz.Core.WebMore.Shared.Components;
 
-public partial class SearchBox : ComponentBase
+public partial class SearchBox(NavigationManager navigationManager, IAppDialogService dialogService)
+    : ComponentBase
 {
     [Parameter]
     public string? Keyword { get; set; }
 
-    private bool _loading = false;
-    
+    private string? _keyword;
+
     protected override async Task OnInitializedAsync()
     {
-        _loading = true;
-        // 模拟一点延迟，否则太快了看不到骨架屏，或者如果有初始化逻辑可以放这里
-        await Task.Delay(100); 
-        _loading = false;
+        _keyword = Keyword;
         await base.OnInitializedAsync();
     }
 
-    private Task OnSearch()
+    private async Task OnSearch()
     {
-        if (string.IsNullOrWhiteSpace(Keyword))
+        if (string.IsNullOrWhiteSpace(_keyword))
         {
-            return Task.CompletedTask;
+            await dialogService.AlertAsync("请输入关键字");
+            return;
         }
-        
-        // TODO search
-        return Task.CompletedTask;
+
+        navigationManager.NavigateTo($"/article/search?keyword={WebUtility.UrlEncode(_keyword)}");
+    }
+
+    private async Task HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await OnSearch();
+        }
     }
 }

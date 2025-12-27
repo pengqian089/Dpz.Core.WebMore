@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -64,5 +65,12 @@ public class ArticleService(HttpClient httpClient, ILogger<ArticleService> logge
     public async Task<List<ArticleMiniModel>> GetNewsAsync()
     {
         return await httpClient.GetFromJsonAsync<List<ArticleMiniModel>>("/api/Article/news") ?? [];
+    }
+
+    public async Task<List<ArticleSearchResultModel>> SearchAsync(string keyword)
+    {
+        return await httpClient.GetFromJsonAsync<List<ArticleSearchResultModel>>(
+                $"/api/Article/search?keyword={WebUtility.UrlEncode(keyword)}"
+            ) ?? [];
     }
 }

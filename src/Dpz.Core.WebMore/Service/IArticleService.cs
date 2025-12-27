@@ -52,4 +52,11 @@ public interface IArticleService
     /// </summary>
     /// <returns></returns>
     Task<List<ArticleMiniModel>> GetNewsAsync();
+
+    /// <summary>
+    /// 搜索文章
+    /// </summary>
+    /// <param name="keyword"></param>
+    /// <returns></returns>
+    Task<List<ArticleSearchResultModel>> SearchAsync(string keyword);
 }

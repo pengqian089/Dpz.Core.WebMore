@@ -1,10 +1,11 @@
-﻿@foreach (var item in Articles)
+﻿@using System.Net
+@foreach (var item in Articles)
 {
     <article class="article-card" @key="item.Id">
         @if (!string.IsNullOrEmpty(item.MainImage))
         {
             <div class="article-card__cover">
-                @if (!item.MainImage.StartsWith(Program.AssetsHost, StringComparison.OrdinalIgnoreCase))
+                @if (!item.MainImage.StartsWith(Program.UpyunHost, StringComparison.OrdinalIgnoreCase))
                 {
                     <img
                         src="@Program.LibraryHost/loaders/oval.svg"
@@ -46,11 +47,8 @@
                 <div class="article-card__tags">
                     @foreach (var tag in item.Tags.Take(3))
                     {
-                        <a asp-controller="Article"
-                           asp-action="Index"
-                           asp-route-tag="@tag"
-                           class="article__tag"
-                           data-pjax>
+                        <a href="/article/list/tag/@(WebUtility.UrlEncode(tag))"
+                           class="article__tag">
                             #@tag
                         </a>
                     }

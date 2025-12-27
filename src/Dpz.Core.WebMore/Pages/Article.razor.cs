@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Dpz.Core.WebMore.Helper;
 using Dpz.Core.WebMore.Models;
 using Dpz.Core.WebMore.Service;
 using Microsoft.AspNetCore.Components;
@@ -12,7 +13,7 @@ public partial class Article(IArticleService articleService)
     [EditorRequired]
     public required string Id { get; set; }
 
-    [Parameter]
+    [SupplyParameterFromQuery(Name = "text")]
     public string? Text { get; set; }
 
     private ArticleModel? _article;
@@ -34,6 +35,23 @@ public partial class Article(IArticleService articleService)
             _loading = false;
             return;
         }
+
+        // Apply highlighting if search text is present
+        if (!string.IsNullOrEmpty(Text))
+        {
+            article.Markdown = HighlightHelper.HighlightKeywords(article.Markdown, Text);
+
+            if (!string.IsNullOrEmpty(article.Introduction))
+            {
+                article.Introduction = HighlightHelper.HighlightKeywords(
+                    article.Introduction,
+                    Text
+                );
+            }
+
+            article.Title = HighlightHelper.HighlightKeywords(article.Title, Text);
+        }
+
         _article = article;
         _loading = false;
         await base.OnParametersSetAsync();
