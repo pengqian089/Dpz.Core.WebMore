@@ -12,7 +12,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 var configuration = builder.Configuration;
-var baseAddress =
+BaseAddress =
     configuration["BaseAddress"]
     ?? throw new Exception("configuration node BaseAddress is null or empty");
 WebHost =
@@ -25,8 +25,7 @@ LibraryHost =
     configuration["LibraryHost"]
     ?? throw new Exception("configuration node LibraryHost is null or empty");
 
-
-builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(baseAddress) });
+builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(BaseAddress) });
 
 RegisterInject(builder);
 
@@ -70,6 +69,11 @@ static void RegisterInject(WebAssemblyHostBuilder builder)
 
 public partial class Program
 {
+    /// <summary>
+    /// web api base address
+    /// </summary>
+    public static string BaseAddress { get; private set; } = "";
+
     /// <summary>
     /// web host
     /// </summary>

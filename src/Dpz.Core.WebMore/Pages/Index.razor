@@ -109,24 +109,37 @@ else
         <section class="hero" id="hero-slider">
             @if (_banners.Count > 0)
             {
-                @foreach (var pic in _banners)
+                var currentBanner = _banners[_currentBannerIndex];
+                var description = string.IsNullOrEmpty(currentBanner.Description) ? "自由 · 开放 · 合作 · 共享" : currentBanner.Description;
+                
+                @for (var i = 0; i < _banners.Count; i++)
                 {
-                     <div class="hero__bg" data-bg="@pic.AccessUrl" data-desc="@(string.IsNullOrEmpty(pic.Description) ? "自由 · 开放 · 合作 · 共享" : pic.Description)"></div>
+                    var pic = _banners[i];
+                    var isActive = i == _currentBannerIndex ? "active" : "";
+                    <div class="hero__bg @isActive" style="background-image: url('@pic.AccessUrl')"></div>
                 }
+                
+                <div class="hero__overlay"></div>
+                <div class="container hero__content">
+                    <h1 class="hero__title" id="hero-title">@description</h1>
+                    <p class="hero__subtitle" id="hero-subtitle">保持热爱，奔赴山海</p>
+                    <div class="hero__actions">
+                        <a href="#latest-articles" class="btn btn--primary">开始阅读</a>
+                    </div>
+                </div>
             }
             else
             {
                  <div class="hero__bg active" style="background-color: #333;"></div>
-            }
-            
-            <div class="hero__overlay"></div>
-            <div class="container hero__content">
-                <h1 class="hero__title" id="hero-title">自由 · 开放 · 合作 · 共享</h1>
-                <p class="hero__subtitle" id="hero-subtitle">保持热爱，奔赴山海</p>
-                <div class="hero__actions">
-                    <a href="#latest-articles" class="btn btn--primary">开始阅读</a>
+                 <div class="hero__overlay"></div>
+                 <div class="container hero__content">
+                    <h1 class="hero__title" id="hero-title">自由 · 开放 · 合作 · 共享</h1>
+                    <p class="hero__subtitle" id="hero-subtitle">保持热爱，奔赴山海</p>
+                    <div class="hero__actions">
+                        <a href="#latest-articles" class="btn btn--primary">开始阅读</a>
+                    </div>
                 </div>
-            </div>
+            }
         </section>
     
         <!-- Main Content Area -->
@@ -134,18 +147,21 @@ else
             <!-- Articles Feed -->
             <div class="page-content" id="latest-articles">
                 <!-- Featured Video Section -->
-                <div class="home-video-section js-home-video-section">
-                    <div class="home-video-section__header">
-                        <h3 class="home-video-section__title">
-                            <i class="fa fa-play-circle"></i> 精选视频
-                        </h3>
-                    </div>
-                    <div class="home-video-section__body">
-                        <div class="home-video-player js-home-video-container">
-                            <!-- Player will be injected here -->
+                @if (_currentVideo != null)
+                {
+                    <div class="home-video-section js-home-video-section">
+                        <div class="home-video-section__header">
+                            <h3 class="home-video-section__title">
+                                <i class="fa fa-play-circle"></i> 精选视频
+                            </h3>
+                        </div>
+                        <div class="home-video-section__body">
+                            <div class="home-video-player js-home-video-container">
+                                <!-- Player will be injected here -->
+                            </div>
                         </div>
                     </div>
-                </div>
+                }
     
                 <div class="section-header">
                     <h2 class="section-title">最新文章</h2>
