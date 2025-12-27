@@ -14,10 +14,10 @@ public partial class SearchBox(NavigationManager navigationManager, IAppDialogSe
 
     private string? _keyword;
 
-    protected override async Task OnInitializedAsync()
+    protected override Task OnParametersSetAsync()
     {
         _keyword = Keyword;
-        await base.OnInitializedAsync();
+        return base.OnParametersSetAsync();
     }
 
     private async Task OnSearch()

@@ -229,12 +229,10 @@
     height: 100%;
     object-fit: cover;
     transition: transform 0.2s steps(5); 
-    filter: grayscale(60%) sepia(20%); /* Faded photo look */
 }
 
 .article-card:hover .article-card__cover img {
     transform: scale(1.02);
-    filter: grayscale(0%) sepia(0%);
 }
 
 /* Content Area */

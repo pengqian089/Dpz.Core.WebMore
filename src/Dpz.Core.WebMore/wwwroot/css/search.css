@@ -146,15 +146,15 @@
 
 .search-card:hover {
     transform: translateX(5px);
-    border-color: var(--color-accent);
-    box-shadow: -5px 5px 0 rgba(0,0,0,0.3);
+    border-color: var(--color-rust);
+    box-shadow: -5px 5px 0 var(--color-rust);
     z-index: 10;
 }
 
 /* Light mode shadow */
 @media (prefers-color-scheme: light) {
     .search-card:hover {
-        box-shadow: -5px 5px 15px rgba(0,0,0,0.1);
+        box-shadow: -5px 5px 0 var(--color-rust);
     }
 }
 
@@ -172,12 +172,10 @@
     height: 100%;
     object-fit: cover;
     transition: transform 0.5s ease;
-    filter: grayscale(30%);
 }
 
 .search-card:hover .search-card__cover img {
     transform: scale(1.1);
-    filter: grayscale(0%);
 }
 
 /* Glitch overlay on hover */
@@ -260,7 +258,7 @@
     color: var(--color-text-main);
     text-decoration: none;
     transition: color 0.2s;
-    background-image: linear-gradient(var(--color-accent), var(--color-accent));
+    background-image: linear-gradient(var(--color-rust), var(--color-rust));
     background-size: 0% 2px;
     background-position: left bottom;
     background-repeat: no-repeat;
@@ -268,7 +266,7 @@
 }
 
 .search-card:hover .search-card__title a {
-    color: var(--color-accent);
+    color: var(--color-rust);
     background-size: 100% 2px;
 }
 
@@ -340,9 +338,9 @@ mark {
 }
 
 .search-card__tags a:hover {
-    color: var(--color-accent);
-    border-color: var(--color-accent);
-    box-shadow: 0 0 8px rgba(var(--color-accent-rgb), 0.2);
+    color: var(--color-rust);
+    border-color: var(--color-rust);
+    box-shadow: 0 0 8px rgba(183, 65, 14, 0.2);
 }
 
 .search-card__stats {
