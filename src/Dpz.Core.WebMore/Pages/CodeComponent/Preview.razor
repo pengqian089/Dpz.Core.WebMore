@@ -1,29 +1,31 @@
-﻿@if (Node?.CodeContainer == null)
-{
-    <pre><code>没有内容</code></pre>
-}
-else
-{
-    @if (string.IsNullOrEmpty(Node.CodeContainer.Language))
+﻿<div class="code-preview-container">
+    @if (Node?.CodeContainer == null)
     {
-        <pre><code>@Node.CodeContainer.CodeContent</code></pre>
-    }
-    else if (string.Equals(Node.CodeContainer.Language, "markdown", StringComparison.CurrentCultureIgnoreCase))
-    {
-        <MarkdownPreview Markdown="@Node.CodeContainer.CodeContent"></MarkdownPreview>
+        <pre><code>没有内容</code></pre>
     }
     else
     {
-        <pre
-            data-start="1"
-            class="linkable-line-numbers">
-            <code 
-                class="language-@Node.CodeContainer.Language">
-                @Node.CodeContainer.CodeContent
-            </code>
-        </pre>
+        @if (string.IsNullOrEmpty(Node.CodeContainer.Language))
+        {
+            <pre><code>@Node.CodeContainer.CodeContent</code></pre>
+        }
+        else if (string.Equals(Node.CodeContainer.Language, "markdown", StringComparison.CurrentCultureIgnoreCase))
+        {
+            <MarkdownPreview Markdown="@Node.CodeContainer.CodeContent"></MarkdownPreview>
+        }
+        else
+        {
+            <pre
+                data-start="1"
+                class="linkable-line-numbers">
+                <code 
+                    class="language-@Node.CodeContainer.Language">
+                    @Node.CodeContainer.CodeContent
+                </code>
+            </pre>
+        }
     }
-}
+</div>
 
 @code {
 
