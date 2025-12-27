@@ -1,9 +1,11 @@
 /* Music Player Styles - Cyberpunk Wasteland */
 
 :root {
-    --music-player-size: 64px;
+    --music-player-size: 70px;
     --music-player-panel-width: 380px;
     --music-player-theme: var(--color-rust); /* Use global rust color */
+    --music-neon-primary: #ffb700;
+    --music-neon-secondary: #00f3ff;
     --music-player-bg: rgba(20, 18, 16, 0.98);
     --music-player-text: #e6e2dd;
     --music-player-text-secondary: #a69e96;
@@ -19,102 +21,116 @@
     }
 }
 
-/* Mini Player (Bottom Left) - Hexagonal Badge */
+/* Mini Player (Bottom Left) - Reactor Core Style */
 .music-player__mini {
     position: fixed;
     left: 20px;
     bottom: 20px;
     width: var(--music-player-size);
     height: var(--music-player-size);
-    /* Hexagon Clip */
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    background: var(--music-player-bg);
     z-index: 100;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
-    border: none; /* Borders handled by pseudo-element or container shadows if needed */
-    box-shadow: none; /* clip-path cuts shadow, handled via filter if necessary */
-    filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Remove background/clip from container to show outer elements */
+    background: transparent;
+    border: none;
+    box-shadow: none;
 }
 
 .music-player__mini:hover {
-    transform: scale(1.05);
-    filter: drop-shadow(0 0 8px var(--music-player-theme));
+    transform: scale(1.1);
+    z-index: 101;
 }
 
-.music-player__mini:active {
-    transform: scale(0.95);
-}
-
-/* Inner border simulation */
-.music-player__mini::after {
+/* Outer Rotating Ring (Reactor Casing) */
+.music-player__mini::before {
     content: '';
     position: absolute;
-    inset: 2px;
-    background: var(--music-player-bg);
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    z-index: -1;
+    inset: -5px;
+    border: 2px dashed var(--music-neon-primary);
+    border-radius: 50%;
+    animation: reactor-spin 10s linear infinite;
+    opacity: 0.6;
+    pointer-events: none;
 }
 
+.music-player__mini:hover::before {
+    border-color: var(--music-neon-secondary);
+    box-shadow: 0 0 15px var(--music-neon-secondary);
+    opacity: 1;
+    animation-duration: 2s; /* Speed up on hover */
+}
+
+/* Inner Cover Area */
 .music-player__mini-cover {
-    width: 100%;
-    height: 100%;
-    display: block;
+    width: 70%;
+    height: 70%;
+    border-radius: 50%;
     position: absolute;
-    inset: 0;
-    overflow: hidden;
+    top: 15%;
+    left: 15%;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    opacity: 0.8;
-    mix-blend-mode: luminosity; /* Wasteland feel */
-    transition: opacity 0.2s;
+    z-index: 2;
+    box-shadow: 0 0 0 2px rgba(0,0,0,0.8);
 }
 
-.music-player__mini:hover .music-player__mini-cover {
-    opacity: 1;
-    mix-blend-mode: normal;
-}
-
-/* Progress Ring - Hidden or redesigned for hexagon */
+/* Progress Ring */
 .music-player__progress-ring {
     position: absolute;
-    top: -5px;
-    left: -5px;
-    width: calc(100% + 10px);
-    height: calc(100% + 10px);
-    pointer-events: none;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     transform: rotate(-90deg);
-    z-index: 1;
-    display: none; /* Standard ring doesn't fit hexagon nicely, hiding for now */
+    z-index: 3;
+    pointer-events: none;
+    filter: drop-shadow(0 0 4px var(--music-neon-primary));
 }
 
-/* Status Overlay */
+.music-player__progress-ring circle {
+    transition: stroke-dashoffset 0.1s linear;
+    stroke: var(--music-neon-primary);
+    stroke-width: 4px;
+    stroke-linecap: butt; /* Digital look */
+}
+
+/* Status Overlay (Play/Pause) */
 .music-player__mini-overlay {
     position: absolute;
     inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    pointer-events: none;
-    z-index: 2;
+    z-index: 4;
+    opacity: 0;
+    transition: opacity 0.2s;
+    background: rgba(0,0,0,0.4);
+    border-radius: 50%;
+    backdrop-filter: blur(2px);
+}
+
+.music-player__mini:hover .music-player__mini-overlay {
+    opacity: 1;
 }
 
 .music-player__mini-status {
-    width: 32px;
-    height: 32px;
-    /* Square cutout */
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--music-player-theme);
-    font-size: 14px;
-    border: 1px solid var(--music-player-theme);
-    box-shadow: 0 0 5px var(--music-player-theme);
+    color: #fff;
+    font-size: 20px;
+    text-shadow: 0 0 10px var(--music-neon-secondary);
+    width: auto;
+    height: auto;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+@keyframes reactor-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 /* Panel Container */
