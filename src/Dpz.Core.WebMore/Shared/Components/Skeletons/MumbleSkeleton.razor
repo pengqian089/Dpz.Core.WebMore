@@ -1,0 +1,49 @@
+<div class="mumble-layout">
+    <main class="mumble-layout__main">
+        @for (int i = 0; i < 3; i++)
+        {
+            <article class="mumble-card">
+                <div class="mumble-card__header">
+                    <div class="skeleton skeleton--circle" style="width: 40px; height: 40px; margin-right: 1rem;"></div>
+                    <div class="mumble-card__meta" style="flex: 1;">
+                        <div class="skeleton skeleton--text skeleton--w-30"></div>
+                        <div class="skeleton skeleton--text skeleton--w-20" style="height: 0.8em;"></div>
+                    </div>
+                </div>
+
+                <div class="mumble-card__content">
+                    <div class="skeleton skeleton--text skeleton--w-90"></div>
+                    <div class="skeleton skeleton--text skeleton--w-100"></div>
+                    <div class="skeleton skeleton--text skeleton--w-80"></div>
+                    <div class="skeleton skeleton--text skeleton--w-60"></div>
+                </div>
+
+                <div class="mumble-card__footer">
+                    <div class="skeleton skeleton--button skeleton--w-20" style="width: 80px; margin-right: 15px;"></div>
+                    <div class="skeleton skeleton--button skeleton--w-20" style="width: 60px; margin-right: 15px;"></div>
+                    <div class="skeleton skeleton--button skeleton--w-20" style="width: 60px;"></div>
+                </div>
+            </article>
+        }
+    </main>
+
+    <aside class="mumble-layout__sidebar">
+        <div class="history-widget">
+            <h3 class="history-widget__title">
+                <div class="skeleton skeleton--text skeleton--w-40"></div>
+            </h3>
+            <div class="history-widget__list">
+                @for (var i = 0; i < 5; i++)
+                {
+                    <div class="history-item">
+                        <div class="history-item__content">
+                            <div class="skeleton skeleton--text skeleton--w-90"></div>
+                        </div>
+                        <div class="skeleton skeleton--text skeleton--w-40" style="height: 0.8em; margin-top: 4px;"></div>
+                    </div>
+                }
+            </div>
+        </div>
+    </aside>
+</div>
+

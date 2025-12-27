@@ -1,55 +1,41 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Dpz.Core.WebMore.Models;
 using Dpz.Core.WebMore.Service;
-using Dpz.Core.WebMore.Shared;
 using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Configuration;
 using Microsoft.JSInterop;
-using MudBlazor;
 
-namespace Dpz.Core.WebMore.Pages
+namespace Dpz.Core.WebMore.Pages;
+
+public partial class Article(IArticleService articleService)
 {
-    public partial class Article
+    [Parameter]
+    [EditorRequired]
+    public required string Id { get; set; }
+
+    [Parameter]
+    public string? Text { get; set; }
+
+    private ArticleModel? _article;
+
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
     {
-        [Parameter] public string Id { get; set; }
-        [Inject] private IArticleService ArticleService { get; set; }
-        [Inject] private IJSRuntime JsRuntime { get; set; }
-        [Inject] private IDialogService DialogService { get; set; }
-        [Inject] private ISnackbar Snackbar { get; set; }
+        await base.OnInitializedAsync();
+    }
 
-        private ArticleModel _article = new();
-
-        private bool _loading = true;
-
-        protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
+    {
+        _loading = true;
+        var article = await articleService.GetArticleAsync(Id);
+        if (article == null)
         {
-            await base.OnInitializedAsync();
-        }
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await JsRuntime.InvokeVoidAsync("Prism.highlightAll");
-            await base.OnAfterRenderAsync(firstRender);
-        }
-
-        protected override async Task OnParametersSetAsync()
-        {
-            _loading = true;
-            _article = await ArticleService.GetArticleAsync(Id);
+            // TODO show error
             _loading = false;
-            await base.OnParametersSetAsync();
+            return;
         }
-
-        private void ShowPay()
-        {
-            DialogService.Show<WeChatPay>("",new DialogOptions{CloseButton = true});
-        }
-
-        private void Like()
-        {
-            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-            Snackbar.Add("点赞接口还未实现", Severity.Normal);
-        }
+        _article = article;
+        _loading = false;
+        await base.OnParametersSetAsync();
     }
 }

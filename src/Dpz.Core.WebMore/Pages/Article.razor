@@ -1,75 +1,82 @@
 ﻿@page "/article/read/{Id}"
-<article>
-    <h1 class="nav-map">
-        <span>您现在的位置是：首页 > 文章列表 > 文章详情</span>
-        <a href="/" class="n1">网站首页</a>
-        <a href="/article/list" class="n2">文章列表</a>
-    </h1>
-    <div class="infos-box">
-        @if (_loading)
-        {
-            <MudCard>
-                <MudCardContent>
-                    <MudSkeleton Width="30%" Height="42px;"/>
-                    <MudSkeleton Width="80%"/>
-                    <MudSkeleton Width="100%"/>
-                    <MudSkeleton Width="100%"/>
-                    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="200px"/>
-                    <MudSkeleton Width="100%"/>
-                    <MudSkeleton Width="100%"/>
-                    <MudSkeleton Width="100%"/>
-                </MudCardContent>
-                <MudCardActions>
-                    <MudSkeleton Width="64px" Height="40px" Class="ml-2"/>
-                    <MudSkeleton Width="105px" Height="40px" Class="ml-3"/>
-                </MudCardActions>
-            </MudCard>
-        }
-        else
-        {
-            <PageTitle>@((_article?.Title ?? "") + " - 个人文章分享")</PageTitle>
-            <div class="news-view">
-                <h3 class="news-title">@_article?.Title</h3>
-                <div class="blog-info">
-                    <ul>
-                        <li class="author">
-                            @_article?.Author?.Name
-                        </li>
-                        @foreach (var tag in _article?.Tags ?? new List<string>())
+
+@if (_loading || _article == null)
+{
+    <ArticleDetailSkeleton />
+}
+else
+{
+    <PageTitle>@_article.Title - 个人文章分享</PageTitle>
+    <div class="container article-container">
+
+        <div class="article-layout">
+            <article class="article-read shadow-lg">
+                <header class="article-header">
+                    <h1 class="article-title">
+                       @_article.Title
+                    </h1>
+
+                    @if (_article.AdWeight >= 0.7)
+                    {
+                        <div class="alert alert--warning mb-1">
+                            <i class="fa fa-warning"></i> AI分析结果显示本文可能包含广告，请注意甄别
+                        </div>
+                    }
+
+                    <div class="article-meta">
+                        <span class="article-meta__item" title="发布时间">
+                            <i class="fa fa-calendar"></i>
+                            <ShowDateTime DateTime="_article.CreateTime"></ShowDateTime>
+                        </span>
+                        <span class="article-meta__item">
+                            <i class="fa fa-user"></i> @_article.Author.Name
+                        </span>
+                        <span class="article-meta__item">
+                            <i class="fa fa-eye"></i> @_article.ViewCount 阅读
+                        </span>
+                        <span class="article-meta__item">
+                            <i class="fa-solid fa-comment-dots"></i> @_article.CommentCount 评论
+                        </span>
+                    </div>
+                </header>
+
+                <div class="article-content markdown-body">
+                    @if (!string.IsNullOrEmpty(_article.Introduction))
+                    {
+                        <div class="article-intro">
+                            @((MarkupString)_article.Introduction)
+                        </div>
+                    }
+
+                    <MarkdownPreview Markdown="@_article.Markdown"></MarkdownPreview>
+                </div>
+
+                <footer class="article-footer mt-2">
+                    <div class="article-tags">
+                        <i class="fa fa-tags text-muted mr-1"></i>
+                        @foreach (var tag in _article.Tags)
                         {
-                            <li class="article-tag">
-                                @tag
-                            </li>
+                            <a href="/article/list/tag/@tag" class="article__tag">@tag</a>
                         }
-                        <li class="timer">@_article?.CreateTime.ToString("yyyy-MM-dd")</li>
-                        <li class="view">@(_article?.ViewCount)已阅读</li>
-                        <li class="like">0</li>
-                    </ul>
-                </div>
-                <div class="tags">
-                    <a href="/article/list">文章阅读</a> &nbsp;
-                </div>
-                <div class="news-about">
-                    @((MarkupString) (_article?.Introduction ?? ""))
-                </div>
-                <div class="news-con">
-                    <MarkdownPreview Markdown="@_article?.Markdown"></MarkdownPreview>
-                </div>
-            </div>
-            <div class="share">
-                <p class="like-article">
-                    <a href="javascript:void(0);" @onclick="Like"> 很赞哦！ </a>
-                    (<b>0</b>)
-                </p>
-                <p class="pay-box">
-                    <a href="javascript:void(0)" title="打赏，支持一下" @onclick="ShowPay">打赏本站</a>
-                </p>
-            </div>
-            <div class="new-comment">
-                <h2>文章评论</h2>
-                <Comment Node="CommentNode.Article" Relation="@_article?.Id"></Comment>
-            </div>
-        }
+                    </div>
+                    <div class="article-copyright mt-2">
+                        <p>版权声明：本站文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</p>
+                    </div>
+                </footer>
+            </article>
+
+            <!-- Table of Contents Container -->
+            <nav class="js-toc toc"></nav>
+
+            <!-- Mobile TOC Controls -->
+            <button class="toc-fab js-toc-fab" aria-label="Toggle Table of Contents">
+                <i class="fa fa-list-ul"></i>
+            </button>
+        </div>
+
+        <!-- Comments -->
+        <div class="mt-2">
+            <Comment Node="CommentNode.Article" Relation="@_article.Id"></Comment>
+        </div>
     </div>
-    <RightComponent></RightComponent>
-</article>
+}

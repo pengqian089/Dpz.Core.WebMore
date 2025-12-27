@@ -1,54 +1,43 @@
-﻿@if (!string.IsNullOrEmpty(Name))
+﻿@using Dpz.Core.WebMore.Pages.CodeComponent
+
+@if (!string.IsNullOrEmpty(Name))
 {
-    <li>
-        <div class="node" style="--level: @(Path.Count); content-visibility: auto; contain-intrinsic-size: auto 2rem;@(_activePath == Path ? Active : "")">
-            <div style="grid-area: spacer / spacer / spacer / spacer; display: flex;">
-                <div style="width: 100%; display: flex;">
-                    @for (var i = 0; i < Path.Count - 1; i++)
-                    {
-                        <div class="level-line"></div>
-                    }
-                </div>
+    var isActive = ActivePath.SequenceEqual(Path);
+    <div class="code-tree__node @(_expand ? "is-expanded" : "")">
+        <div class="code-tree__content @(isActive ? "is-active" : "")" @onclick="OnContentClickAsync">
+            <!-- Toggle Icon -->
+            <div class="code-tree__toggle @(IsFolder ? "" : "is-hidden")" @onclick="ToggleNodeAsync" @onclick:stopPropagation>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                    <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                </svg>
             </div>
-            @if (IsFolder)
-            {
-                <div class="expand" @onclick="ExpandNodeAsync">
-                    <Expand IsDown="_expand"></Expand>
-                </div>
-            }
-            <div class="item" @onclick="ExpandNodeAsync">
-                <div class="visual-hidden"></div>
-                <div class="item-visual">
-                    <div class="item-icon">
-                        <ShowIcon IsFolder="@IsFolder" Filename="@Name"></ShowIcon>
-                    </div>
-                </div>
-                <span class="item-content">
-                    @{
-                        var (first,keyword,end) = MatchKeyword(Name);
-                    }
-                    @if (keyword == null || end == null)
-                    {
-                        <MudTooltip Text="@string.Join("/", Path)">
-                            <span>@Name</span>
-                        </MudTooltip>
-                    }
-                    else
-                    {
-                        <MudTooltip Text="@string.Join("/", Path)">
-                            <span class="show-name">
-                                <span>@first</span>
-                                <mark>@keyword</mark>
-                                <span>@end</span>
-                            </span>
-                        </MudTooltip>
-                    }
-                </span>
+            
+            <!-- Icon -->
+            <div class="code-tree__icon">
+                <ShowIcon IsFolder="@IsFolder" Filename="@Name"></ShowIcon>
+            </div>
+            
+            <!-- Label -->
+            <div class="code-tree__label" title="@string.Join("/", Path)">
+                @{
+                    var (first,keyword,end) = MatchKeyword(Name);
+                }
+                @if (keyword == null || end == null)
+                {
+                    @Name
+                }
+                else
+                {
+                    <span>@first</span>
+                    <mark>@keyword</mark>
+                    <span>@end</span>
+                }
             </div>
         </div>
+        
         @if (_childrenNode != null && _expand)
         {
-            <Tree OnSelectedFile="OnSelectedFile" Node="_childrenNode" OnExpandFolder="OnExpandFolder"></Tree>
+            <Tree @ref="_childTree" OnSelectedFile="OnSelectedFile" Node="_childrenNode" OnExpandFolder="OnExpandFolder"></Tree>
         }
-    </li>
+    </div>
 }

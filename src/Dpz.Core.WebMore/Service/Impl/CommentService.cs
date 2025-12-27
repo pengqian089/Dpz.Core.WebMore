@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -10,17 +11,14 @@ using Dpz.Core.WebMore.Models;
 
 namespace Dpz.Core.WebMore.Service.Impl;
 
-public class CommentService : ICommentService
+public class CommentService(HttpClient httpClient) : ICommentService
 {
-    private readonly HttpClient _httpClient;
-
-    public CommentService(HttpClient httpClient)
-    {
-        _httpClient = httpClient;
-    }
-
-    public async Task<IPagedList<CommentModel>> GetPageAsync(CommentNode node, string relation, int pageIndex = 1,
-        int pageSize = 10)
+    public async Task<IPagedList<CommentModel>> GetPageAsync(
+        CommentNode node,
+        string relation,
+        int pageIndex = 1,
+        int pageSize = 10
+    )
     {
         var parameter = new Dictionary<string, string>
         {
@@ -29,24 +27,43 @@ public class CommentService : ICommentService
             { nameof(node), node.ToString() },
             { nameof(relation), relation },
         };
-        return await _httpClient.ToPagedListAsync<CommentModel>("/api/Comment/page", parameter);
+        return await httpClient.ToPagedListAsync<CommentModel>("/api/Comment/page", parameter);
     }
 
-    public async Task<IPagedList<CommentModel>> SendAsync(SendComment comment, int pageSize = 5)
+    public async Task<ResultInformation<IPagedList<CommentModel>>> SendAsync(
+        SendComment comment,
+        int pageSize = 5
+    )
     {
-        var response = await _httpClient.PostAsync($"/api/Comment?pageSize={pageSize}", JsonContent.Create(comment));
+        var response = await httpClient.PostAsync(
+            $"/api/Comment?pageSize={pageSize}",
+            JsonContent.Create(comment)
+        );
 
-        var serializerOptions = new JsonSerializerOptions
+        if (response.StatusCode == HttpStatusCode.BadRequest)
         {
-            PropertyNameCaseInsensitive = true
-        };
-        var result = await response.Content.ReadFromJsonAsync<List<CommentModel>>(serializerOptions);
+            var message = await response.Content.ReadAsStringAsync();
+            return ResultInformation<IPagedList<CommentModel>>.ToFail(message);
+        }
+
+        var serializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        var result =
+            await response.Content.ReadFromJsonAsync<List<CommentModel>>(serializerOptions) ?? [];
 
         response.Headers.TryGetValues("X-Pagination", out var pageInformation);
         var pagination =
-            JsonSerializer.Deserialize<Pagination>(pageInformation?.FirstOrDefault() ?? "{}",
-                serializerOptions) ?? new Pagination();
+            JsonSerializer.Deserialize<Pagination>(
+                pageInformation?.FirstOrDefault() ?? "{}",
+                serializerOptions
+            ) ?? new Pagination();
 
-        return new PagedList<CommentModel>(result, pagination.CurrentPage, pagination.PageSize, pagination.TotalCount);
+        var page = new PagedList<CommentModel>(
+            result,
+            pagination.CurrentPage,
+            pagination.PageSize,
+            pagination.TotalCount
+        );
+
+        return ResultInformation<IPagedList<CommentModel>>.ToSuccess(page);
     }
 }

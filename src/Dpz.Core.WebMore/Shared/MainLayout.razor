@@ -1,62 +1,29 @@
-﻿@using Microsoft.AspNetCore.SignalR.Client
-@inherits LayoutComponentBase
-@inject IMusicService MusicService;
-@inject ISnackbar Snackbar;
-<MudThemeProvider @ref="@_mudThemeProvider" IsDarkMode="@AppTools.IsDark"/>
-<MudPopoverProvider/>
-<MudDialogProvider/>
-<MudSnackbarProvider />
-<NavMenu></NavMenu>
-@Body
+﻿@inherits LayoutComponentBase
 
-<div id="music-player"></div>
-<footer>
-    <p>
-        Copyright &copy;@DateTime.Now.Year Design by
-        <a href="https://core.dpangzi.com" target="_blank">叫我阿胖</a>
-    </p>
-    <p>
-        <a href="https://beian.miit.gov.cn/" target="_blank">鄂ICP备20001883号-1</a>
-    </p>
-</footer>
-<MudScrollToTop TopOffset="100">
-    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Secondary">回到顶部</MudButton>
-</MudScrollToTop>
-@code
-{
-    [Inject]
-    private IJSRuntime JsRuntime { get; set; }
+<div class="site-wrapper">
+    <NavMenu></NavMenu>
+    <main class="site-main">
+        @Body
+    </main>
+    <footer class="site-footer">
+        <div class="container">
+            <p>
+                <a href="https://beian.miit.gov.cn/" target="_blank">鄂ICP备20001883号-1</a>
+            </p>
+            <p class="mt-1" id="app-version">
+                当前版本：@Program.Version
+                <Tooltip Text="@_connectionStatus.Title">
+                    <span class="connection-status @_connectionStatus.Class"></span>
+                </Tooltip>
+            </p>
+            <p>&copy; @DateTime.Now.Year Dpz.Core.Blazor</p>
+        </div>
+    </footer>
 
-    private MudThemeProvider _mudThemeProvider;
+    <div class="back-to-top" id="back-to-top" title="返回顶部">
+        <i class="fa fa-arrow-up"></i>
+    </div>
 
-    protected override async Task OnInitializedAsync()
-    {
-        Program.Connection.On<string>("systemNotification", handler:msg =>
-        {
-            Snackbar.Add(msg);
-        });
-        await base.OnInitializedAsync();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await JsRuntime.InvokeVoidAsync("appInit");
-        if (firstRender)
-        {
-            AppTools.IsDark = await _mudThemeProvider.GetSystemPreference();
-            await JsRuntime.InvokeVoidAsync("playerInit");
-            var musics = await MusicService.GetMusicPageAsync(1, 50);
-            var list = musics.Select(x => new
-            {
-                artist = x.Artist,
-                cover = x.CoverUrl,
-                lrc = x.LyricUrl,
-                name = x.Title,
-                url = x.MusicUrl,
-            });
-            await JsRuntime.InvokeVoidAsync("playerAddList", list);
-            StateHasChanged();
-        }
-        await base.OnAfterRenderAsync(firstRender);
-    }
-}
+    <MusicPlayer/>
+    <Dpz.Core.WebMore.Shared.Components.Dialog.DialogContainer/>
+</div>

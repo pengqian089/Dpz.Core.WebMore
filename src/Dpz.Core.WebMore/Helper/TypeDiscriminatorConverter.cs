@@ -6,20 +6,26 @@ using System.Text.Json.Serialization;
 
 namespace Dpz.Core.WebMore.Helper;
 
-public class TypeDiscriminatorConverter<T> : JsonConverter<T> where T : ITypeDiscriminator
+public class TypeDiscriminatorConverter<T> : JsonConverter<T>
+    where T : ITypeDiscriminator
 {
     private readonly IEnumerable<Type> _types;
-    
+
     public TypeDiscriminatorConverter()
     {
         var type = typeof(T);
-        _types = AppDomain.CurrentDomain.GetAssemblies()
+        _types = AppDomain
+            .CurrentDomain.GetAssemblies()
             .SelectMany(s => s.GetTypes())
             .Where(p => type.IsAssignableFrom(p) && p.IsClass && !p.IsAbstract)
             .ToList();
     }
-    
-    public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+
+    public override T? Read(
+        ref Utf8JsonReader reader,
+        Type typeToConvert,
+        JsonSerializerOptions options
+    )
     {
         if (reader.TokenType != JsonTokenType.StartObject)
         {
@@ -27,7 +33,12 @@ public class TypeDiscriminatorConverter<T> : JsonConverter<T> where T : ITypeDis
         }
 
         using var jsonDocument = JsonDocument.ParseValue(ref reader);
-        if (!jsonDocument.RootElement.TryGetProperty(nameof(ITypeDiscriminator.TypeDiscriminator), out var typeProperty))
+        if (
+            !jsonDocument.RootElement.TryGetProperty(
+                nameof(ITypeDiscriminator.TypeDiscriminator),
+                out var typeProperty
+            )
+        )
         {
             throw new JsonException();
         }
@@ -39,7 +50,9 @@ public class TypeDiscriminatorConverter<T> : JsonConverter<T> where T : ITypeDis
         }
 
         var jsonObject = jsonDocument.RootElement.GetRawText();
-        var result = (T) JsonSerializer.Deserialize(jsonObject, type, options);
+        var result = (T)(
+            JsonSerializer.Deserialize(jsonObject, type, options) ?? throw new JsonException()
+        );
 
         return result;
     }

@@ -1,0 +1,281 @@
+/* Cyberpunk Startup Loading Screen */
+
+.app-startup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #050505;
+    background-image: 
+        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    background-size: 100% 2px, 3px 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    font-family: 'Fira Code', monospace; /* Tech font */
+    color: #e0e0e0;
+    overflow: hidden;
+}
+
+/* Scanline Effect */
+.app-startup::after {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: rgba(18, 16, 16, 0.1);
+    opacity: 0;
+    z-index: 2;
+    pointer-events: none;
+    animation: flicker 0.15s infinite;
+}
+
+/* Container */
+.app-startup__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 60px;
+    position: relative;
+    z-index: 3;
+}
+
+/* Animated Brand/Spinner */
+.app-startup__brand {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Outer Ring - Tech Hud Style */
+.app-startup__ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: #00f3ff;
+    border-bottom-color: #bc13fe;
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.5), 0 0 5px rgba(188, 19, 254, 0.5);
+    animation: spin 2s linear infinite;
+}
+
+.app-startup__ring::before {
+    content: "";
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-left-color: #00f3ff;
+    border-right-color: #bc13fe;
+    opacity: 0.5;
+    animation: spin 3s linear infinite reverse;
+}
+
+.app-startup__ring::after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    border-radius: 50%;
+    border: 1px dashed rgba(255, 255, 255, 0.3);
+    animation: spin 10s linear infinite;
+}
+
+/* Inner Core */
+.app-startup__core {
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 20px solid #fff;
+    position: relative;
+    animation: pulse-triangle 1s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px #00f3ff);
+}
+
+.app-startup__core::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: -10px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 20px solid #fff;
+}
+
+
+/* Title Text */
+.app-startup__title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: 0.5rem;
+    color: #fff;
+    text-shadow: 2px 2px 0px #bc13fe, -2px -2px 0px #00f3ff;
+    position: relative;
+    animation: glitch-text 3s infinite linear alternate-reverse;
+}
+
+/* Subtext */
+.app-startup__subtitle {
+    font-size: 1rem;
+    color: #00f3ff;
+    margin-bottom: 2.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3em;
+    opacity: 0.8;
+    text-shadow: 0 0 5px rgba(0, 243, 255, 0.8);
+}
+
+/* Progress Bar Container */
+.app-startup__progress {
+    width: 300px;
+    height: 12px;
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    padding: 2px;
+    position: relative;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    clip-path: polygon(0 0, 100% 0, 100% 70%, 95% 100%, 0 100%); /* Slight angle cut */
+}
+
+/* Progress Bar Fill */
+.app-startup__bar {
+    height: 100%;
+    width: var(--blazor-load-percentage, 10%);
+    background: repeating-linear-gradient(
+        45deg,
+        #bc13fe,
+        #bc13fe 10px,
+        #9d00e0 10px,
+        #9d00e0 20px
+    );
+    box-shadow: 0 0 10px #bc13fe;
+    transition: width 0.1s ease-out;
+    position: relative;
+}
+
+.app-startup__bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: shine 1.5s infinite;
+}
+
+/* Progress Text */
+.app-startup__status {
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: #00f3ff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.app-startup__status::before {
+    content: "> SYSTEM LOADING: ";
+}
+
+.app-startup__status::after {
+    content: var(--blazor-load-percentage-text, "INITIALIZING...");
+    font-weight: bold;
+}
+
+/* Footer (ICP Info) */
+.app-startup__footer {
+    position: absolute;
+    bottom: 2rem;
+    width: 100%;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #555;
+    z-index: 3;
+}
+
+.app-startup__footer p {
+    margin: 0;
+}
+
+.app-startup__footer a {
+    color: #777;
+    text-decoration: none;
+    transition: color 0.2s;
+    text-transform: uppercase;
+}
+
+.app-startup__footer a:hover {
+    color: #00f3ff;
+    text-shadow: 0 0 5px #00f3ff;
+}
+
+/* Animations */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse-triangle {
+    0% { transform: scale(0.8); opacity: 0.7; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(0.8); opacity: 0.7; }
+}
+
+@keyframes flicker {
+    0% { opacity: 0.05; }
+    5% { opacity: 0.1; }
+    10% { opacity: 0.05; }
+    15% { opacity: 0.15; }
+    20% { opacity: 0.05; }
+    50% { opacity: 0.05; }
+    55% { opacity: 0.1; }
+    60% { opacity: 0.05; }
+    100% { opacity: 0.05; }
+}
+
+@keyframes glitch-text {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+    100% { transform: translate(0); }
+}
+
+@keyframes shine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Responsive adjustment */
+@media (max-width: 600px) {
+    .app-startup__title {
+        font-size: 2rem;
+    }
+    .app-startup__progress {
+        width: 80%;
+    }
+}

@@ -1,0 +1,45 @@
+@if (TotalPages > 1)
+{
+    <div class="pagination">
+        @* Prev *@
+        @if (CurrentPage > 1)
+        {
+            <a class="prev-next-item" href="@GetUrl(CurrentPage - 1)">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        }
+        else
+        {
+            <span class="pagination__item--disabled">
+                <i class="fa fa-angle-left"></i>
+            </span>
+        }
+
+        @* Pages *@
+        @foreach (var pageIndex in GetVisiblePages())
+        {
+            if (pageIndex == CurrentPage)
+            {
+                <span class="pagination__item--active">@pageIndex</span>
+            }
+            else
+            {
+                <a href="@GetUrl(pageIndex)">@pageIndex</a>
+            }
+        }
+
+        @* Next *@
+        @if (CurrentPage < TotalPages)
+        {
+            <a class="prev-next-item" href="@GetUrl(CurrentPage + 1)">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        }
+        else
+        {
+            <span class="pagination__item--disabled">
+                <i class="fa fa-angle-right"></i>
+            </span>
+        }
+    </div>
+}

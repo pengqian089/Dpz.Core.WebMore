@@ -1,0 +1,70 @@
+﻿@page "/friends"
+<PageTitle>友情链接 - 个人文章分享</PageTitle>
+<div class="friends-page">
+    <div class="container">
+        <div class="friends-page__header">
+            <h1 class="friends-page__title">
+                <i class="fa fa-address-book fa-fw"></i>
+                友情链接
+            </h1>
+        </div>
+
+        <div class="friends-page__grid">
+            @if (_isLoading)
+            {
+                @for (var i = 0; i < 12; i++)
+                {
+                    <article class="friend-card">
+                        <div class="friend-card__link">
+                            <div class="friend-card__avatar">
+                                <div class="skeleton skeleton--circle skeleton--block"></div>
+                            </div>
+                            <div class="friend-card__info">
+                                <div class="friend-card__name">
+                                    <div class="skeleton skeleton--text skeleton--w-50"></div>
+                                </div>
+                                <div class="friend-card__desc">
+                                    <div class="skeleton skeleton--text skeleton--w-100"></div>
+                                    <div class="skeleton skeleton--text skeleton--w-75"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                }
+            }
+            else
+            {
+                var random = new Random();
+                foreach (var item in _friends)
+                {
+                    if (item.Link == "https://www.dpangzi.com")
+                    {
+                        item.Link = "https://core.dpangzi.com";
+                        item.Name = "叫我阿胖";
+                        item.Description = "保持热爱 · 共赴山海";
+                    }
+                    var hue = random.Next(0, 360);
+                    <article class="friend-card" style="--hover-hue:@hue;">
+                        <a href="@item.Link" target="_blank" rel="noopener noreferrer" class="friend-card__link" title="@item.Name&#10;@item.Description">
+                            <div class="friend-card__avatar">
+                                <img src="@item.Avatar" alt="@item.Name" loading="lazy"/>
+                            </div>
+                            <div class="friend-card__info">
+                                <div class="friend-card__name">@item.Name</div>
+                                <div class="friend-card__desc">@item.Description</div>
+                            </div>
+                        </a>
+                    </article>
+                }
+            }
+        </div>
+
+        @* @{ *@
+        @*     var key = "friends"; *@
+        @* } *@
+        @* <div class="friends-page__comments"> *@
+        @*     <partial name="_GlobalCommentPartial" model="(CommentNode.Friends,key)"/> *@
+        @* </div> *@
+        <Comment Node="CommentNode.Friends" Relation="friends" />
+    </div>
+</div>

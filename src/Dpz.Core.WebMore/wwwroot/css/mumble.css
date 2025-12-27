@@ -1,0 +1,623 @@
+/* ==========================================================================
+   Mumble (碎碎念) Module Styles
+   ========================================================================== */
+
+:root {
+    /* Spacing */
+    --mumble-spacing-xs: 0.25rem;
+    --mumble-spacing-sm: 0.5rem;
+    --mumble-spacing-md: 1rem;
+    --mumble-spacing-lg: 1.5rem;
+    --mumble-spacing-xl: 2rem;
+
+    /* Radius */
+    --mumble-radius-sm: 4px;
+    --mumble-radius-md: 8px;
+    --mumble-radius-lg: 12px;
+    --mumble-radius-xl: 16px;
+
+    /* Transitions */
+    --mumble-transition-fast: 0.2s ease;
+    --mumble-transition-normal: 0.3s ease;
+
+    /* Light Theme Colors (Default) */
+    --mumble-color-primary: #2563eb;
+    --mumble-color-primary-hover: #1d4ed8;
+    --mumble-color-text-main: #1f2937;
+    --mumble-color-text-secondary: #4b5563;
+    --mumble-color-text-muted: #9ca3af;
+    --mumble-color-bg-body: #f3f4f6;
+    --mumble-color-bg-surface: #ffffff;
+    --mumble-color-bg-surface-alt: #f9fafb;
+    --mumble-color-border: #e5e7eb;
+    --mumble-color-shadow: rgba(0, 0, 0, 0.05);
+    --mumble-color-shadow-hover: rgba(0, 0, 0, 0.1);
+}
+
+/* Dark Theme Adaptation */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --mumble-color-text-main: #e5e7eb;
+        --mumble-color-text-secondary: #d1d5db;
+        --mumble-color-text-muted: #6b7280;
+        --mumble-color-bg-body: #111827;
+        --mumble-color-bg-surface: #1f2937;
+        --mumble-color-bg-surface-alt: #374151;
+        --mumble-color-border: #374151;
+        --mumble-color-shadow: rgba(0, 0, 0, 0.3);
+        --mumble-color-shadow-hover: rgba(0, 0, 0, 0.5);
+    }
+}
+
+[data-theme="dark"] {
+    --mumble-color-text-main: #e5e7eb;
+    --mumble-color-text-secondary: #d1d5db;
+    --mumble-color-text-muted: #6b7280;
+    --mumble-color-bg-body: #111827;
+    --mumble-color-bg-surface: #1f2937;
+    --mumble-color-bg-surface-alt: #374151;
+    --mumble-color-border: #374151;
+    --mumble-color-shadow: rgba(0, 0, 0, 0.3);
+    --mumble-color-shadow-hover: rgba(0, 0, 0, 0.5);
+}
+
+/* Mobile Spacing Optimization */
+@media (max-width: 768px) {
+    :root {
+        --mumble-spacing-md: 0.75rem;
+        --mumble-spacing-lg: 1rem;
+        --mumble-spacing-xl: 1.25rem;
+    }
+}
+
+/* ==========================================================================
+   Layout
+   ========================================================================== */
+
+.mumble-layout {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: var(--mumble-spacing-xl);
+    max-width: 1200px;
+    margin: var(--mumble-spacing-xl) auto;
+    padding: 0 var(--mumble-spacing-md);
+    align-items: start;
+}
+
+.mumble-layout__main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mumble-spacing-lg);
+    min-width: 0;
+}
+
+@media (max-width: 900px) {
+    .mumble-layout {
+        display: block;
+        padding: 0 var(--mumble-spacing-sm);
+    }
+    .mumble-layout__sidebar {
+        display: none;
+    }
+}
+
+/* ==========================================================================
+   Mumble Card
+   ========================================================================== */
+
+.mumble-card {
+    background-color: var(--mumble-color-bg-surface);
+    border-radius: var(--mumble-radius-lg);
+    border: 1px solid var(--mumble-color-border);
+    padding: var(--mumble-spacing-lg);
+    box-shadow: 0 1px 2px var(--mumble-color-shadow);
+    transition: transform var(--mumble-transition-fast), box-shadow var(--mumble-transition-fast);
+    position: relative;
+    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .mumble-card {
+        padding: var(--mumble-spacing-md);
+        border-radius: var(--mumble-radius-md);
+    }
+}
+
+.mumble-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px var(--mumble-color-shadow-hover);
+    border-color: transparent;
+}
+
+.mumble-card--detail:hover {
+    transform: none;
+    box-shadow: 0 1px 2px var(--mumble-color-shadow);
+}
+
+.mumble-card__header {
+    display: flex;
+    align-items: center;
+    gap: var(--mumble-spacing-md);
+    margin-bottom: var(--mumble-spacing-md);
+}
+
+.mumble-card__avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--mumble-color-bg-surface-alt);
+    background-color: var(--mumble-color-bg-surface-alt);
+}
+
+@media (max-width: 768px) {
+    .mumble-card__avatar {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+.mumble-card__meta {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.mumble-card__author {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--mumble-color-text-main);
+    display: flex;
+    align-items: center;
+    gap: var(--mumble-spacing-sm);
+}
+
+.mumble-card__role {
+    font-size: 0.75rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    background-color: var(--mumble-color-bg-surface-alt);
+    color: var(--mumble-color-text-secondary);
+    font-weight: 500;
+}
+
+.mumble-card__time {
+    font-size: 0.85rem;
+    color: var(--mumble-color-text-muted);
+}
+
+.mumble-card__content {
+    color: var(--mumble-color-text-main);
+    font-size: 1rem;
+    line-height: 1.75;
+    margin-bottom: var(--mumble-spacing-lg);
+    position: relative;
+    word-break: break-word;
+}
+
+.mumble-card__content.is-collapsed {
+    max-height: 300px;
+    overflow: hidden;
+    mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+}
+
+.mumble-card__content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--mumble-radius-md);
+    margin: var(--mumble-spacing-sm) 0;
+    box-shadow: 0 2px 4px var(--mumble-color-shadow);
+    cursor: zoom-in;
+    display: block;
+}
+
+.mumble-card__content a {
+    color: var(--mumble-color-primary);
+    text-decoration: none;
+    border-bottom: 1px dashed var(--mumble-color-primary);
+}
+
+.mumble-card__read-more {
+    display: none;
+    text-align: center;
+    margin-top: calc(var(--mumble-spacing-md) * -1);
+    margin-bottom: var(--mumble-spacing-md);
+    position: relative;
+    z-index: 10;
+}
+
+.mumble-card__read-more.is-expanded {
+    margin-top: var(--mumble-spacing-sm);
+}
+
+.mumble-card__read-more-btn {
+    background-color: var(--mumble-color-bg-surface-alt);
+    border: 1px solid var(--mumble-color-border);
+    color: var(--mumble-color-text-secondary);
+    padding: var(--mumble-spacing-sm) var(--mumble-spacing-xl);
+    border-radius: 99px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all var(--mumble-transition-fast);
+}
+
+.mumble-card__read-more-btn:hover {
+    background-color: var(--mumble-color-primary);
+    color: #fff;
+    border-color: var(--mumble-color-primary);
+}
+
+.mumble-card__footer {
+    display: flex;
+    align-items: center;
+    gap: var(--mumble-spacing-lg);
+    padding-top: var(--mumble-spacing-md);
+    border-top: 1px solid var(--mumble-color-bg-surface-alt);
+}
+
+.mumble-action {
+    display: flex;
+    align-items: center;
+    gap: var(--mumble-spacing-sm);
+    color: var(--mumble-color-text-muted);
+    font-size: 0.9rem;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: var(--mumble-spacing-xs) var(--mumble-spacing-sm);
+    border-radius: var(--mumble-radius-md);
+    transition: all var(--mumble-transition-fast);
+    font-family: inherit;
+    text-decoration: none;
+}
+
+.mumble-action:hover {
+    background-color: var(--mumble-color-bg-surface-alt);
+    color: var(--mumble-color-primary);
+}
+
+.mumble-action--active {
+    color: var(--mumble-color-primary);
+    background-color: rgba(37, 99, 235, 0.1);
+}
+
+/* ==========================================================================
+   Comments Section (Universal Adaption)
+   ========================================================================== */
+
+.mumble-comments {
+    margin-top: var(--mumble-spacing-lg);
+    padding-top: var(--mumble-spacing-lg);
+    border-top: 1px dashed var(--mumble-color-border);
+    animation: mumbleFadeIn var(--mumble-transition-normal);
+}
+
+.mumble-comments.is-hidden {
+    display: none;
+}
+
+@keyframes mumbleFadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Header */
+.comment-section__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--mumble-spacing-md);
+}
+
+.comment-section__title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--mumble-color-text-main);
+}
+
+.comment-section__refresh-btn {
+    background: none;
+    border: none;
+    color: var(--mumble-color-text-muted);
+    cursor: pointer;
+    transition: color var(--mumble-transition-fast);
+}
+
+.comment-section__refresh-btn:hover {
+    color: var(--mumble-color-primary);
+}
+
+/* Form */
+.comment-form {
+    background-color: var(--mumble-color-bg-surface-alt);
+    padding: var(--mumble-spacing-md);
+    border-radius: var(--mumble-radius-md);
+    margin-bottom: var(--mumble-spacing-lg);
+    border: 1px solid var(--mumble-color-border);
+}
+
+.comment-form__header {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--mumble-spacing-md);
+    margin-bottom: var(--mumble-spacing-md);
+}
+
+.comment-form__group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mumble-spacing-xs);
+}
+
+.comment-form__label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--mumble-color-text-secondary);
+}
+
+.comment-form__input,
+.comment-form__editor {
+    width: 100%;
+    padding: var(--mumble-spacing-sm) var(--mumble-spacing-md);
+    border: 1px solid var(--mumble-color-border);
+    border-radius: var(--mumble-radius-sm);
+    background-color: var(--mumble-color-bg-surface);
+    color: var(--mumble-color-text-main);
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: all var(--mumble-transition-fast);
+    box-sizing: border-box;
+}
+
+.comment-form__editor {
+    min-height: 100px;
+    resize: vertical;
+    display: block;
+}
+
+.comment-form__input:focus,
+.comment-form__editor:focus {
+    outline: none;
+    border-color: var(--mumble-color-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.comment-form__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--mumble-spacing-md);
+}
+
+.comment-form__actions {
+    display: flex;
+    gap: var(--mumble-spacing-sm);
+}
+
+.comment-form__action-btn {
+    color: var(--mumble-color-text-muted);
+    background: none;
+    border: none;
+    padding: var(--mumble-spacing-xs);
+    border-radius: var(--mumble-radius-sm);
+    cursor: pointer;
+    transition: all var(--mumble-transition-fast);
+    display: flex;
+    align-items: center;
+}
+
+.comment-form__action-btn:hover {
+    color: var(--mumble-color-primary);
+    background-color: rgba(37, 99, 235, 0.1);
+}
+
+.comment-form__submit-btn {
+    background-color: var(--mumble-color-primary);
+    color: #fff;
+    border: none;
+    padding: var(--mumble-spacing-sm) var(--mumble-spacing-lg);
+    border-radius: var(--mumble-radius-sm);
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: var(--mumble-spacing-sm);
+    transition: background-color var(--mumble-transition-fast);
+}
+
+.comment-form__submit-btn:hover {
+    background-color: var(--mumble-color-primary-hover);
+}
+
+.comment-form__submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Comment List & Items */
+.comment-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mumble-spacing-md);
+}
+
+.comment-item {
+    display: flex;
+    gap: var(--mumble-spacing-md);
+    animation: mumbleFadeIn 0.5s ease;
+}
+
+.comment-item__avatar {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+}
+
+.comment-item__avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid var(--mumble-color-border);
+}
+
+.comment-item__body {
+    flex: 1;
+    background-color: var(--mumble-color-bg-surface-alt);
+    padding: var(--mumble-spacing-md);
+    border-radius: var(--mumble-radius-md);
+    border-top-left-radius: 2px;
+    min-width: 0; /* Text wrap fix */
+}
+
+.comment-item__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--mumble-spacing-xs);
+    font-size: 0.85rem;
+}
+
+.comment-item__date {
+    color: var(--mumble-color-text-muted);
+}
+
+.comment-item__content {
+    font-size: 0.95rem;
+    color: var(--mumble-color-text-main);
+    line-height: 1.6;
+    word-break: break-word;
+}
+
+.comment-item__content img {
+    max-width: 100%;
+    border-radius: var(--mumble-radius-sm);
+    margin: var(--mumble-spacing-sm) 0;
+}
+
+.comment-item__actions {
+    margin-top: var(--mumble-spacing-sm);
+    display: flex;
+    gap: var(--mumble-spacing-md);
+}
+
+.comment-item__reply-btn {
+    font-size: 0.8rem;
+    color: var(--mumble-color-text-muted);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.comment-item__reply-btn:hover {
+    color: var(--mumble-color-primary);
+}
+
+/* Replies */
+.comment-replies {
+    margin-top: var(--mumble-spacing-md);
+    padding-left: var(--mumble-spacing-md);
+    border-left: 2px solid var(--mumble-color-border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--mumble-spacing-md);
+}
+
+/* Load More */
+.comment-load-more {
+    text-align: center;
+    margin-top: var(--mumble-spacing-lg);
+}
+
+.comment-load-more__btn {
+    background-color: var(--mumble-color-bg-surface);
+    border: 1px solid var(--mumble-color-border);
+    color: var(--mumble-color-text-secondary);
+    padding: var(--mumble-spacing-sm) var(--mumble-spacing-xl);
+    border-radius: 99px;
+    cursor: pointer;
+    transition: all var(--mumble-transition-fast);
+}
+
+.comment-load-more__btn:hover {
+    border-color: var(--mumble-color-primary);
+    color: var(--mumble-color-primary);
+}
+
+/* Empty State */
+.comment-empty {
+    text-align: center;
+    padding: var(--mumble-spacing-xl);
+    color: var(--mumble-color-text-muted);
+}
+
+/* ==========================================================================
+   History Widget
+   ========================================================================== */
+
+.history-widget {
+    background-color: var(--mumble-color-bg-surface);
+    border-radius: var(--mumble-radius-lg);
+    border: 1px solid var(--mumble-color-border);
+    padding: var(--mumble-spacing-lg);
+    position: sticky;
+    top: var(--mumble-spacing-lg);
+}
+
+.history-widget__title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--mumble-color-text-main);
+    margin-top: 0;
+    margin-bottom: var(--mumble-spacing-md);
+    padding-bottom: var(--mumble-spacing-sm);
+    border-bottom: 2px solid var(--mumble-color-bg-surface-alt);
+}
+
+.history-widget__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mumble-spacing-md);
+}
+
+.history-item {
+    padding-bottom: var(--mumble-spacing-md);
+    border-bottom: 1px dashed var(--mumble-color-border);
+    transition: transform var(--mumble-transition-fast);
+}
+
+.history-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.history-item:hover {
+    transform: translateX(4px);
+}
+
+.history-item__content {
+    font-size: 0.9rem;
+    color: var(--mumble-color-text-secondary);
+    margin-bottom: var(--mumble-spacing-xs);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.5;
+}
+
+.history-item__time {
+    font-size: 0.75rem;
+    color: var(--mumble-color-text-muted);
+    text-align: right;
+    display: block;
+    font-style: italic;
+}
+
+

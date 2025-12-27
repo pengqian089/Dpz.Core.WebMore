@@ -1,15 +1,16 @@
-﻿<div class="avatar">
+﻿<div class="comment-avatar-wrapper">
     @if (Commenter is GuestCommenter guestCommenter)
     {
-        <img src="https://cravatar.cn/avatar/@guestCommenter.EmailMd5" alt="@guestCommenter.NickName"/>
+        <img class="comment-avatar-img" src="https://cravatar.cn/avatar/@guestCommenter.EmailMd5" alt="@guestCommenter.NickName"/>
     }
     else if(Commenter is MemberCommenter memberCommenter)
     {
-        <img src="@memberCommenter.Avatar" alt="@memberCommenter.NickName"/>
+        <img class="comment-avatar-img" src="@memberCommenter.Avatar" alt="@memberCommenter.NickName"/>
     }
 </div>
 
 @code {
     [Parameter]
-    public Commenter Commenter { get; set; }
+    [EditorRequired]
+    public required Commenter Commenter { get; set; }
 }

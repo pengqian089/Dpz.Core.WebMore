@@ -1,0 +1,79 @@
+/* Home Video Component */
+.home-video-section {
+    margin-bottom: var(--spacing-xl);
+    background-color: var(--color-bg-surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+    box-shadow: 0 4px 6px var(--color-shadow);
+    transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.home-video-section:hover {
+    box-shadow: 0 10px 15px var(--color-shadow);
+}
+
+.home-video-section__header {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--color-bg-surface-alt);
+}
+
+.home-video-section__title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.home-video-section__title i {
+    color: var(--color-primary);
+}
+
+.home-video-section__body {
+    padding: var(--spacing-md);
+}
+
+/* Player Container */
+.home-video-player {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+    background-color: #000;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+}
+
+/* Ensure Artplayer or any video element fills the container */
+.home-video-player:not(.is-web-fullscreen):not(.is-fullscreen) > * {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+}
+
+/* Dark Mode Adjustments */
+@media (prefers-color-scheme: dark) {
+    .home-video-section {
+        border-color: var(--color-border);
+    }
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+    .home-video-section__body {
+        padding: var(--spacing-sm);
+    }
+    
+    .home-video-section {
+        border-radius: var(--radius-md);
+    }
+}

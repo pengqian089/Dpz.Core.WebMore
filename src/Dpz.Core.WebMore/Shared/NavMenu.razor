@@ -1,89 +1,158 @@
-﻿@inject ISnackbar _snackbar;
-<header class="header-navigation" id="header">
-    <nav>
-        <div class="logo">
-            <a href="">叫我阿胖嗷~</a>
+﻿@implements IDisposable
+@inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Components.Routing
+
+<header class="site-header">
+    <div class="container site-header__inner">
+
+        <!-- 1. Left: Logo -->
+        <div class="header-left">
+            <a class="site-logo" href="/">
+                <img src="https://dpangzi.com/favicon.png" alt="logo" class="site-logo__img" />
+                <span class="site-logo__text">叫我阿胖</span>
+            </a>
         </div>
-        <h2 id="menu-nav" @onclick="ShowMenu" class="@(_mMenuShow ? "open" : "")">
-            <span class="nav-icon"></span>
-        </h2>
-        <ul id="menu-list" style="@(_menuList)">
-            <li>
-                <NavLink href="/" Match="NavLinkMatch.All" @onclick="Nav">首页</NavLink>
-            </li>
-            <li>
-                <NavLink href="/article/list" Match="NavLinkMatch.Prefix" @onclick="Nav">文章列表</NavLink>
-            </li>
-            <li>
-                <NavLink href="/mumble" @onclick="Nav">碎碎念</NavLink>
-            </li>
-            <li>
-                <NavLink href="/timeline" @onclick="Nav">时间轴</NavLink>
-            </li>
-            <li>
-                <NavLink href="/code" @onclick="Nav">源码</NavLink>
-            </li>
-            <li>
-                <NavLink href="/bookmark" @onclick="Nav">书签</NavLink>
-            </li>
-            <li></li>
-            <li>
-                <a>其他</a>
-                <ul class="sub">
-                    <li>
-                       <NavLink href="/bson-to-json" @onclick="Nav">显示BSON</NavLink>
+
+        <!-- 2. Center: Navigation Menu -->
+        <div class="header-center">
+            <nav class="nav-container">
+                <ul class="nav-menu">
+                    <li class="nav-menu__item @IsActive("", true)">
+                        <NavLink href="" Match="NavLinkMatch.All" class="nav-menu__link">
+                            <i class="fa fa-home fa-fw"></i>
+                            <span class="nav-menu__text">
+                                首页
+                            </span>
+                        </NavLink>
+                    </li>
+                    <li class="nav-menu__item @IsActive("article")">
+                        <NavLink href="article/list" class="nav-menu__link">
+                            <i class="fa fa-file-text fa-fw"></i>
+                            <span class="nav-menu__text">
+                                文章
+                            </span>
+                        </NavLink>
+                    </li>
+                    <li class="nav-menu__item @IsActive("mumble")">
+                        <NavLink href="mumble" class="nav-menu__link">
+                            <i class="fa fa-bullhorn fa-fw"></i>
+                            <span class="nav-menu__text">
+                                碎碎念
+                            </span>
+                        </NavLink>
+                    </li>
+                    <li class="nav-menu__item @IsActive("steam")">
+                        <NavLink href="steam" class="nav-menu__link">
+                            <i class="fa-brands fa-steam"></i>
+                            <span class="nav-menu__text">
+                                Steam
+                            </span>
+                        </NavLink>
+                    </li>
+                    <li class="nav-menu__item @IsActive("bookmark")">
+                        <NavLink href="bookmark" class="nav-menu__link">
+                            <i class="fa fa-bookmark fa-fw"></i>
+                            <span class="nav-menu__text">
+                                书签
+                            </span>
+                        </NavLink>
+                    </li>
+
+                    <!-- Dropdown -->
+                    <li class="nav-menu__item nav-menu__item--has-sub @MoreActive()">
+                        <span class="nav-menu__link" style="cursor: default">
+                            <span class="nav-menu__text">更多</span>
+                            <i class="fa fa-angle-down nav-menu__arrow"></i>
+                        </span>
+                        <div class="nav-dropdown">
+                            <NavLink href="albums" class="nav-dropdown__item">
+                                <i class="fa-solid fa-photo-film"></i> 相册
+                            </NavLink>
+                            <NavLink href="code" class="nav-dropdown__item">
+                                <i class="fa fa-code"></i> 网站源码
+                            </NavLink>
+                            <NavLink href="timeline" class="nav-dropdown__item">
+                                <i class="fa fa-calendar"></i> 时间轴
+                            </NavLink>
+                            <NavLink href="friends" class="nav-dropdown__item">
+                                <i class="fa fa-address-book"></i> 友链
+                            </NavLink>
+                        </div>
                     </li>
                 </ul>
-            </li>
-            
-            @* <li> *@
-            @*     <a href="">留言</a> *@
-            @* </li> *@
-            @* <li> *@
-            @*     <a href="/article/read/1011">内容页</a> *@
-            @* </li> *@
-        </ul>
-        <div class="search-box">
-            <div id="search_bar" class="search_bar">
-                <form method="post">
-                    <input class="input" placeholder="想搜点什么呢.." type="text" name="keyboard" id="keyboard">
-                    <p class="search_ico" @onclick="Search">
-                        <span></span>
-                    </p>
-                </form>
-            </div>
+            </nav>
         </div>
-    </nav>
+
+        <!-- 3. Right: User & Actions -->
+        <div class="header-right">
+
+            <!-- Mobile Toggle -->
+            <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
+                <span class="nav-toggle__icon"></span>
+            </button>
+        </div>
+
+    </div>
 </header>
 
+<!-- Mobile Menu Overlay -->
+<div class="mobile-menu-overlay"></div>
+
 @code {
-    private bool _mMenuShow = false;
+    private string _currentUrl = "";
 
-    private string _menuList = "";
-
-    private void ShowMenu()
+    protected override void OnInitialized()
     {
-        _mMenuShow = !_mMenuShow;
-        _menuList = _mMenuShow ? "display:block" : "display:none";
-    }
-
-    private void Search()
-    {
-        _snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-        _snackbar.Add("暂时没有实现搜索的打算！", Severity.Normal);
-    }
-
-    private void Nav()
-    {
-        if (_mMenuShow)
+        // Get initial URL (relative)
+        _currentUrl = Navigation.ToBaseRelativePath(Navigation.Uri);
+        // Remove fragment if any (optional)
+        if (_currentUrl.Contains('#'))
         {
-            ShowMenu();
+            _currentUrl = _currentUrl.Split('#')[0];
         }
+
+        Navigation.LocationChanged += OnLocationChanged;
     }
 
-    protected override async Task OnInitializedAsync()
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
-        await base.OnInitializedAsync();
+        _currentUrl = Navigation.ToBaseRelativePath(e.Location);
+        if (_currentUrl.Contains('#'))
+        {
+            _currentUrl = _currentUrl.Split('#')[0];
+        }
+        StateHasChanged();
     }
 
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+    }
+
+    private string IsActive(string href, bool matchAll = false)
+    {
+        // Remove query string for comparison
+        var path = _currentUrl.Split('?')[0];
+
+        if (matchAll)
+        {
+            return string.IsNullOrEmpty(path) ? "nav-menu__item--active" : "";
+        }
+
+        if (string.IsNullOrEmpty(path)) return "";
+
+        return path.StartsWith(href, StringComparison.OrdinalIgnoreCase) ? "nav-menu__item--active" : "";
+    }
+
+    private string MoreActive()
+    {
+        var path = _currentUrl.Split('?')[0];
+        var moreLinks = new[] { "albums", "code", "timeline", "friends" };
+        foreach (var link in moreLinks)
+        {
+            if (path.StartsWith(link, StringComparison.OrdinalIgnoreCase))
+                return "nav-menu__item--active";
+        }
+        return "";
+    }
 }

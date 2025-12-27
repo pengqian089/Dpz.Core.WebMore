@@ -1,44 +1,224 @@
 ﻿@page "/"
-@using Dpz.Core.WebMore.Pages.ArticleComponent
 <PageTitle>首页 - 个人文章分享</PageTitle>
-<article>
-    <div class="pics-box">
-        @if (_banners.Any())
-        {
-            <!--banner begin-->
-            <div class="banner">
-                <div id="banner" class="fader">
-                    <ul>
-                        @foreach (var item in _banners)
-                        {
 
-                            <li class="slide">
-                                <img src="@item.AccessUrl" alt="@item.Description">
-                                <span class="img-info">@item.Description</span>
-                            </li>
-                        }
-                    </ul>
-                    <div class="fader_controls">
-                        <div class="page prev" data-target="prev">&lsaquo;</div>
-                        <div class="page next" data-target="next">&rsaquo;</div>
-                        <ul class="pager_list">
-                        </ul>
-                    </div>
+@if (_loading)
+{
+    <!-- Skeleton Layout -->
+    <div class="home-view">
+        <!-- Hero Skeleton -->
+        <section class="hero skeleton skeleton--block" style="height: 500px; display: block; border-radius: 0;">
+            <div class="container hero__content">
+                <div class="skeleton skeleton--title skeleton--w-40" style="height: 3rem; background: rgba(255,255,255,0.1); margin-bottom: 1rem;"></div>
+                <div class="skeleton skeleton--text skeleton--w-20" style="height: 1.5rem; background: rgba(255,255,255,0.1);"></div>
+            </div>
+        </section>
+
+        <div class="container page-layout">
+            <div class="page-content">
+                <!-- Video Section Skeleton -->
+                <div class="home-video-section" style="margin-bottom: 2rem;">
+                    <div class="skeleton skeleton--block" style="height: 300px; border-radius: var(--radius-lg);"></div>
+                </div>
+
+                <!-- Section Header Skeleton -->
+                <div class="section-header" style="border: none;">
+                    <div class="skeleton skeleton--title skeleton--w-20" style="margin: 0;"></div>
+                </div>
+
+                <!-- Articles Skeleton -->
+                <div class="article-grid">
+                    @for (var i = 0; i < 3; i++)
+                    {
+                        <article class="article-card" style="pointer-events: none;">
+                            <div class="article-card__cover skeleton skeleton--block"></div>
+                            <div class="article-card__content">
+                                <div class="article-card__meta">
+                                    <div class="skeleton skeleton--text skeleton--w-20"></div>
+                                    <div class="skeleton skeleton--text skeleton--w-10"></div>
+                                </div>
+                                <div class="article-card__title">
+                                    <div class="skeleton skeleton--title skeleton--w-80"></div>
+                                </div>
+                                <div class="article-card__excerpt">
+                                    <div class="skeleton skeleton--text skeleton--block"></div>
+                                    <div class="skeleton skeleton--text skeleton--block"></div>
+                                    <div class="skeleton skeleton--text skeleton--w-60"></div>
+                                </div>
+                                <div class="article-card__footer">
+                                    <div class="article-card__tags" style="display: flex; gap: 0.5rem;">
+                                        <div class="skeleton skeleton--button skeleton--w-20"></div>
+                                        <div class="skeleton skeleton--button skeleton--w-20"></div>
+                                    </div>
+                                    <div class="article-card__stats">
+                                        <div class="skeleton skeleton--text skeleton--w-10"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    }
                 </div>
             </div>
-            <!--banner end-->
-        }
-        else
-        {
-            <MudCard>
-                <MudSkeleton SkeletonType="SkeletonType.Rectangle" Height="300px" />
-            </MudCard>
-        }
+
+            <!-- Sidebar Skeleton -->
+            <aside class="page-sidebar">
+                <!-- Profile Skeleton -->
+                <div class="widget card">
+                    <div class="card__body text-center">
+                        <div class="skeleton skeleton--circle" style="width: 80px; height: 80px; margin: 0 auto 1rem auto;"></div>
+                        <div class="skeleton skeleton--title skeleton--w-40" style="margin: 0 auto 0.5rem auto;"></div>
+                        <div class="skeleton skeleton--text skeleton--w-20" style="margin: 0 auto 1rem auto;"></div>
+                        <div class="social-links mt-1" style="justify-content: center; gap: 1rem; display: flex;">
+                             <div class="skeleton skeleton--circle" style="width: 32px; height: 32px;"></div>
+                             <div class="skeleton skeleton--circle" style="width: 32px; height: 32px;"></div>
+                             <div class="skeleton skeleton--circle" style="width: 32px; height: 32px;"></div>
+                             <div class="skeleton skeleton--circle" style="width: 32px; height: 32px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Intro Skeleton -->
+                <div class="widget card">
+                     <div class="card__header" style="border-bottom: 1px solid var(--color-border);">
+                         <div class="skeleton skeleton--title skeleton--w-30" style="margin: 0;"></div>
+                     </div>
+                     <div class="card__body">
+                         <div class="skeleton skeleton--text"></div>
+                         <div class="skeleton skeleton--text"></div>
+                         <div class="skeleton skeleton--text"></div>
+                         <div class="skeleton skeleton--text skeleton--w-60"></div>
+                     </div>
+                </div>
+
+                <!-- Tag Cloud Skeleton -->
+                 <div class="widget">
+                      <div class="tag-cloud">
+                          @for(int k=0; k<10; k++) {
+                              <div class="skeleton skeleton--button skeleton--w-20" style="width: 60px; height: 24px; border-radius: 99px;"></div>
+                          }
+                      </div>
+                 </div>
+            </aside>
+        </div>
     </div>
-    <div class="blank"></div>
-    <!--blogs box begin-->
-    <div class="blogsbox">
-        <ArticleShow Source="_topArticles" IsLoading="_loading"></ArticleShow>
+}
+else
+{
+    <!-- Real Content -->
+    <div class="home-view">
+        <!-- Hero Section -->
+        <section class="hero" id="hero-slider">
+            @if (_banners.Count > 0)
+            {
+                var currentBanner = _banners[_currentBannerIndex];
+                var description = string.IsNullOrEmpty(currentBanner.Description) ? "自由 · 开放 · 合作 · 共享" : currentBanner.Description;
+                
+                @for (var i = 0; i < _banners.Count; i++)
+                {
+                    var pic = _banners[i];
+                    var isActive = i == _currentBannerIndex ? "active" : "";
+                    <div class="hero__bg @isActive" style="background-image: url('@pic.AccessUrl')"></div>
+                }
+                
+                <div class="hero__overlay"></div>
+                <div class="container hero__content">
+                    <h1 class="hero__title" id="hero-title">@description</h1>
+                    <p class="hero__subtitle" id="hero-subtitle">保持热爱，奔赴山海</p>
+                    <div class="hero__actions">
+                        <a href="#latest-articles" class="btn btn--primary">开始阅读</a>
+                    </div>
+                </div>
+            }
+            else
+            {
+                 <div class="hero__bg active" style="background-color: #333;"></div>
+                 <div class="hero__overlay"></div>
+                 <div class="container hero__content">
+                    <h1 class="hero__title" id="hero-title">自由 · 开放 · 合作 · 共享</h1>
+                    <p class="hero__subtitle" id="hero-subtitle">保持热爱，奔赴山海</p>
+                    <div class="hero__actions">
+                        <a href="#latest-articles" class="btn btn--primary">开始阅读</a>
+                    </div>
+                </div>
+            }
+        </section>
+    
+        <!-- Main Content Area -->
+        <div class="container page-layout">
+            <!-- Articles Feed -->
+            <div class="page-content" id="latest-articles">
+                <!-- Featured Video Section -->
+                @if (_currentVideo != null)
+                {
+                    <div class="home-video-section js-home-video-section">
+                        <div class="home-video-section__header">
+                            <h3 class="home-video-section__title">
+                                <i class="fa fa-play-circle"></i> 精选视频
+                            </h3>
+                        </div>
+                        <div class="home-video-section__body">
+                            <div class="home-video-player js-home-video-container">
+                                <!-- Player will be injected here -->
+                            </div>
+                        </div>
+                    </div>
+                }
+    
+                <div class="section-header">
+                    <h2 class="section-title">最新文章</h2>
+                    <a href="/article/list" class="section-more">查看更多 <i class="fa fa-arrow-right"></i></a>
+                </div>
+                
+                <div class="article-grid">
+                    <ArticleItems Articles="_topArticles"></ArticleItems>
+                </div>
+            </div>
+    
+            <!-- Sidebar -->
+            <aside class="page-sidebar">
+                <!-- Profile Card -->
+                <div class="widget card">
+                    <div class="card__body text-center">
+                        <img src="@Program.AssetsHost/images/Lara-Croft.png" alt="Avatar" class="avatar avatar--lg mb-1">
+                        <h3 class="widget__title">叫我阿胖</h3>
+                        <p class="text-muted">彭迁</p>
+                        <div class="social-links mt-1">
+                            <a href="https://github.com/pengqian089" target="_blank" title="Github">
+                                <i class="fa-brands fa-github"></i>
+                            </a>
+                            <a href="mailto:pengqian089@hotmail.com" title="邮箱">
+                                <i class="fa-solid fa-envelope"></i>
+                            </a>
+                            <a href="https://wpa.qq.com/msgrd?v=3&uin=350952323&site=qq&menu=yes" title="QQ" target="_blank">
+                                <i class="fa-brands fa-qq"></i>
+                            </a>
+                            <a href="https://core.dpangzi.com/resume.html" target="_blank" title="查看简历">
+                                <i class="fa fa-file-text"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+    
+                
+                <!-- Introduction -->
+                <div class="widget card">
+                    <div class="card__header">
+                        <h4 class="card__title">
+                            <i class="fa-solid fa-address-card"></i>
+                            关于我
+                        </h4>
+                    </div>
+                    <div class="card__body widget__intro">
+                        <p>彭氏胖纸者，名迁，江陵人，诞于夏。少聪慧，敏于学。</p>
+                        <p>古人有言，曰：趋于地，就于时。迁者诞于炎炎之夏，故活泼而好动。</p>
+                        <p>江陵者襟江带河，集日月精华，文人骚客多出于此，迁虽芸芸之其一，实粹粹然也。</p>
+                        <p>迁之性，稳而健，平而滑。若得于古，不可为刺客而说客也夫刺客，静若处子，动若蛇蝎。偏安于角落，偶然爆发。而说客者，平滑婉转，若流水，或缓或急，然不可断绝也。</p>
+                        <p>迁者，柔弱如水，暴怒如江。遏飞舟击巉石曲回肠终归海。</p>
+                    </div>
+                </div>
+    
+                <!-- Tags Cloud -->
+                <TagCloud></TagCloud>
+            </aside>
+        </div>
     </div>
-    <RightComponent></RightComponent>
-</article>
+}

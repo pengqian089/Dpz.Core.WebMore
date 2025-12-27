@@ -1,0 +1,220 @@
+/* Albums Page Styles - BEM naming */
+
+.albums {
+    --albums-gap: 1rem;
+    --albums-col-count: 1;
+    /* Use same max-width and margins as steam-container */
+    max-width: var(--container-width);
+    margin: 0 auto;
+    padding: var(--spacing-md);
+    animation: fadeIn var(--transition-normal);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Header - Mimic .steam-header */
+.albums__header {
+    text-align: left; /* Changed from center to match steam */
+    margin-bottom: var(--spacing-lg);
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: var(--spacing-sm);
+    /* padding: 0 var(--spacing-md); removed to align with container padding */
+}
+
+.albums__title {
+    font-size: 1.5rem; /* Matched steam-header__title */
+    font-weight: 700;
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-text-main);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.albums__subtitle {
+    color: var(--color-text-secondary);
+    font-size: 1rem; /* Slightly smaller */
+    margin-bottom: var(--spacing-sm);
+}
+
+.albums__stats {
+    display: inline-flex; /* Changed from flex center */
+    gap: var(--spacing-lg);
+    font-size: 0.875rem; /* Matched steam meta */
+    color: var(--color-text-muted);
+}
+
+/* Masonry Layout */
+.albums__grid {
+    column-count: var(--albums-col-count);
+    column-gap: var(--albums-gap);
+    width: 100%;
+    margin: 0 auto;
+}
+
+.albums__item {
+    break-inside: avoid;
+    margin-bottom: var(--albums-gap);
+    /* Fix for column rendering bugs in some browsers */
+    transform: translateZ(0); 
+}
+
+/* Card */
+.albums__card {
+    position: relative;
+    border-radius: var(--radius-lg); /* Matched steam radius */
+    overflow: hidden;
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border); /* Added border like steam card */
+    box-shadow: none; /* Steam card has no shadow initially */
+    transition: all var(--transition-normal);
+    cursor: zoom-in;
+}
+
+.albums__card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px -5px var(--color-shadow);
+    border-color: var(--color-primary);
+}
+
+.albums__image-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.albums__image {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: transform var(--transition-normal), opacity var(--transition-normal);
+    opacity: 0; /* Fade in on load */
+}
+
+.albums__image.is-loaded {
+    opacity: 1;
+}
+
+/* Zoom effect on hover like steam card image */
+.albums__card:hover .albums__image {
+    transform: scale(1.05);
+}
+
+/* Overlay & Actions */
+.albums__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--spacing-md);
+    pointer-events: none; /* Let click pass through to card/image for zoom */
+}
+
+.albums__card:hover .albums__overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.albums__actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: flex-end;
+}
+
+.albums__action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform var(--transition-fast), background var(--transition-fast);
+}
+
+.albums__action-btn:hover {
+    background: #fff;
+    transform: scale(1.1);
+}
+
+.albums__info {
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    transform: translateY(10px);
+    transition: transform var(--transition-fast);
+}
+
+.albums__card:hover .albums__info {
+    transform: translateY(0);
+}
+
+.albums__desc {
+    font-size: 0.95rem;
+    margin-bottom: var(--spacing-xs);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.albums__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+.albums__meta-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Loader */
+.albums__loading {
+    display: flex;
+    justify-content: center;
+    padding: var(--spacing-xl) 0;
+    width: 100%;
+}
+
+.albums__spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--color-bg-surface-alt);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: albums-spin 1s linear infinite;
+}
+
+.albums__no-more {
+    text-align: center;
+    padding: var(--spacing-xl) 0;
+    color: var(--color-text-muted);
+}
+
+@keyframes albums-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive Columns */
+@media (min-width: 640px) {
+    .albums { --albums-col-count: 2; }
+}
+
+@media (min-width: 1024px) {
+    .albums { --albums-col-count: 3; }
+}
+
+@media (min-width: 1280px) {
+    .albums { --albums-col-count: 4; }
+}

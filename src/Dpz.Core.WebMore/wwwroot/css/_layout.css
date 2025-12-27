@@ -1,0 +1,144 @@
+/* Reset & Base */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+    background-color: var(--color-bg-body);
+    color: var(--color-text-main);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color var(--transition-normal), color var(--transition-normal);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.site-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.site-main {
+    flex: 1;
+    width: 100%;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+a:hover {
+    color: var(--color-primary);
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+mark {
+    background-color: var(--color-mark-bg);
+    color: var(--color-mark-text);
+    padding: 0.1em 0.2em;
+    border-radius: var(--radius-sm);
+}
+
+/* Layout Utilities */
+.container {
+    width: 100%;
+    max-width: var(--container-width);
+    margin: var(--spacing-xl) auto 0;
+    padding: 0 var(--spacing-md);
+}
+
+/* Header & Navigation */
+.site-header {
+    height: var(--header-height);
+    background-color: rgba(255, 255, 255, 0.8);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+}
+
+@media (prefers-color-scheme: dark) {
+    .site-header {
+        background-color: rgba(30, 41, 59, 0.8);
+    }
+}
+
+.site-header__inner {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.site-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--color-text-main);
+}
+
+.site-logo__img {
+    height: 32px;
+    width: 32px;
+    border-radius: var(--radius-sm);
+}
+
+/* Footer */
+.site-footer {
+    padding: var(--spacing-xl) 0;
+    margin-top: var(--spacing-xl);
+    background-color: var(--color-bg-surface);
+    border-top: 1px solid var(--color-border);
+    text-align: center;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+}
+
+/* Utility Classes */
+.text-center { text-align: center; }
+.mt-1 { margin-top: var(--spacing-md); }
+.mt-2 { margin-top: var(--spacing-lg); }
+
+/* SignalR Connection Status */
+.connection-status {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background-color: var(--color-status-disconnected);
+    vertical-align: middle;
+    margin-left: var(--spacing-sm);
+    transition: background-color var(--transition-normal), box-shadow var(--transition-normal);
+    cursor: help;
+}
+
+.connection-status--connected {
+    background-color: var(--color-status-connected);
+    box-shadow: 0 0 4px var(--color-status-connected-shadow);
+}
+
+.connection-status--disconnected {
+    background-color: var(--color-status-error);
+    animation: status-pulse 2s infinite;
+}
+
+@keyframes status-pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}

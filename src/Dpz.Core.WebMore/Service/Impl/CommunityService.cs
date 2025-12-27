@@ -4,20 +4,19 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Dpz.Core.WebMore.Models;
 
-namespace Dpz.Core.WebMore.Service.Impl
-{
-    public class CommunityService:ICommunityService
-    {
-        private readonly HttpClient _httpClient;
+namespace Dpz.Core.WebMore.Service.Impl;
 
-        public CommunityService(HttpClient httpClient)
-        {
-            _httpClient = httpClient;
-        }
-        
-        public async Task<List<PictureModel>> GetBannersAsync()
-        {
-            return await _httpClient.GetFromJsonAsync<List<PictureModel>>("/api/Community/getBanners");
-        }
+public class CommunityService(HttpClient httpClient) : ICommunityService
+{
+    public async Task<List<PictureRecordModel>> GetBannersAsync()
+    {
+        return await httpClient.GetFromJsonAsync<List<PictureRecordModel>>(
+                "/api/Community/getBanners"
+            ) ?? [];
+    }
+
+    public async Task<List<FriendModel>> GetFriendsAsync()
+    {
+        return await httpClient.GetFromJsonAsync<List<FriendModel>>("/api/Community/friends") ?? [];
     }
 }

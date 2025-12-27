@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Dpz.Core.WebMore.Models;
@@ -10,72 +11,185 @@ using Microsoft.JSInterop;
 
 namespace Dpz.Core.WebMore.Pages;
 
-public partial class Bookmark
+public partial class Bookmark(
+    IBookmarkService bookmarkService,
+    NavigationManager navigationManager,
+    IJSRuntime jsRuntime
+) : ComponentBase, IAsyncDisposable
 {
-    [Inject] private IBookmarkService BookmarkService { get; set; }
-    
-    [Inject] private IJSRuntime JsRuntime { get; set; }
+    [SupplyParameterFromQuery(Name = "title")]
+    public string? Title { get; set; }
 
-    private string _title = null;
-
-    private readonly List<string> _categories = [];
+    [SupplyParameterFromQuery(Name = "categories")]
+    public string[] SelectedCategories { get; set; } = [];
 
     private List<BookmarkModel> _source = [];
 
-    private bool _loading = false;
+    private List<string> Categories =>
+        _source.SelectMany(x => x.Categories).Distinct().OrderByDescending(x => x).ToList();
+
+    private bool _loading;
+    private IJSObjectReference? _module;
+    private string _searchText = "";
+    private List<string> _suggestions = [];
+    private Timer? _debounceTimer;
+    private int _selectedIndex = -1;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadDataAsync();
+        _searchText = Title ?? "";
         await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _searchText = Title ?? "";
+        await LoadDataAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await jsRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./Pages/Bookmark.razor.js"
+            );
+            await _module.InvokeVoidAsync("init", ".bookmark__grid");
+        }
+        // Always try to layout after render, the JS observer should handle it but we can force it if needed
+        // await _module.InvokeVoidAsync("layout");
     }
 
     private async Task LoadDataAsync()
     {
         _loading = true;
-
-        _source = await BookmarkService.GetBookmarksAsync(_title, _categories);
-
+        // Assuming GetBookmarksAsync takes List<string> for categories
+        _source = await bookmarkService.GetBookmarksAsync(Title, SelectedCategories.ToList());
         _loading = false;
     }
-    
-    
 
-    private async Task<IEnumerable<string>> SearchAsync(string value,CancellationToken token)
+    private void OnSearchInput(ChangeEventArgs e)
     {
-        if (string.IsNullOrEmpty(value))
-        {
-            return [];
-        }
-
-        return await BookmarkService.SearchAsync(value, _categories);
+        _searchText = e.Value?.ToString() ?? "";
+        _selectedIndex = -1;
+        _debounceTimer?.Dispose();
+        _debounceTimer = new Timer(
+            async _ =>
+            {
+                if (string.IsNullOrWhiteSpace(_searchText))
+                {
+                    _suggestions.Clear();
+                    await InvokeAsync(StateHasChanged);
+                }
+                else
+                {
+                    await InvokeAsync(async () =>
+                    {
+                        var results = await bookmarkService.SearchAsync(
+                            _searchText,
+                            SelectedCategories.ToList()
+                        );
+                        _suggestions = results.ToList();
+                        StateHasChanged();
+                    });
+                }
+            },
+            null,
+            300,
+            Timeout.Infinite
+        );
     }
-    
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        Console.WriteLine("on after render async");
-        await JsRuntime.InvokeVoidAsync("showLazyImage");
-        await base.OnAfterRenderAsync(firstRender);
-    }
 
-    private async Task SelectCategoryAsync(string category)
+    private async Task OnKeyDown(KeyboardEventArgs e)
     {
-        if (_categories.Contains(category))
+        if (_suggestions.Count == 0)
         {
             return;
         }
-        _categories.Add(category);
-        await LoadDataAsync();
+
+        if (e.Key == "ArrowDown")
+        {
+            _selectedIndex = (_selectedIndex + 1) % _suggestions.Count;
+            _searchText = _suggestions[_selectedIndex];
+            if (_module != null)
+            {
+                await _module.InvokeVoidAsync("scrollToItem", _selectedIndex);
+            }
+        }
+        else if (e.Key == "ArrowUp")
+        {
+            if (_selectedIndex == -1)
+            {
+                _selectedIndex = 0;
+            }
+            _selectedIndex = (_selectedIndex - 1 + _suggestions.Count) % _suggestions.Count;
+            _searchText = _suggestions[_selectedIndex];
+            if (_module != null)
+            {
+                await _module.InvokeVoidAsync("scrollToItem", _selectedIndex);
+            }
+        }
+        else if (e.Key == "Enter")
+        {
+            NavigateToSearch();
+        }
+        else if (e.Key == "Escape")
+        {
+            _suggestions.Clear();
+            _selectedIndex = -1;
+        }
     }
 
-    private async Task UnSelectCategoryAsync(string category)
+    private void NavigateToSearch()
     {
-        if (!_categories.Contains(category))
+        var query = new Dictionary<string, object?>
         {
-            return;
+            ["title"] = _searchText,
+            ["categories"] = SelectedCategories,
+        };
+        var uri = navigationManager.GetUriWithQueryParameters("/bookmark", query);
+        navigationManager.NavigateTo(uri);
+        _suggestions.Clear();
+    }
+
+    private void SelectSuggestion(string suggestion)
+    {
+        _searchText = suggestion;
+        NavigateToSearch();
+    }
+
+    private string GetCategoryUrl(string category)
+    {
+        var list = SelectedCategories.ToList();
+        if (list.Contains(category))
+        {
+            list.Remove(category);
+        }
+        else
+        {
+            list.Add(category);
         }
 
-        _categories.Remove(category);
-        await LoadDataAsync();
+        var query = new Dictionary<string, object?> { ["categories"] = list.ToArray() };
+
+        if (!string.IsNullOrEmpty(Title))
+        {
+            query["title"] = Title;
+        }
+
+        return navigationManager.GetUriWithQueryParameters("/bookmark", query);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_debounceTimer != null)
+        {
+            await _debounceTimer.DisposeAsync();
+        }
+        if (_module is not null)
+        {
+            await _module.DisposeAsync();
+        }
     }
 }

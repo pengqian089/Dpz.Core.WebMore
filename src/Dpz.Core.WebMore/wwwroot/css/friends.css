@@ -1,0 +1,153 @@
+/* Friends Page Styles */
+.friends-page {
+    padding-bottom: var(--spacing-xl);
+}
+
+.friends-page__header {
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 2px solid var(--color-bg-surface-alt);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.friends-page__title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--color-text-main);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.friends-page__title i {
+    color: var(--color-primary);
+}
+
+.friends-page__subtitle {
+    margin-top: var(--spacing-xs);
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+}
+
+.friends-page__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+/* Friend Card */
+.friend-card {
+    background-color: var(--color-bg-surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    transition: all var(--transition-normal);
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+
+    /* Dynamic Hover Color Variables */
+    --hover-hue: 220; /* Default Blue */
+    --hover-color: hsl(var(--hover-hue), 75%, 45%);
+}
+
+@media (prefers-color-scheme: dark) {
+    .friend-card {
+        --hover-color: hsl(var(--hover-hue), 80%, 65%);
+    }
+}
+
+.friend-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px var(--color-shadow);
+    border-color: var(--hover-color);
+}
+
+.friend-card__link {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-lg);
+    text-decoration: none;
+    height: 100%;
+}
+
+.friend-card__avatar {
+    flex-shrink: 0;
+    width: 64px;
+    height: 64px;
+    margin-right: var(--spacing-md);
+    position: relative;
+}
+
+.friend-card__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid var(--color-bg-surface-alt);
+    transition: transform var(--transition-fast), border-color var(--transition-normal);
+}
+
+.friend-card:hover .friend-card__avatar img {
+    transform: rotate(10deg);
+    border-color: var(--hover-color);
+}
+
+.friend-card__info {
+    flex: 1;
+    min-width: 0; /* Enable text truncation */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.friend-card__name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    margin-bottom: var(--spacing-xs);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: color var(--transition-fast);
+}
+
+.friend-card:hover .friend-card__name {
+    color: var(--hover-color);
+}
+
+.friend-card__desc {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Skeleton Loading State (Optional, if we want to add it later) */
+.friend-card--skeleton .friend-card__avatar,
+.friend-card--skeleton .friend-card__name,
+.friend-card--skeleton .friend-card__desc {
+    background-color: var(--color-bg-surface-alt);
+    color: transparent;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 640px) {
+    .friends-page__grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .friend-card__link {
+        padding: var(--spacing-md);
+    }
+}
+
+.friends-page__comments {
+    margin-top: var(--spacing-xl);
+}
+

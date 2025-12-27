@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Dpz.Core.WebMore.Models;
 using Dpz.Core.WebMore.Service;
@@ -8,56 +9,107 @@ using Microsoft.JSInterop;
 
 namespace Dpz.Core.WebMore.Pages;
 
-public partial class Timeline
+public partial class Timeline(ITimelineService timelineService, IJSRuntime jsRuntime)
+    : ComponentBase,
+        IAsyncDisposable
 {
-    private double _width;
-
-    private DotNetObjectReference<Timeline> _objectReference;
-
-    [DynamicDependency(nameof(UpdateWindowWidth))]
-    public Timeline()
-    {
-        
-    }
-
-    [Inject] private IJSRuntime JsRuntime { get; set; }
-
-    [Inject]private ITimelineService TimelineService { get; set; }
-
-    private List<TimelineModel> _source = new();
+    private List<TimelineItemViewModel> _source = [];
+    private bool _isLoading = true;
+    private IJSObjectReference? _jsModule;
+    private IJSObjectReference? _observer;
+    private DotNetObjectReference<Timeline>? _dotNetRef;
 
     protected override async Task OnInitializedAsync()
     {
-        _objectReference = DotNetObjectReference.Create(this);
-        _width = await JsRuntime.InvokeAsync<double>("getWindowWidth");
-        _source = await TimelineService.GetTimelineAsync();
+        try
+        {
+            var data = await timelineService.GetTimelineAsync();
+            _source = data.Select(x => new TimelineItemViewModel { Model = x }).ToList();
+        }
+        finally
+        {
+            _isLoading = false;
+        }
         await base.OnInitializedAsync();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (_source.Count > 0 && _observer == null)
         {
-            await InitWindowWidthListener();
+            try
+            {
+                _jsModule = await jsRuntime.InvokeAsync<IJSObjectReference>(
+                    "import",
+                    "./Pages/Timeline.razor.js"
+                );
+
+                _dotNetRef = DotNetObjectReference.Create(this);
+
+                // Initialize observer only when we have items
+                _observer = await _jsModule.InvokeAsync<IJSObjectReference>(
+                    "initTimeline",
+                    _dotNetRef,
+                    ".timeline__item"
+                );
+            }
+            catch (JSException)
+            {
+                // Handle JS loading errors if necessary
+            }
         }
+        await base.OnAfterRenderAsync(firstRender);
     }
 
-    private async Task InitWindowWidthListener()
+    [JSInvokable]
+    public void OnItemsVisible(int[] indices)
     {
-        await JsRuntime.InvokeVoidAsync("addWindowWidthListener", _objectReference);
+        var hasChanges = false;
+        foreach (var index in indices)
+        {
+            if (index >= 0 && index < _source.Count)
+            {
+                var item = _source[index];
+                if (!item.IsVisible)
+                {
+                    item.IsVisible = true;
+                    hasChanges = true;
+                }
+            }
+        }
+
+        if (hasChanges)
+        {
+            StateHasChanged();
+        }
     }
 
     public async ValueTask DisposeAsync()
     {
-        await JsRuntime.InvokeVoidAsync("removeWindowWidthListener", _objectReference);
-        _objectReference?.Dispose();
+        try
+        {
+            if (_observer != null)
+            {
+                await _observer.InvokeVoidAsync("dispose");
+                await _observer.DisposeAsync();
+            }
+
+            if (_jsModule != null)
+            {
+                await _jsModule.DisposeAsync();
+            }
+
+            _dotNetRef?.Dispose();
+        }
+        catch (JSDisconnectedException)
+        {
+            // Ignore if JS is already disconnected
+        }
     }
 
-    [JSInvokable]
-    public Task UpdateWindowWidth(int windowWidth)
+    public class TimelineItemViewModel
     {
-        _width = windowWidth;
-        StateHasChanged();
-        return Task.CompletedTask;
+        public required TimelineModel Model { get; set; }
+        public bool IsVisible { get; set; }
     }
 }

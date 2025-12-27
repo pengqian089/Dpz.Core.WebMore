@@ -5,7 +5,7 @@ namespace Dpz.Core.WebMore.Service;
 
 public interface ICodeService
 {
-    Task<CodeNoteTree> GetTreeAsync(params string[] path);
+    Task<CodeNoteTree> GetTreeAsync(params string[]? path);
 
-    Task<CodeNoteTree> SearchAsync(string keyword);
+    Task<CodeNoteTree> SearchAsync(string? keyword);
 }

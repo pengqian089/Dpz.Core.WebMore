@@ -1,0 +1,110 @@
+﻿@page "/albums"
+
+<PageTitle>我的相册 - 个人文章分享</PageTitle>
+
+<div class="albums">
+
+    <div class="albums__header">
+        <h1 class="albums__title"><i class="fa fa-camera-retro"></i> 精彩瞬间</h1>
+        <p class="albums__subtitle">记录生活，分享感动</p>
+        <div class="albums__stats">
+            <span>共 @_totalItemCount 张照片</span>
+            <span>第 @(_pageIndex > 1 ? _pageIndex - 1 : 1) / @_totalPageCount 页</span>
+        </div>
+    </div>
+
+    <div class="albums__grid">
+        @if (_pictures.Count == 0 && _isLoading)
+        {
+            @for (int i = 0; i < 6; i++)
+            {
+                <div class="albums__item">
+                    <div class="albums__card">
+                        <div class="albums__image-wrapper" style="aspect-ratio: 4/3; background: transparent;">
+                             <div class="skeleton skeleton--block"></div>
+                        </div>
+                         <div class="albums__overlay" style="opacity: 1; pointer-events: none; background: transparent; justify-content: flex-end;">
+                            <div class="albums__info" style="transform: none; width: 100%;">
+                                <div class="skeleton skeleton--text skeleton--w-80"></div>
+                                <div class="albums__meta">
+                                    <div class="albums__meta-row">
+                                        <div class="skeleton skeleton--text skeleton--w-30" style="height: 0.8rem"></div>
+                                        <div class="skeleton skeleton--text skeleton--w-30" style="height: 0.8rem"></div>
+                                    </div>
+                                    <div class="albums__meta-row">
+                                        <div class="skeleton skeleton--text skeleton--w-40" style="height: 0.8rem"></div>
+                                        <div class="skeleton skeleton--text skeleton--w-20" style="height: 0.8rem"></div>
+                                    </div>
+                                </div>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            @for (var i = 0; i < _pictures.Count; i++)
+            {
+                var index = i;
+                var picture = _pictures[i];
+                <div class="albums__item">
+                    <div class="albums__card" @onclick="() => OpenGallery(index)">
+                        <div class="albums__image-wrapper">
+                            <img class="albums__image is-loaded"
+                                 src="@(picture.AccessUrl)!albums"
+                                 alt="@picture.Description"
+                                 width="@picture.Width"
+                                 height="@picture.Height"
+                                 loading="lazy" />
+                            <div class="albums__overlay">
+                                <div class="albums__actions">
+                                    <button class="albums__action-btn" @onclick:stopPropagation @onclick="() => DownloadImage(picture.AccessUrl)" title="下载">
+                                        <i class="fa fa-download"></i>
+                                    </button>
+                                    <button class="albums__action-btn" @onclick:stopPropagation @onclick="() => ShareImage(picture.AccessUrl)" title="分享">
+                                        <i class="fa fa-share"></i>
+                                    </button>
+                                </div>
+                                <div class="albums__info">
+                                    <div class="albums__desc">@picture.Description</div>
+                                    <div class="albums__meta">
+                                        <div class="albums__meta-row">
+                                            <span>@(picture.Creator?.Name ?? "Unknown")</span>
+                                            <span>@picture.UploadTime.ToString("yyyy/MM/dd")</span>
+                                        </div>
+                                        <div class="albums__meta-row">
+                                            <span>@picture.Width × @picture.Height</span>
+                                            <span>@((picture.Length / 1024.0 / 1024.0).ToString("F2")) MB</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    @if (_hasMore)
+    {
+        <div class="albums__loading">
+             @if (_isLoading && _pictures.Count > 0)
+             {
+                 <div class="albums__spinner"></div>
+             }
+             else if (!_isLoading)
+             {
+                 <div class="albums__spinner" style="opacity: 0; pointer-events: none;"></div>
+             }
+        </div>
+    }
+    
+    @if (!_hasMore)
+    {
+        <div class="albums__no-more">
+            <p>已经到底啦 ~</p>
+        </div>
+    }
+</div>

@@ -1,39 +1,48 @@
-﻿<ul>
-    @foreach (var item in Node.Directories)
+﻿<CascadingValue Value="this">
+    @if (Node.IsRoot)
     {
-        <TreeNode 
-            OnSelectedFile="OnSelectedFile" 
-            IsFolder="@(true)" 
-            Name="@item.Name" 
-            Path="item.CurrentPath"
-            OnExpandFolder="OnExpandFolder"
-            Keyword="@Keyword"/>
-    
-    }
+        @foreach (var item in Node.Directories)
+        {
+            <TreeNode OnSelectedFile="OnSelectedFile"
+                      IsFolder="@(true)"
+                      Name="@item.Name"
+                      Path="item.CurrentPath"
+                      OnExpandFolder="OnExpandFolder"
+                      Keyword="@Keyword"/>
+        }
 
-    @foreach (var item in Node.Files)
+        @foreach (var item in Node.Files)
+        {
+            <TreeNode OnSelectedFile="OnSelectedFile"
+                      IsFolder="@(false)"
+                      Name="@item.Name"
+                      Path="item.CurrentPath"
+                      OnExpandFolder="OnExpandFolder"
+                      Keyword="@Keyword"/>
+        }
+    }
+    else
     {
-        <TreeNode 
-            OnSelectedFile="OnSelectedFile" 
-            IsFolder="@(false)" 
-            Name="@item.Name" 
-            Path="item.CurrentPath"
-            OnExpandFolder="OnExpandFolder"
-            Keyword="@Keyword"/>
+        <div class="code-tree__children">
+            @foreach (var item in Node.Directories)
+            {
+                <TreeNode OnSelectedFile="OnSelectedFile"
+                          IsFolder="@(true)"
+                          Name="@item.Name"
+                          Path="item.CurrentPath"
+                          OnExpandFolder="OnExpandFolder"
+                          Keyword="@Keyword"/>
+            }
+
+            @foreach (var item in Node.Files)
+            {
+                <TreeNode OnSelectedFile="OnSelectedFile"
+                          IsFolder="@(false)"
+                          Name="@item.Name"
+                          Path="item.CurrentPath"
+                          OnExpandFolder="OnExpandFolder"
+                          Keyword="@Keyword"/>
+            }
+        </div>
     }
-</ul>
-
-@code {
-
-    [Parameter]
-    public CodeNoteTree Node { get; set; } = new();
-    
-    [Parameter] 
-    public EventCallback<CodeNoteTree> OnSelectedFile { get; set; }
-    
-    [Parameter]
-    public EventCallback<CodeNoteTree> OnExpandFolder { get; set; }
-    
-    [Parameter]
-    public string Keyword { get; set; }
-}
+</CascadingValue>

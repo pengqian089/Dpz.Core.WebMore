@@ -1,0 +1,489 @@
+.article-read {
+    background-color: var(--color-bg-surface);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    border: 1px solid var(--color-border);
+}
+
+.article-header {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.article-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-text-main);
+    margin-bottom: var(--spacing-md);
+    line-height: 1.3;
+}
+
+.article-meta {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-lg);
+}
+
+/* Typography for Article Content (Markdown) */
+.article-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--color-text-main);
+}
+
+.article-content h1,
+.article-content h2,
+.article-content h3 {
+    margin-top: var(--spacing-xl);
+    margin-bottom: var(--spacing-md);
+    font-weight: 700;
+    color: var(--color-text-main);
+}
+
+.article-content p {
+    margin-bottom: var(--spacing-md);
+}
+
+.article-content img {
+    border-radius: var(--radius-md);
+    margin: var(--spacing-lg) 0;
+    box-shadow: 0 4px 6px var(--color-shadow);
+}
+
+.article-intro {
+    position: relative;
+    margin: var(--spacing-xl) 0;
+    padding: 1.5rem 1.5rem 1.5rem 4.5rem; /* Left padding for the icon */
+    background-color: var(--color-bg-surface-alt);
+    border-radius: var(--radius-lg);
+    color: var(--color-text-secondary);
+    font-size: 1.05rem;
+    line-height: 1.75;
+    /* Clean look without border */
+    border: none; 
+}
+
+/* Icon decoration */
+.article-intro::before {
+    content: '\f10d'; /* fa-quote-left */
+    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome";
+    font-weight: 900;
+    
+    position: absolute;
+    left: 1.25rem;
+    top: 1.25rem;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    
+    background-color: var(--color-bg-surface);
+    color: var(--color-primary);
+    border-radius: 50%;
+    font-size: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .article-intro {
+        padding: 1.25rem 1.25rem 1.25rem 1.25rem;
+        margin: var(--spacing-lg) 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .article-intro::before {
+        position: static; /* Flow naturally on mobile */
+        width: 2rem;
+        height: 2rem;
+        font-size: 0.9rem;
+    }
+}
+
+.article-intro p {
+    margin-bottom: 0.75em;
+}
+
+.article-intro p:last-child {
+    margin-bottom: 0;
+}
+
+.article-intro p {
+    margin-bottom: 1em;
+}
+
+.article-intro p:last-child {
+    margin-bottom: 0;
+}
+
+/* Remove article-content blockquote to let markdown.css handle generic blockquotes */
+/* .article-content blockquote was here */
+
+.article-content pre {
+    background-color: #1e293b; /* Dark bg for code */
+    color: #e2e8f0;
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    margin: var(--spacing-lg) 0;
+}
+
+.article-content code {
+    font-family: monospace;
+    background-color: var(--color-bg-surface-alt);
+    padding: 0.2em 0.4em;
+    border-radius: var(--radius-sm);
+    font-size: 0.9em;
+}
+.article-content pre code {
+    background-color: transparent;
+    padding: 0;
+}
+
+/* Article Card Modern Redesign */
+.article-card {
+    background-color: var(--color-bg-surface);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    /* More subtle shadow */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    border: 1px solid transparent;
+    position: relative;
+    height: auto;
+}
+
+/* Dark mode adjustment */
+@media (prefers-color-scheme: dark) {
+    .article-card {
+        border-color: var(--color-border);
+        box-shadow: none;
+        background-color: var(--color-bg-surface);
+    }
+}
+
+/* Hover Effect */
+.article-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    border-color: var(--color-primary);
+}
+
+/* Cover Wrapper */
+.article-card__cover {
+    width: 100%;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+}
+
+.article-card__cover img {
+    /* Base styles for mobile (relative flow) */
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    display: block;
+}
+
+/* Lazy loading placeholder */
+.article-card__cover img.lazy:not(.loaded) {
+    object-fit: scale-down;
+    padding: 2rem;
+    background-color: var(--color-bg-surface-alt);
+}
+
+.article-card:hover .article-card__cover img {
+    transform: scale(1.08);
+}
+
+/* Content Area */
+.article-card__content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    position: relative;
+}
+
+/* Meta Data */
+.article-card__meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    margin-bottom: 0.75rem;
+}
+
+.article-card__meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.article-card__meta i {
+    font-size: 0.9em;
+    opacity: 0.7;
+}
+
+/* Title */
+.article-card__title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem 0;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    
+    /* Limit title lines to prevent overwhelming the card */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.article-card__title a {
+    color: var(--color-text-main);
+    text-decoration: none;
+    transition: color 0.2s ease;
+    background-image: linear-gradient(var(--color-primary), var(--color-primary));
+    background-size: 0 2px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.3s, color 0.3s;
+}
+
+.article-card__title a:hover {
+    color: var(--color-primary);
+    background-size: 100% 2px;
+}
+
+/* Excerpt */
+.article-card__excerpt {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    line-height: 1.625;
+    margin-bottom: 1.5rem;
+    
+    /* Multi-line truncation */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
+    /* Layout safety */
+    word-wrap: break-word;
+    word-break: break-word;
+    opacity: 0.9;
+}
+
+/* 
+   Reset internal HTML elements to display as inline text 
+   This prevents block-level elements (like <p>) from breaking the layout or truncation
+*/
+.article-card__excerpt > * {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+
+/* Hide non-text elements in excerpt */
+.article-card__excerpt img,
+.article-card__excerpt video,
+.article-card__excerpt audio,
+.article-card__excerpt table,
+.article-card__excerpt pre,
+.article-card__excerpt code,
+.article-card__excerpt blockquote {
+    display: none;
+}
+
+/* Footer */
+.article-card__footer {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--color-border);
+}
+
+/* Tags */
+.article-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.article__tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    background-color: var(--color-bg-surface-alt);
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.article__tag:hover {
+    background-color: var(--color-primary);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+/* Stats */
+.article-card__stats {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+/* Desktop Layout (Horizontal) */
+@media (min-width: 768px) {
+    .article-card {
+        flex-direction: row;
+        /* Let content dictate height */
+        height: auto;
+        min-height: 220px;
+        /* Align items stretch makes both children equal height */
+        align-items: stretch;
+    }
+
+    .article-card__cover {
+        width: 38%;
+        flex-shrink: 0;
+        /* 
+           Using flex on the cover itself to manage the image 
+           without absolute positioning.
+        */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        /* Important: no specific height set here, it inherits from parent stretch */
+    }
+    
+    .article-card__cover img {
+        /* 
+           Restore normal flow behavior.
+           Since the parent (.article-card__cover) is stretched by flexbox to match the content height,
+           height: 100% here will make the image fill that calculated height.
+           object-fit: cover ensures it crops rather than distorts.
+        */
+        position: static; 
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .article-card__content {
+        width: 62%;
+        padding: 1.5rem 1.75rem;
+        /* Flex column to distribute content vertically */
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .article-card__title {
+        font-size: 1.5rem;
+    }
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+    .article-read {
+        padding: var(--spacing-md);
+        border-radius: var(--radius-md);
+    }
+
+    .article-header {
+        margin-bottom: var(--spacing-lg);
+        padding-bottom: var(--spacing-md);
+    }
+    
+    .article-title {
+        font-size: 1.5rem;
+        margin-bottom: var(--spacing-sm);
+    }
+
+    .article-meta {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: var(--spacing-md);
+        font-size: 0.9rem;
+        justify-content: center;
+    }
+    
+    .article-meta__item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    
+    /* 当屏幕宽度不足以容纳所有元素时，隐藏回复数量（第4个元素） */
+    @media (max-width: 420px) {
+        .article-meta__item:nth-child(4) {
+            display: none;
+        }
+    }
+
+    .article-content {
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+    
+    .article-content h1,
+    .article-content h2,
+    .article-content h3 {
+        margin-top: var(--spacing-lg);
+        margin-bottom: var(--spacing-sm);
+    }
+    
+    .article-intro {
+        margin: var(--spacing-lg) 0;
+        padding: var(--spacing-md);
+    }
+
+    .article-content pre {
+        margin: var(--spacing-md) 0;
+        padding: var(--spacing-sm);
+    }
+
+    .article-card__content {
+        padding: 1.25rem;
+    }
+    
+    .article-card__title {
+        font-size: 1.25rem;
+    }
+    
+    .article-card__excerpt {
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+        line-height: 1.5;
+    }
+}

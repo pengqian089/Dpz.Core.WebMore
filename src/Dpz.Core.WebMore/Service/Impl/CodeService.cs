@@ -10,9 +10,9 @@ namespace Dpz.Core.WebMore.Service.Impl;
 
 public class CodeService(HttpClient httpClient) : ICodeService
 {
-    private static Dictionary<string, CodeNoteTree> _cache = new();
+    private static readonly Dictionary<string, CodeNoteTree> Cache = new();
 
-    public async Task<CodeNoteTree> GetTreeAsync(params string[] path)
+    public async Task<CodeNoteTree> GetTreeAsync(params string[]? path)
     {
         var cacheKey = "CacheKey";
         var parameters = "";
@@ -23,19 +23,22 @@ public class CodeService(HttpClient httpClient) : ICodeService
             cacheKey = string.Join("/", path);
         }
 
-        if (_cache.TryGetValue(cacheKey, out var cacheNode))
+        if (Cache.TryGetValue(cacheKey, out var cacheNode))
         {
             return cacheNode;
         }
 
-
-        var node = await httpClient.GetFromJsonAsync<CodeNoteTree>("/api/Code" + parameters);
-        _cache.Add(cacheKey, node);
+        var node =
+            await httpClient.GetFromJsonAsync<CodeNoteTree>("/api/Code" + parameters)
+            ?? new CodeNoteTree();
+        Cache.Add(cacheKey, node);
         return node;
     }
 
-    public async Task<CodeNoteTree> SearchAsync(string keyword)
+    public async Task<CodeNoteTree> SearchAsync(string? keyword)
     {
-        return await httpClient.GetFromJsonAsync<CodeNoteTree>($"/api/Code/search?keyword={keyword}");
+        return await httpClient.GetFromJsonAsync<CodeNoteTree>(
+                $"/api/Code/search?keyword={keyword}"
+            ) ?? new CodeNoteTree();
     }
 }

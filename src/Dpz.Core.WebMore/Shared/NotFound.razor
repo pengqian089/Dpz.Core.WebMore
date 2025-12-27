@@ -1,9 +1,32 @@
 ﻿@inherits LayoutComponentBase
-<div class="content">
-    <h2 class="content__title">404 not found</h2>
-    <img class="content__img" src="images/Scarecrow.png" alt="scarecrow" />
-    <h1 class="content__header">真是惊喜啊，惊喜啊！！！</h1>
-    <p class="content__body">谁给翻译翻译什么叫惊喜，什么叫他妈的惊喜，你怎么找到这儿来了？</p>
-    <button class="content__btn" href="">回到首页</button>
+@inject NavigationManager NavigationManager
+
+<div class="not-found-container">
+    <div class="not-found__glitch-wrapper">
+        <div class="not-found__code" data-text="404">404</div>
+    </div>
+    
+    <h2 class="not-found__title">页面失联了</h2>
+    
+    <div class="not-found__description">
+        <p>我们找遍了宇宙的每一个角落，也没能找到您要访问的页面。</p>
+        <p>它可能已经被移动、删除，或者从未存在过。</p>
+        <span class="not-found__description-quote">"谁给翻译翻译什么叫惊喜，什么叫他妈的惊喜，你怎么找到这儿来了？"</span>
+    </div>
+    
+    <div class="not-found__actions">
+        <a href="/" class="not-found__btn not-found__btn--primary">
+            <i class="fa-solid fa-house"></i> 返回首页
+        </a>
+        <button class="not-found__btn not-found__btn--secondary" @onclick="GoBack">
+            <i class="fa-solid fa-arrow-left"></i> 返回上一页
+        </button>
+    </div>
 </div>
-@Body
+
+@code {
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("javascript:history.back()");
+    }
+}

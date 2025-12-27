@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Dpz.Core.WebMore.Models;
 using Dpz.Core.WebMore.Service;
@@ -7,7 +8,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace Dpz.Core.WebMore.Pages.CodeComponent;
 
-public partial class TreeNode : IDisposable
+public partial class TreeNode(ICodeService codeService) : IDisposable
 {
     [Parameter]
     public bool IsFolder { get; set; }
@@ -16,44 +17,126 @@ public partial class TreeNode : IDisposable
     public string Name { get; set; } = "";
 
     [Parameter]
-    public List<string> Path { get; set; }
+    public List<string> Path { get; set; } = [];
 
     [Parameter]
-    public string Keyword { get; set; }
+    public string? Keyword { get; set; }
 
-    [Inject]
-    private ICodeService CodeService { get; set; }
+    [CascadingParameter]
+    private Tree? ParentTree { get; set; }
 
-    private bool _expand = false;
+    [CascadingParameter(Name = "ExpandedNodes")]
+    public Dictionary<string, CodeNoteTree>? ExpandedNodes { get; set; }
 
-    private CodeNoteTree _childrenNode;
+    [CascadingParameter(Name = "ActivePath")]
+    public List<string> ActivePath { get; set; } = [];
 
-    private const string Active = "background-color: rgb(196 224 255 / 12%)";
-    private static List<string> _activePath = null;
+    private bool _expand;
+    private CodeNoteTree? _childrenNode;
+    private Tree? _childTree;
+    private string _tempName = "";
 
-    private async Task ExpandNodeAsync()
+    // Keep track of which active path we have responded to
+    private List<string> _lastProcessedActivePath = [];
+
+    protected override void OnInitialized()
     {
-        if (Name == "loading...")
-            return;
-        _activePath = Path;
+        base.OnInitialized();
+        ParentTree?.RegisterNode(this);
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        // Check if we should auto-expand based on Cascading Value
+        if (ExpandedNodes != null && IsFolder && !_expand && _childrenNode == null)
+        {
+            var pathStr = string.Join("/", Path);
+            if (ExpandedNodes.TryGetValue(pathStr, out var node))
+            {
+                _childrenNode = node;
+                _expand = true;
+            }
+        }
+    }
+
+    private async Task ToggleNodeAsync()
+    {
+        if (!IsFolder || Name == "loading...") return;
+
+        if (!_expand)
+        {
+            await ExpandNodeAsync();
+        }
+        else
+        {
+            _expand = false;
+        }
+    }
+
+    private async Task OnContentClickAsync()
+    {
+        if (Name == "loading...") return;
+        
+        // Notify parent (CodeView) about selection via callbacks
+        // The CodeView will update the ActivePath CascadingValue
+        
+        if (IsFolder)
+        {
+            if (!_expand)
+            {
+                await ExpandNodeAsync();
+            }
+            else
+            {
+                if (_childrenNode != null && OnExpandFolder.HasDelegate)
+                {
+                    await OnExpandFolder.InvokeAsync(_childrenNode);
+                }
+            }
+        }
+        else
+        {
+            await SelectFileAsync();
+        }
+    }
+
+    public async Task ExpandNodeAsync()
+    {
+        if (Name == "loading...") return;
+        
         if (!IsFolder)
         {
             await SelectFileAsync();
             return;
         }
 
-        if (!_expand)
+        if (!_expand || _childrenNode == null)
         {
             _tempName = Name;
             Name = "loading...";
-            _childrenNode ??= await CodeService.GetTreeAsync(Path.ToArray());
-            await OnExpandFolder.InvokeAsync(_childrenNode);
-            Name = _tempName;
+            try 
+            {
+                _childrenNode = await codeService.GetTreeAsync(Path.ToArray());
+                if (OnExpandFolder.HasDelegate)
+                {
+                    await OnExpandFolder.InvokeAsync(_childrenNode);
+                }
+            }
+            finally
+            {
+                Name = _tempName;
+            }
+            _expand = true;
+            return;
         }
-        // else
-        //     _childrenNode = null;
-
-        _expand = !_expand;
+        
+        _expand = true;
+        if (OnExpandFolder.HasDelegate && _childrenNode != null)
+        {
+            await OnExpandFolder.InvokeAsync(_childrenNode);
+        }
     }
 
     [Parameter]
@@ -62,22 +145,31 @@ public partial class TreeNode : IDisposable
     [Parameter]
     public EventCallback<CodeNoteTree> OnSelectedFile { get; set; }
 
-    private string _tempName = "";
-
     private async Task SelectFileAsync()
     {
         _tempName = Name;
         Name = "loading...";
-        var node = await CodeService.GetTreeAsync(Path.ToArray());
-        await OnSelectedFile.InvokeAsync(node);
-        Name = _tempName;
-        StateHasChanged();
+        try
+        {
+            var node = await codeService.GetTreeAsync(Path.ToArray());
+            if (OnSelectedFile.HasDelegate)
+            {
+                await OnSelectedFile.InvokeAsync(node);
+            }
+        }
+        finally
+        {
+            Name = _tempName;
+            StateHasChanged();
+        }
     }
 
-    (string first, string keyword, string end) MatchKeyword(string name)
+    private (string first, string? keyword, string? end) MatchKeyword(string name)
     {
         if (string.IsNullOrEmpty(Keyword))
+        {
             return (name, null, null);
+        }
 
         var startIndex = name.IndexOf(Keyword, StringComparison.CurrentCultureIgnoreCase);
         if (startIndex >= 0)
@@ -89,24 +181,13 @@ public partial class TreeNode : IDisposable
         return (name, null, null);
     }
 
-    // private bool _select = false;
-    // private async Task SelectNodeAsync()
-    // {
-    //     if (!IsFolder)
-    //         return;
-    //     if(!_expand)
-    //         _childrenNode = await CodeService.GetTreeAsync(Path.ToArray());
-    //     else
-    //         _childrenNode = null;
-    //
-    //     _expand = !_expand;
-    // }
     public void Dispose()
     {
-        if (_activePath != null)
-        {
-            Console.WriteLine("dispose");
-            _activePath = null;
-        }
+        ParentTree?.UnregisterNode(this);
+    }
+
+    public TreeNode? FindNodeByPath(List<string> path)
+    {
+        return _childTree?.FindNodeByPath(path);
     }
 }

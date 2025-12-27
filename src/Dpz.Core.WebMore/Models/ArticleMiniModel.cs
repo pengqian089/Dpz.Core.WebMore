@@ -5,23 +5,23 @@ namespace Dpz.Core.WebMore.Models;
 
 public class ArticleMiniModel
 {
-    public string Id { get; set; }
-    
+    public required string Id { get; set; }
+
     /// <summary>
     /// 文章标题
     /// </summary>
-    public string Title { get; set; }
+    public required string Title { get; set; }
 
     /// <summary>
     /// 简介
     /// </summary>
-    public string Introduction { get; set; }
+    public string? Introduction { get; set; }
 
     /// <summary>
     /// 主图片
     /// </summary>
-    public string MainImage { get; set; }
-    
+    public string? MainImage { get; set; }
+
     /// <summary>
     /// 回复量
     /// </summary>
@@ -35,22 +35,22 @@ public class ArticleMiniModel
     /// <summary>
     /// 文章相关图片地址
     /// </summary>
-    public List<string> ImagesAddress { get; set; }
+    public List<string> ImagesAddress { get; set; } = [];
 
     /// <summary>
     /// 标签
     /// </summary>
-    public List<string> Tags { get; set; }
+    public List<string> Tags { get; set; } = [];
 
     /// <summary>
     /// 作者
     /// </summary>
-    public UserInfo Author { get; set; }
+    public required UserInfo Author { get; set; }
 
     /// <summary>
     /// 来源
     /// </summary>
-    public string From { get; set; }
+    public string? From { get; set; }
 
     /// <summary>
     /// 发表时间

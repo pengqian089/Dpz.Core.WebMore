@@ -2,10 +2,11 @@
 using System.Threading.Tasks;
 using Dpz.Core.WebMore.Models;
 
-namespace Dpz.Core.WebMore.Service
+namespace Dpz.Core.WebMore.Service;
+
+public interface ICommunityService
 {
-    public interface ICommunityService
-    {
-        Task<List<PictureModel>> GetBannersAsync();
-    }
+    Task<List<PictureRecordModel>> GetBannersAsync();
+    
+    Task<List<FriendModel>> GetFriendsAsync();
 }

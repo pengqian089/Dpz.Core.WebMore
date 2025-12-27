@@ -1,0 +1,31 @@
+@implements IDisposable
+
+<!-- Dialogs (Modal) -->
+@foreach (var dialog in _dialogs)
+{
+    <DialogBox @key="dialog.Id" Model="dialog" OnClose="RemoveDialog" />
+}
+
+<!-- Toasts -->
+<div class="toast-container">
+    @foreach (var toast in _toasts)
+    {
+        <ToastBox @key="toast.Id" Model="toast" OnClose="RemoveToast" />
+    }
+</div>
+
+<!-- Notifications -->
+<div class="notification-container" style="position: fixed; top: 15px; right: 20px; width: 350px; z-index: 1500; pointer-events: none; display: flex; flex-direction: column; gap: 15px;">
+    <!-- We need pointer-events: auto on children, which is handled in CSS/Component? 
+         Actually NotificationBox CSS has no pointer-events: auto. 
+         Wait, notification-box in CSS had pointer-events not specified (default auto).
+         If container is none, children need auto.
+    -->
+    <style>
+        .notification-box { pointer-events: auto; }
+    </style>
+    @foreach (var notification in _notifications)
+    {
+        <NotificationBox @key="notification.Id" Model="notification" OnClose="RemoveNotification" />
+    }
+</div>
