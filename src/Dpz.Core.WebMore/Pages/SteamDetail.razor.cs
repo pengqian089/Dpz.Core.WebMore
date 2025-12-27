@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dpz.Core.WebMore.Models;
 using Dpz.Core.WebMore.Service;
@@ -17,6 +18,8 @@ public partial class SteamDetail(ISteamService steamService, IJSRuntime jsRuntim
     private bool _isLoading = true;
     private bool _animate;
     private readonly Dictionary<string, bool> _collapsedGroups = new();
+
+    private bool IsCyberpunk2077 => _model?.Name?.Contains("Cyberpunk 2077", StringComparison.OrdinalIgnoreCase) == true;
 
     protected override async Task OnInitializedAsync()
     {
