@@ -1,5 +1,15 @@
 /* Steam Module - Cyberpunk Wasteland Theme */
 
+:root {
+    --cp-yellow: #fcee0a;
+    --cp-blue: #00f0ff;
+    --cp-red: #ff003c;
+    /* Use variables from bookmark.css or define fallback */
+    --color-accent: var(--cp-blue);
+    --color-primary: var(--cp-yellow);
+    --color-text-main: #e0e0e0;
+}
+
 /* --- Keyframes --- */
 @keyframes glitch-skew {
     0% { transform: skew(0deg); }
@@ -27,20 +37,6 @@
     100% { clip-path: inset(80% 0 5% 0); transform: translate(0); filter: hue-rotate(0deg) contrast(1); }
 }
 
-@keyframes noise-anim {
-    0% { transform: translate(0, 0); }
-    10% { transform: translate(-5%, -5%); }
-    20% { transform: translate(-10%, 5%); }
-    30% { transform: translate(5%, -10%); }
-    40% { transform: translate(-5%, 15%); }
-    50% { transform: translate(-10%, 5%); }
-    60% { transform: translate(15%, 0); }
-    70% { transform: translate(0, 10%); }
-    80% { transform: translate(-15%, 0); }
-    90% { transform: translate(10%, 5%); }
-    100% { transform: translate(5%, 0); }
-}
-
 @keyframes scanline {
     0% { background-position: 0 -100vh; }
     100% { background-position: 0 100vh; }
@@ -48,19 +44,19 @@
 
 /* --- Layout & Container --- */
 .steam-container {
-    max-width: var(--container-width);
+    max-width: var(--container-width, 1400px);
     margin: 0 auto;
-    padding: var(--spacing-md);
+    padding: var(--spacing-md, 1rem);
     position: relative;
-    animation: fadeIn var(--transition-normal);
+    animation: fadeIn 0.3s;
 }
 
 /* --- Steam Index (Game List) --- */
 
 .steam-header {
-    margin-bottom: var(--spacing-lg);
-    padding-bottom: var(--spacing-sm);
-    border-bottom: 2px solid var(--color-border);
+    margin-bottom: var(--spacing-lg, 2rem);
+    padding-bottom: var(--spacing-sm, 1rem);
+    border-bottom: 2px solid var(--color-border, #333);
     position: relative;
     display: flex;
     justify-content: space-between;
@@ -80,31 +76,61 @@
 }
 
 .steam-header__title {
-    font-family: var(--font-stack-display);
+    font-family: var(--font-stack-display, sans-serif);
     font-size: 2rem;
     font-weight: 800;
     text-transform: uppercase;
     color: var(--color-text-main);
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-sm, 0.5rem);
     letter-spacing: 0.05em;
+    position: relative;
+}
+
+/* Title Glitch Effect */
+.steam-header__title::before,
+.steam-header__title::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--color-bg-body, #050505);
+    opacity: 0.8;
+}
+
+.steam-header__title::before {
+    left: 2px;
+    text-shadow: -1px 0 var(--cp-red);
+    clip: rect(24px, 550px, 90px, 0);
+    animation: glitch-anim 3s infinite linear alternate-reverse;
+}
+
+.steam-header__title::after {
+    left: -2px;
+    text-shadow: -1px 0 var(--cp-blue);
+    clip: rect(85px, 550px, 140px, 0);
+    animation: glitch-anim 2.5s infinite linear alternate-reverse;
 }
 
 .steam-header__title i {
     color: var(--color-accent);
+    position: relative;
+    z-index: 2;
 }
 
 .steam-game-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: var(--spacing-lg);
+    gap: var(--spacing-lg, 2rem);
 }
 
 /* --- Cyberpunk Card Style --- */
 .steam-game-card {
-    background: var(--color-bg-surface);
-    border: 1px solid var(--color-border);
+    background: var(--color-bg-surface, #111);
+    border: 1px solid var(--color-border, #333);
     position: relative;
     /* Angled corners (Cyberpunk style) */
     clip-path: polygon(
@@ -156,7 +182,7 @@
     padding-top: 46%;
     background: #000;
     overflow: hidden;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border, #333);
 }
 
 .steam-game-card__image {
@@ -166,69 +192,60 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: filter 0.3s ease, transform 0.5s ease;
-    filter: sepia(30%) contrast(1.1) grayscale(20%); /* Wasteland look */
+    /* Removed filters: sepia(30%) contrast(1.1) grayscale(20%); */
+    transition: filter 0.3s ease;
 }
 
-/* Glitch overlay on hover */
-.steam-game-card__image-wrapper::after {
-    content: "";
+/* Glitch Overlay on Hover (Mimicking Bookmark Effect) */
+.steam-game-card:hover .steam-game-card__image-wrapper::before,
+.steam-game-card:hover .steam-game-card__image-wrapper::after {
+    content: '';
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    /* Noise Pattern */
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.5'/%3E%3C/svg%3E");
-    background-size: 200px 200px;
-    opacity: 0;
-    mix-blend-mode: hard-light;
+    background-image: var(--card-img);
+    background-size: cover;
+    background-position: center;
+    opacity: 0.6;
     pointer-events: none;
+    display: block;
     z-index: 2;
 }
 
-/* Extra layer for scanlines/color split on hover */
-.steam-game-card__image-wrapper::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: repeating-linear-gradient(0deg, transparent, transparent 2px, #000 3px, #000 3px);
-    background-size: 100% 4px;
-    z-index: 3;
-    opacity: 0;
-    pointer-events: none;
+/* Red Channel Glitch */
+.steam-game-card:hover .steam-game-card__image-wrapper::before {
+    background-color: var(--cp-red);
+    background-blend-mode: hard-light;
+    mix-blend-mode: hard-light;
+    animation: glitch-anim 3s infinite linear alternate-reverse;
+}
+
+/* Blue Channel Glitch */
+.steam-game-card:hover .steam-game-card__image-wrapper::after {
+    background-color: var(--cp-blue);
+    background-blend-mode: hard-light;
+    mix-blend-mode: hard-light;
+    animation: glitch-anim 2.5s infinite linear alternate-reverse;
 }
 
 .steam-game-card:hover .steam-game-card__image {
-    filter: contrast(1.5) brightness(1.2);
-    /* No scale, just glitch */
+    /* Optional: Slight brightening on hover to pop */
+    filter: brightness(1.1);
 }
-
-.steam-game-card:hover .steam-game-card__image-wrapper::after {
-    opacity: 0.6;
-    animation: glitch-anim 0.3s infinite linear alternate-reverse;
-}
-
-.steam-game-card:hover .steam-game-card__image-wrapper::before {
-    opacity: 0.3;
-    animation: scanline 8s linear infinite;
-}
-
 
 .steam-game-card__content {
-    padding: var(--spacing-md);
+    padding: var(--spacing-md, 1rem);
     flex-grow: 1;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-sm);
-    background: var(--color-bg-surface);
+    gap: var(--spacing-sm, 0.5rem);
+    background: var(--color-bg-surface, #111);
 }
 
 .steam-game-card__title {
-    font-family: var(--font-stack-display);
+    font-family: var(--font-stack-display, sans-serif);
     font-size: 1.1rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -236,24 +253,52 @@
     margin: 0;
     line-height: 1.3;
     letter-spacing: 0.02em;
+    position: relative;
 }
 
+/* Card Title Glitch on Hover */
 .steam-game-card:hover .steam-game-card__title {
     color: var(--color-primary);
-    text-shadow: 2px 0 var(--color-shadow);
+    text-shadow: 2px 0 rgba(0,0,0,0.5);
     animation: glitch-skew 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
 }
 
+.steam-game-card:hover .steam-game-card__title::before,
+.steam-game-card:hover .steam-game-card__title::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--color-bg-surface, #111);
+    opacity: 0.8;
+}
+
+.steam-game-card:hover .steam-game-card__title::before {
+    left: 2px;
+    text-shadow: -1px 0 var(--cp-red);
+    clip: rect(24px, 550px, 90px, 0);
+    animation: glitch-anim 2s infinite linear alternate-reverse;
+}
+
+.steam-game-card:hover .steam-game-card__title::after {
+    left: -2px;
+    text-shadow: -1px 0 var(--cp-blue);
+    clip: rect(85px, 550px, 140px, 0);
+    animation: glitch-anim 2s infinite linear alternate-reverse;
+}
+
 .steam-game-card__meta {
-    font-family: var(--font-stack-mono);
+    font-family: var(--font-stack-mono, monospace);
     font-size: 0.8rem;
-    color: var(--color-text-secondary);
+    color: var(--color-text-secondary, #888);
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-sm, 0.5rem);
     margin-top: auto;
-    padding-top: var(--spacing-sm);
-    border-top: 1px dashed var(--color-border);
+    padding-top: var(--spacing-sm, 0.5rem);
+    border-top: 1px dashed var(--color-border, #333);
 }
 
 /* --- Achievement Summary Widget --- */
@@ -261,22 +306,22 @@
     display: flex;
     flex-direction: column;
     gap: 4px;
-    margin-top: var(--spacing-sm);
+    margin-top: var(--spacing-sm, 0.5rem);
 }
 
 .steam-summary__stats {
     display: flex;
     justify-content: space-between;
-    font-family: var(--font-stack-mono);
+    font-family: var(--font-stack-mono, monospace);
     font-size: 0.75rem;
-    color: var(--color-text-muted);
+    color: var(--color-text-muted, #666);
     text-transform: uppercase;
 }
 
 .steam-summary__progress-track {
     height: 8px;
     background: rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-border, #333);
     position: relative;
     /* Skewed ends for style */
     transform: skewX(-20deg);
@@ -322,13 +367,12 @@
 .steam-summary__icon {
     width: 24px;
     height: 24px;
-    border: 1px solid var(--color-border);
-    filter: grayscale(100%);
+    border: 1px solid var(--color-border, #333);
+    /* filter: grayscale(100%); Removed as requested */
     transition: filter 0.2s;
 }
 
 .steam-summary__icon:hover {
-    filter: none;
     border-color: var(--color-accent);
 }
 
@@ -344,17 +388,17 @@
 .steam-back-btn {
     display: inline-flex;
     align-items: center;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-xs, 0.25rem);
     padding: 6px 16px;
-    background: var(--color-bg-surface);
-    border: 1px solid var(--color-border);
-    color: var(--color-text-secondary);
-    font-family: var(--font-stack-mono);
+    background: var(--color-bg-surface, #111);
+    border: 1px solid var(--color-border, #333);
+    color: var(--color-text-secondary, #888);
+    font-family: var(--font-stack-mono, monospace);
     font-size: 0.875rem;
     text-decoration: none;
     text-transform: uppercase;
     transition: all 0.2s;
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-md, 1rem);
     clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
 }
 
@@ -365,12 +409,12 @@
 }
 
 .steam-detail-header {
-    background: var(--color-bg-surface);
-    border: 1px solid var(--color-border);
-    padding: var(--spacing-lg);
-    margin-bottom: var(--spacing-lg);
+    background: var(--color-bg-surface, #111);
+    border: 1px solid var(--color-border, #333);
+    padding: var(--spacing-lg, 2rem);
+    margin-bottom: var(--spacing-lg, 2rem);
     display: flex;
-    gap: var(--spacing-lg);
+    gap: var(--spacing-lg, 2rem);
     position: relative;
     /* Tech border corners */
     --corner-size: 20px;
@@ -413,95 +457,130 @@
     width: 100%;
     max-width: 460px;
     aspect-ratio: 460/215;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-border, #333);
     overflow: hidden;
-}
-
-/* Detail cover - Noise & Glitch Overlay (Always Active) */
-.steam-detail-header__cover-wrapper::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /* Noise */
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.5'/%3E%3C/svg%3E");
-    background-size: 200px 200px;
-    opacity: 0.7;
-    mix-blend-mode: hard-light;
-    animation: glitch-anim 2.5s infinite linear alternate-reverse;
-    pointer-events: none;
-}
-
-/* Scanlines for Detail Cover */
-.steam-detail-header__cover-wrapper::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: repeating-linear-gradient(0deg, transparent, transparent 2px, #000 3px, #000 3px);
-    background-size: 100% 4px;
-    z-index: 3;
-    opacity: 0.4;
-    pointer-events: none;
-    animation: scanline 16s linear infinite;
 }
 
 .steam-detail-header__cover {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: sepia(10%) contrast(1.2);
+    /* Removed filters: sepia(10%) contrast(1.2); */
+}
+
+/* Detail Cover Glitch (Always Active or Hover? Original was always active, let's keep it but use the new style) */
+/* The user requested "Apply Bookmark image effect", which is on Hover.
+   However, for a detail header, maybe we want it subtle or on hover?
+   Let's apply the same logic: clean by default, glitch on hover.
+*/
+
+.steam-detail-header__cover-wrapper:hover .steam-detail-header__cover {
+    /* filter: brightness(1.1); */
+}
+
+.steam-detail-header__cover-wrapper:hover::before,
+.steam-detail-header__cover-wrapper:hover::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: var(--card-img);
+    background-size: cover;
+    background-position: center;
+    opacity: 0.6;
+    pointer-events: none;
+    display: block;
+    z-index: 2;
+}
+
+.steam-detail-header__cover-wrapper:hover::before {
+    background-color: var(--cp-red);
+    background-blend-mode: hard-light;
+    mix-blend-mode: hard-light;
+    animation: glitch-anim 3s infinite linear alternate-reverse;
+}
+
+.steam-detail-header__cover-wrapper:hover::after {
+    background-color: var(--cp-blue);
+    background-blend-mode: hard-light;
+    mix-blend-mode: hard-light;
+    animation: glitch-anim 2.5s infinite linear alternate-reverse;
 }
 
 .steam-detail-header__info {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--spacing-md, 1rem);
 }
 
 .steam-detail-header__title {
-    font-family: var(--font-stack-display);
+    font-family: var(--font-stack-display, sans-serif);
     font-size: 2.5rem;
     font-weight: 900;
     color: var(--color-text-main);
     text-transform: uppercase;
     margin: 0;
     line-height: 1.1;
-    /* Glitch text effect on hover */
     position: relative;
 }
 
-.steam-detail-header__title:hover {
-    animation: glitch-skew 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+/* Detail Header Title Glitch (Always Active) */
+.steam-detail-header__title {
     color: var(--color-primary);
+    animation: glitch-skew 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
 }
+
+.steam-detail-header__title::before,
+.steam-detail-header__title::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--color-bg-surface, #111);
+    opacity: 0.8;
+}
+
+.steam-detail-header__title::before {
+    left: 2px;
+    text-shadow: -1px 0 var(--cp-red);
+    clip: rect(24px, 550px, 90px, 0);
+    animation: glitch-anim 3s infinite linear alternate-reverse;
+}
+
+.steam-detail-header__title::after {
+    left: -2px;
+    text-shadow: -1px 0 var(--cp-blue);
+    clip: rect(85px, 550px, 140px, 0);
+    animation: glitch-anim 2s infinite linear alternate-reverse;
+}
+
 
 .steam-detail-header__meta {
     display: flex;
-    gap: var(--spacing-lg);
-    font-family: var(--font-stack-mono);
-    color: var(--color-text-secondary);
+    gap: var(--spacing-lg, 2rem);
+    font-family: var(--font-stack-mono, monospace);
+    color: var(--color-text-secondary, #888);
     font-size: 0.9rem;
-    border-bottom: 1px dashed var(--color-border);
-    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px dashed var(--color-border, #333);
+    padding-bottom: var(--spacing-sm, 1rem);
 }
 
 .steam-stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: var(--spacing-md);
-    margin-top: var(--spacing-sm);
+    gap: var(--spacing-md, 1rem);
+    margin-top: var(--spacing-sm, 0.5rem);
 }
 
 .steam-stat-box {
-    background: var(--color-bg-surface-alt);
-    border: 1px solid var(--color-border);
-    padding: var(--spacing-sm);
+    background: var(--color-bg-surface-alt, #1a1a1a);
+    border: 1px solid var(--color-border, #333);
+    padding: var(--spacing-sm, 1rem);
     text-align: center;
     position: relative;
     clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px);
@@ -515,54 +594,54 @@
     right: 2px;
     width: 4px;
     height: 4px;
-    background: var(--color-text-muted);
+    background: var(--color-text-muted, #666);
 }
 
 .steam-stat-box__value {
     display: block;
-    font-family: var(--font-stack-display);
+    font-family: var(--font-stack-display, sans-serif);
     font-size: 1.75rem;
     font-weight: 700;
 }
 
 .steam-stat-box__label {
-    font-family: var(--font-stack-mono);
+    font-family: var(--font-stack-mono, monospace);
     font-size: 0.7rem;
-    color: var(--color-text-muted);
+    color: var(--color-text-muted, #666);
     text-transform: uppercase;
 }
 
 /* Groups */
 .steam-group {
-    margin-bottom: var(--spacing-lg);
-    border: 1px solid var(--color-border);
-    background: var(--color-bg-surface);
+    margin-bottom: var(--spacing-lg, 2rem);
+    border: 1px solid var(--color-border, #333);
+    background: var(--color-bg-surface, #111);
 }
 
 .steam-group__header {
-    padding: var(--spacing-md);
-    background: var(--color-bg-surface-alt);
+    padding: var(--spacing-md, 1rem);
+    background: var(--color-bg-surface-alt, #1a1a1a);
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border, #333);
     transition: background 0.2s;
 }
 
 .steam-group__header:hover {
-    background: var(--color-bg-surface);
+    background: var(--color-bg-surface, #111);
     color: var(--color-primary);
 }
 
 .steam-group__title {
-    font-family: var(--font-stack-display);
+    font-family: var(--font-stack-display, sans-serif);
     font-size: 1.25rem;
     font-weight: 700;
     margin: 0;
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-sm, 0.5rem);
     text-transform: uppercase;
 }
 
@@ -589,9 +668,9 @@
 /* Achievement Item */
 .steam-achievement {
     display: flex;
-    gap: var(--spacing-md);
-    padding: var(--spacing-md);
-    border-bottom: 1px dashed var(--color-border);
+    gap: var(--spacing-md, 1rem);
+    padding: var(--spacing-md, 1rem);
+    border-bottom: 1px dashed var(--color-border, #333);
     transition: background 0.2s;
 }
 
@@ -607,7 +686,7 @@
     width: 64px;
     height: 64px;
     flex-shrink: 0;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-border, #333);
     background: #000;
 }
 
@@ -622,7 +701,7 @@
 }
 
 .steam-achievement__name {
-    font-family: var(--font-stack-display);
+    font-family: var(--font-stack-display, sans-serif);
     font-size: 1rem;
     font-weight: 700;
     color: var(--color-text-main);
@@ -631,7 +710,7 @@
 
 .steam-achievement__desc {
     font-size: 0.875rem;
-    color: var(--color-text-secondary);
+    color: var(--color-text-secondary, #888);
 }
 
 .steam-achievement__status {
@@ -639,9 +718,9 @@
     flex-direction: column;
     align-items: flex-end;
     min-width: 120px;
-    font-family: var(--font-stack-mono);
+    font-family: var(--font-stack-mono, monospace);
     font-size: 0.75rem;
-    color: var(--color-text-muted);
+    color: var(--color-text-muted, #666);
 }
 
 .steam-status-badge {
@@ -659,7 +738,7 @@
 }
 
 .steam-status-badge--locked {
-    color: var(--color-text-muted);
+    color: var(--color-text-muted, #666);
     border-style: dashed;
 }
 
@@ -670,13 +749,26 @@
 
 /* Empty State */
 .steam-empty {
-    padding: var(--spacing-xl);
+    padding: var(--spacing-xl, 3rem);
     text-align: center;
-    border: 2px dashed var(--color-border);
-    background: var(--color-bg-surface-alt);
-    font-family: var(--font-stack-mono);
+    border: 2px dashed var(--color-border, #333);
+    background: var(--color-bg-surface-alt, #1a1a1a);
+    font-family: var(--font-stack-mono, monospace);
 }
 
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .steam-achievement {
+        flex-direction: column;
+    }
+    
+    .steam-achievement__status {
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-between;
+        margin-top: var(--spacing-sm, 1rem);
+    }
+}
 
 /* --- Cyberpunk 2077 Easter Egg Specifics --- */
 .theme-cyberpunk {
@@ -732,21 +824,4 @@
     background: #fcee0a;
     border: none;
     animation: glitch-skew 3s infinite alternate-reverse;
-}
-
-/* Add a Samurai logo or similar effect via pseudo element if desired, 
-   but keeping it CSS-only simple for now. */
-
-/* Responsive adjustments */
-@media (max-width: 640px) {
-    .steam-achievement {
-        flex-direction: column;
-    }
-    
-    .steam-achievement__status {
-        flex-direction: row;
-        width: 100%;
-        justify-content: space-between;
-        margin-top: var(--spacing-sm);
-    }
 }

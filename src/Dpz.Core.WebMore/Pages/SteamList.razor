@@ -12,7 +12,7 @@ else
 {
     <div class="steam-container">
         <div class="steam-header">
-            <h1 class="steam-header__title">
+            <h1 class="steam-header__title" data-text="Steam 游戏库">
                 <i class="fa fa-gamepad"></i> Steam 游戏库
             </h1>
         </div>
@@ -24,12 +24,12 @@ else
                 <div class="steam-game-card">
                     <a href="/steam/@item.Id"
                        class="steam-game-card__link">
-                        <div class="steam-game-card__image-wrapper">
+                        <div class="steam-game-card__image-wrapper" style="@(string.IsNullOrEmpty(item.ImageLogo) ? "" : $"--card-img: url('{item.ImageLogo}');")">
                             <img src="@item.ImageLogo" alt="@item.Name" class="steam-game-card__image lazy"
                                  data-src="@item.ImageLogo"/>
                         </div>
                         <div class="steam-game-card__content">
-                            <h2 class="steam-game-card__title">@item.Name</h2>
+                            <h2 class="steam-game-card__title" data-text="@item.Name">@item.Name</h2>
                             <div class="steam-game-card__meta">
                                 <i class="fa-regular fa-clock"></i>
                                 <span>@($"{time.TotalHours:0} 小时 {time.Minutes:00} 分钟")</span>

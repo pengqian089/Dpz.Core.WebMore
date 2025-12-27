@@ -67,7 +67,7 @@ else
             {
                 <div class="bookmark-card">
                     <a href="@item.Url" target="_blank" class="bookmark-card__link">
-                        <div class="bookmark-card__image-wrapper">
+                        <div class="bookmark-card__image-wrapper" style="@(string.IsNullOrEmpty(item.Image) ? "" : $"--card-img: url('{item.Image}!bookmark');")">
                             @if (!string.IsNullOrEmpty(item.Image))
                             {
                                 <img class="bookmark-card__preview lazy" data-src="@(item.Image + "!bookmark")" src="@Program.LibraryHost/loaders/puff.svg" alt="@item.Title" loading="lazy" />

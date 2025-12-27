@@ -7,7 +7,7 @@
 else
 {
     <PageTitle>@_model.Name - 游戏成就 - 个人文章分享</PageTitle>
-    <div class="steam-container @(IsCyberpunk2077 ? "theme-cyberpunk" : "")">
+    <div class="steam-container @(IsCyberpunk2077 || _model.Name.Contains("Cyberpunk 2077") ? "theme-cyberpunk" : "")">
     <a href="/steam" class="steam-back-btn">
         <i class="fa fa-arrow-left"></i> 返回游戏列表
     </a>
@@ -32,11 +32,11 @@ else
         var time = TimeSpan.FromMinutes(_model.PlayTime);
 
         <div class="steam-detail-header">
-            <div class="steam-detail-header__cover-wrapper">
+            <div class="steam-detail-header__cover-wrapper" style="@(string.IsNullOrEmpty(_model.ImageLogo) ? "" : $"--card-img: url('{_model.ImageLogo}');")">
                 <img src="@_model.ImageLogo" alt="@_model.Name" class="steam-detail-header__cover"/>
             </div>
             <div class="steam-detail-header__info">
-                <h1 class="steam-detail-header__title">@_model.Name</h1>
+                <h1 class="steam-detail-header__title" data-text="@_model.Name">@_model.Name</h1>
                 
                 <div class="steam-detail-header__meta">
                     <div class="steam-detail-header__meta-item">
