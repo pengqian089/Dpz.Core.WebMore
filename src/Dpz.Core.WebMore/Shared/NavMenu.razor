@@ -1,4 +1,8 @@
-﻿<header class="site-header">
+﻿@implements IDisposable
+@inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Components.Routing
+
+<header class="site-header">
     <div class="container site-header__inner">
 
         <!-- 1. Left: Logo -->
@@ -13,40 +17,40 @@
         <div class="header-center">
             <nav class="nav-container">
                 <ul class="nav-menu">
-                    <li class="nav-menu__item @IsActive(MenuItem.Steam)">
-                        <NavLink href="/" Match="NavLinkMatch.All" class="nav-menu__link">
+                    <li class="nav-menu__item @IsActive("", true)">
+                        <NavLink href="" Match="NavLinkMatch.All" class="nav-menu__link">
                             <i class="fa fa-home fa-fw"></i>
                             <span class="nav-menu__text">
                                 首页
                             </span>
                         </NavLink>
                     </li>
-                    <li class="nav-menu__item @IsActive(MenuItem.Steam)">
-                        <NavLink href="/article/list" class="nav-menu__link">
+                    <li class="nav-menu__item @IsActive("article")">
+                        <NavLink href="article/list" class="nav-menu__link">
                             <i class="fa fa-file-text fa-fw"></i>
                             <span class="nav-menu__text">
                                 文章
                             </span>
                         </NavLink>
                     </li>
-                    <li class="nav-menu__item @IsActive(MenuItem.Steam)">
-                        <NavLink href="/mumble" class="nav-menu__link">
+                    <li class="nav-menu__item @IsActive("mumble")">
+                        <NavLink href="mumble" class="nav-menu__link">
                             <i class="fa fa-bullhorn fa-fw"></i>
                             <span class="nav-menu__text">
                                 碎碎念
                             </span>
                         </NavLink>
                     </li>
-                    <li class="nav-menu__item @IsActive(MenuItem.Steam)">
-                        <NavLink href="/steam" class="nav-menu__link">
+                    <li class="nav-menu__item @IsActive("steam")">
+                        <NavLink href="steam" class="nav-menu__link">
                             <i class="fa-brands fa-steam"></i>
                             <span class="nav-menu__text">
                                 Steam
                             </span>
                         </NavLink>
                     </li>
-                    <li class="nav-menu__item @IsActive(MenuItem.Bookmark)">
-                        <NavLink href="/bookmark" class="nav-menu__link">
+                    <li class="nav-menu__item @IsActive("bookmark")">
+                        <NavLink href="bookmark" class="nav-menu__link">
                             <i class="fa fa-bookmark fa-fw"></i>
                             <span class="nav-menu__text">
                                 书签
@@ -61,20 +65,20 @@
                             <i class="fa fa-angle-down nav-menu__arrow"></i>
                         </span>
                         <div class="nav-dropdown">
-                            <NavLink href="/albums"
-                                     class="@SubActive(MenuItem.Albums)">
+                            <NavLink href="albums"
+                                     class="nav-dropdown__item">
                                 <i class="fa-solid fa-photo-film"></i> 相册
                             </NavLink>
-                            <NavLink href="/code"
-                                     class="@SubActive(MenuItem.Albums)">
+                            <NavLink href="code"
+                                     class="nav-dropdown__item">
                                 <i class="fa fa-code"></i> 网站源码
                             </NavLink>
-                            <NavLink href="/timeline"
-                                     class="@SubActive(MenuItem.Albums)">
+                            <NavLink href="timeline"
+                                     class="nav-dropdown__item">
                                 <i class="fa fa-calendar"></i> 时间轴
                             </NavLink>
-                            <NavLink href="/friends"
-                                     class="@SubActive(MenuItem.Albums)">
+                            <NavLink href="friends"
+                                     class="nav-dropdown__item">
                                 <i class="fa fa-address-book"></i> 友链
                             </NavLink>
                         </div>
@@ -98,23 +102,61 @@
 <!-- Mobile Menu Overlay -->
 <div class="mobile-menu-overlay"></div>
 
-
-
-
-
-
-
 @code {
+    private string _currentUrl = "";
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        await base.OnInitializedAsync();
+        // Get initial URL (relative)
+        _currentUrl = Navigation.ToBaseRelativePath(Navigation.Uri);
+        // Remove fragment if any (optional)
+        if (_currentUrl.Contains('#'))
+        {
+            _currentUrl = _currentUrl.Split('#')[0];
+        }
+        
+        Navigation.LocationChanged += OnLocationChanged;
     }
 
-    private readonly MenuItem _menu = MenuItem.Home;
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        _currentUrl = Navigation.ToBaseRelativePath(e.Location);
+         if (_currentUrl.Contains('#'))
+        {
+            _currentUrl = _currentUrl.Split('#')[0];
+        }
+        StateHasChanged();
+    }
 
-    private string IsActive(MenuItem item) => _menu == item ? "nav-menu__item--active" : "";
-    string SubActive(MenuItem item) => _menu == item ? "nav-dropdown__item active" : "nav-dropdown__item";
-    string MoreActive() => _menu is MenuItem.Albums or MenuItem.Code or MenuItem.Timeline or MenuItem.Friends ? "nav-menu__item--active" : "";
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+    }
 
+    private string IsActive(string href, bool matchAll = false)
+    {
+        // Remove query string for comparison
+        var path = _currentUrl.Split('?')[0];
+
+        if (matchAll)
+        {
+            return string.IsNullOrEmpty(path) ? "nav-menu__item--active" : "";
+        }
+        
+        if (string.IsNullOrEmpty(path)) return "";
+        
+        return path.StartsWith(href, StringComparison.OrdinalIgnoreCase) ? "nav-menu__item--active" : "";
+    }
+    
+    private string MoreActive()
+    {
+        var path = _currentUrl.Split('?')[0];
+        var moreLinks = new[] { "albums", "code", "timeline", "friends" };
+        foreach(var link in moreLinks)
+        {
+            if(path.StartsWith(link, StringComparison.OrdinalIgnoreCase))
+                return "nav-menu__item--active";
+        }
+        return "";
+    }
 }
