@@ -5,6 +5,19 @@
     --code-header-height: 60px;
     --code-line-color: var(--color-border);
     --code-line-style: 1px dashed;
+
+    /* Code Block Colors (Default/Dark) */
+    --code-block-bg: #0d0c0b;
+    --code-block-text: #e6e2dd;
+    --code-block-border: var(--color-text-muted);
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --code-block-bg: #f6f8fa;
+        --code-block-text: #24292e;
+        --code-block-border: #e1e4e8;
+    }
 }
 
 .code-explorer {
@@ -435,19 +448,21 @@ mark {
 }
 
 /* Code Block Styling */
-pre {
-    background-color: #0d0c0b !important; /* Always dark for code */
-    color: #e6e2dd;
+.code-preview__pre,
+.readme-main pre {
+    background-color: var(--code-block-bg) !important;
+    color: var(--code-block-text);
     padding: var(--spacing-md);
     overflow-x: auto;
-    border: 1px solid var(--color-text-muted);
+    border: 1px solid var(--code-block-border);
     border-left: 4px solid var(--color-accent);
     font-family: 'Fira Code', Consolas, monospace !important;
     position: relative;
 }
 
 /* Scanline overlay for code */
-pre::before {
+.code-preview__pre::before,
+.readme-main pre::before {
     content: " ";
     display: block;
     position: absolute;
@@ -461,7 +476,15 @@ pre::before {
     pointer-events: none;
 }
 
-code {
+@media (prefers-color-scheme: light) {
+    .code-preview__pre::before,
+    .readme-main pre::before {
+        opacity: 0.1;
+    }
+}
+
+.code-preview__code,
+.readme-main code {
     font-family: inherit !important;
     z-index: 1;
     position: relative;

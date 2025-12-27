@@ -66,6 +66,28 @@
     }
 }
 
+/* Light Mode Adaptation */
+@media (prefers-color-scheme: light) {
+    .skeleton {
+        --skeleton-base: #e2e8f0;
+        --skeleton-highlight: rgba(0, 0, 0, 0.05);
+        background: linear-gradient(
+            90deg, 
+            var(--skeleton-base) 0%, 
+            var(--skeleton-base) 40%, 
+            #cbd5e1 50%, 
+            var(--skeleton-base) 60%, 
+            var(--skeleton-base) 100%
+        );
+        background-size: 200% 100%;
+    }
+    
+    .skeleton::after {
+        background-color: var(--color-accent, #fce300); 
+        opacity: 0.5;
+    }
+}
+
 /* Modifiers for Shape */
 .skeleton--circle {
     border-radius: 0; /* Cyberpunk likes sharp edges, or maybe Hexagon? */

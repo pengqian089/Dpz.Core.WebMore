@@ -406,3 +406,43 @@
     letter-spacing: 0.05em;
     border: 1px solid rgba(255,255,255,0.2);
 }
+
+/* Back To Top Button */
+#back-to-top {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 3rem;
+    height: 3rem;
+    background: var(--color-bg-surface-alt);
+    border: 2px solid var(--color-accent);
+    color: var(--color-accent);
+    z-index: 100;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    clip-path: polygon(20% 0, 100% 0, 100% 80%, 80% 100%, 0 100%, 0 20%);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+#back-to-top.is-visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+#back-to-top:hover {
+    background: var(--color-accent);
+    color: var(--color-bg-surface);
+    transform: translateY(-5px);
+    box-shadow: 0 0 15px var(--color-accent);
+}
+
+#back-to-top svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}

@@ -825,3 +825,66 @@
     border: none;
     animation: glitch-skew 3s infinite alternate-reverse;
 }
+
+/* Light Mode Adaptation */
+@media (prefers-color-scheme: light) {
+    :root {
+        --color-bg-surface: #ffffff;
+        --color-bg-surface-alt: #f8f9fa;
+        --color-border: #e2e8f0;
+        --color-text-main: #1a1a1a;
+        --color-text-secondary: #4a5568;
+        --color-text-muted: #718096;
+        
+        --cp-bg: #f5f5f7; /* For glitch backgrounds */
+    }
+
+    /* 覆盖硬编码的背景色 */
+    .steam-game-card,
+    .steam-detail-header,
+    .steam-group,
+    .steam-back-btn {
+        background: var(--color-bg-surface);
+        border-color: var(--color-border);
+    }
+    
+    .steam-stat-box,
+    .steam-group__header {
+        background: var(--color-bg-surface-alt);
+        border-color: var(--color-border);
+    }
+    
+    /* Glitch 效果背景修正 */
+    .steam-header__title::before,
+    .steam-header__title::after,
+    .steam-detail-header__title::before,
+    .steam-detail-header__title::after,
+    .steam-game-card:hover .steam-game-card__title::before,
+    .steam-game-card:hover .steam-game-card__title::after {
+        background: var(--cp-bg);
+    }
+    
+    /* 成就列表悬停 */
+    .steam-achievement:hover {
+        background: rgba(0, 0, 0, 0.03);
+    }
+    
+    /* 进度条轨道 */
+    .steam-summary__progress-track {
+        background: rgba(0, 0, 0, 0.1);
+        border-color: var(--color-border);
+    }
+    
+    /* Empty State */
+    .steam-empty {
+        background: var(--color-bg-surface-alt);
+        border-color: var(--color-border);
+    }
+    
+    /* Icon borders */
+    .steam-summary__icon, 
+    .steam-achievement__icon {
+        border-color: var(--color-border);
+        background: #fff; /* Icon bg */
+    }
+}

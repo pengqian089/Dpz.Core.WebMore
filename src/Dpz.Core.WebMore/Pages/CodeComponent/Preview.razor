@@ -1,13 +1,13 @@
 ﻿<div class="code-preview-container">
     @if (Node?.CodeContainer == null)
     {
-        <pre><code>没有内容</code></pre>
+        <pre class="code-preview__pre"><code class="code-preview__code">没有内容</code></pre>
     }
     else
     {
         @if (string.IsNullOrEmpty(Node.CodeContainer.Language))
         {
-            <pre><code>@Node.CodeContainer.CodeContent</code></pre>
+            <pre class="code-preview__pre"><code class="code-preview__code">@Node.CodeContainer.CodeContent</code></pre>
         }
         else if (string.Equals(Node.CodeContainer.Language, "markdown", StringComparison.CurrentCultureIgnoreCase))
         {
@@ -17,9 +17,9 @@
         {
             <pre
                 data-start="1"
-                class="linkable-line-numbers">
+                class="linkable-line-numbers code-preview__pre">
                 <code 
-                    class="language-@Node.CodeContainer.Language">
+                    class="language-@Node.CodeContainer.Language code-preview__code">
                     @Node.CodeContainer.CodeContent
                 </code>
             </pre>

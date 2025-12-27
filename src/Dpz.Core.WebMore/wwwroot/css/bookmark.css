@@ -404,10 +404,6 @@
     animation: glitch-anim 2.5s infinite linear alternate-reverse;
 }
 
-/* Original Noise & Scanlines - Made subtle or removed if conflicting */
-/* Keeping scanlines as a base texture, but lowering opacity */
-/* We can add a separate element for scanlines if needed, but for now let's focus on the title-like glitch */
-
 /* Content Area */
 .bookmark-card__content {
     padding: 1.5rem;
@@ -524,24 +520,54 @@
     }
 }
 
-/* Dark Mode Overrides (if system is light by default and we need to force dark for CP style) */
-/* Assuming the app supports light/dark switching, but CP style is inherently dark. 
-   We will enforce dark aesthetics regardless of system preference for this specific "theme",
-   OR we can adapt light mode to be a "high-tech white laboratory" look.
-   Given "Cyberpunk + Wasteland", dark is safer. Let's ensure it looks good in light mode too or force dark variables.
-*/
-
+/* Light Mode Adaptation */
 @media (prefers-color-scheme: light) {
-    /* Optional: Invert for light mode or keep dark "hacker" vibe? 
-       Cyberpunk is usually dark neon. Let's keep it dark even in light mode for consistency with the requested style.
-       But if strict light mode is required: */
-    /* 
     :root {
-       --cp-bg: #f0f0f0;
-       --cp-bg-alt: #fff;
-       --cp-text: #111;
-       ... 
-    } 
-    */
-    /* For now, we stick to the dark CP aesthetic as it's the requested style */
+        --cp-bg: #f8f9fa;
+        --cp-bg-alt: #ffffff;
+        --cp-text: #1a1a1a;
+        --cp-text-dim: #555;
+        --cp-border: #e2e8f0;
+        /* Keep accents but slightly adjusted for white bg if needed */
+        --cp-yellow: #d4a017; 
+        --cp-blue: #0366d6;
+        --cp-red: #d90429;
+    }
+
+    /* 调整搜索框阴影 */
+    .bookmark__search-wrapper {
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    
+    /* 调整卡片阴影 */
+    .bookmark-card {
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    
+    .bookmark-card:hover {
+        box-shadow: 8px 8px 0 rgba(0,0,0,0.1);
+    }
+    
+    /* 图片占位符 */
+    .bookmark-card__no-image {
+        background: repeating-linear-gradient(
+            45deg,
+            #f1f5f9,
+            #f1f5f9 10px,
+            #e2e8f0 10px,
+            #e2e8f0 20px
+        );
+        color: #94a3b8;
+    }
+    
+    /* 页脚淡色背景 */
+    .bookmark-card__footer {
+        background: rgba(0,0,0,0.03);
+    }
+    
+    /* Glitch 文字效果调整（在浅色背景上需要反转阴影逻辑） */
+    .bookmark__title::before, .bookmark__title::after {
+        background: var(--cp-bg); /* Use the new light bg */
+        opacity: 0.6;
+    }
 }
