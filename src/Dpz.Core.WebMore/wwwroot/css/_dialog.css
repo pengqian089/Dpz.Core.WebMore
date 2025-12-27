@@ -141,6 +141,36 @@
     color: var(--color-text-main);
 }
 
+/* Component Dialog Specifics */
+.dialog--component {
+    width: 600px; /* Default width for component dialogs */
+    max-width: 90vw; /* Responsive max-width */
+}
+
+.dialog__content {
+    max-height: 70vh; /* Limit height to 70% of viewport height */
+    overflow-y: auto; /* Enable vertical scrolling */
+    padding-right: var(--spacing-sm); /* Add padding for scrollbar space */
+}
+
+/* Custom scrollbar for webkit */
+.dialog__content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.dialog__content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.dialog__content::-webkit-scrollbar-thumb {
+    background-color: var(--color-border);
+    border-radius: 4px;
+}
+
+.dialog__content::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-text-muted);
+}
+
 /* Toast (Non-modal) */
 .toast-container {
     position: fixed;
@@ -291,9 +321,21 @@
 
 /* Mobile Adaptation */
 @media (max-width: 640px) {
-    .dialog {
+    /* Existing dialog overrides for mobile */
+    .dialog:not(.dialog--component) {
         width: 95%;
         margin: 0 auto;
+    }
+    
+    /* Component dialog mobile overrides */
+    .dialog--component {
+        width: 95% !important; /* Force full width on mobile */
+        max-width: 95% !important;
+        margin: 0 auto;
+    }
+    
+    .dialog__content {
+        max-height: 60vh; /* Slightly smaller height on mobile to fit keyboard/UI */
     }
     
     .toast-container {
@@ -374,161 +416,5 @@
 
 /* 通知框标题 */
 .notification-box__title {
-    padding: var(--spacing-md) var(--spacing-lg);
-    font-weight: 600;
-    font-size: 1rem;
-    color: var(--color-text-main);
-    border-bottom: 1px solid var(--color-border);
-}
-
-/* 通知框内容容器 */
-.notification-box__content-container {
-    padding: var(--spacing-md) var(--spacing-lg);
-}
-
-/* 通知框内容 */
-.notification-box__content {
-    color: var(--color-text-secondary);
-    font-size: 0.875rem;
-    line-height: 1.6;
-    word-wrap: break-word;
-}
-
-/* 通知框进度条容器 */
-.notification-box__progress {
-    margin-top: var(--spacing-sm);
-    height: 26px;
-    background-color: var(--color-bg-surface-alt);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-/* 通知框进度条背景 */
-.notification-box__progress-track {
-    flex: 1;
-    height: 100%;
-    background-color: var(--color-bg-surface-alt);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    position: relative;
-}
-
-/* 通知框进度条 */
-.notification-box__progress-bar {
-    height: 100%;
-    background-color: var(--color-primary);
-    border-radius: var(--radius-md);
-    transition: width var(--transition-normal);
-    position: absolute;
-    top: 0;
-    left: 0;
-    min-width: 0;
-    width: 0;
-}
-
-/* 当进度为0时完全隐藏 */
-.notification-box__progress-bar[style*="width: 0%"],
-.notification-box__progress-bar[style*="width:0%"] {
-    display: none;
-}
-
-.notification-box--success .notification-box__progress-bar {
-    background-color: #10b981;
-}
-
-.notification-box--warning .notification-box__progress-bar {
-    background-color: #f59e0b;
-}
-
-.notification-box--error .notification-box__progress-bar {
-    background-color: #ef4444;
-}
-
-/* 通知框进度条文本（固定在进度条轨道中间） */
-.notification-box__progress-text {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 0.8125rem;
-    font-weight: 600;
-    white-space: nowrap;
-    line-height: 1;
-    letter-spacing: 0.02em;
-    z-index: 1;
-    pointer-events: none;
-    color: #ffffff;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-}
-
-/* 当进度条为0或隐藏时，文字颜色改为深色以便在浅色背景上可见 */
-.notification-box__progress-bar[style*="display: none"] ~ .notification-box__progress-text,
-.notification-box__progress-bar[style*="display:none"] ~ .notification-box__progress-text {
-    color: var(--color-text-secondary);
-    text-shadow: none;
-}
-
-/* 通知框进度条文本（外部，当进度太小时显示在右侧） */
-.notification-box__progress-text--external {
-    font-size: 0.8125rem;
-    color: var(--color-text-secondary);
-    font-weight: 600;
-    white-space: nowrap;
-    line-height: 1;
-    letter-spacing: 0.02em;
-    min-width: 50px;
-    text-align: right;
-    flex-shrink: 0;
-}
-
-/* 通知框关闭按钮 */
-.notification-box__close {
-    position: absolute;
-    top: var(--spacing-sm);
-    right: var(--spacing-sm);
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--color-text-muted);
-    font-size: 1.25rem;
-    line-height: 1;
-    padding: 0;
-    border-radius: var(--radius-sm);
-    transition: all var(--transition-fast);
-}
-
-.notification-box__close:hover {
-    color: var(--color-text-main);
-    background-color: var(--color-bg-surface-alt);
-}
-
-.notification-box__close:focus {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
-}
-
-/* 深色模式适配 */
-@media (prefers-color-scheme: dark) {
-    .notification-box {
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-    }
-}
-
-/* 移动端适配 */
-@media (max-width: 640px) {
-    .notification-box {
-        right: 10px;
-        left: 10px;
-        width: calc(100% - 20px);
-        max-width: none;
-    }
+    /* styles... */
 }

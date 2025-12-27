@@ -1,5 +1,6 @@
 ﻿@page "/mumble"
 @page "/mumble/{PageIndex:int}"
+
 <PageTitle>碎碎念 - 个人文章分享</PageTitle>
 
 
@@ -11,49 +12,58 @@ else
 {
     <div class="mumble-layout">
         <main class="mumble-layout__main">
-            @foreach (var item in _source)
+            @foreach (var vm in _viewModels)
             {
-                <article class="mumble-card" id="mumble-@item.Id">
+                <article class="mumble-card" id="mumble-@vm.Model.Id">
                     <div class="mumble-card__header">
-                        <img class="mumble-card__avatar" src="@item.Author.Avatar" alt="@item.Author.Name" loading="lazy">
+                        <img class="mumble-card__avatar" src="@vm.Model.Author.Avatar" alt="@vm.Model.Author.Name" loading="lazy">
                         <div class="mumble-card__meta">
                             <div class="mumble-card__author">
-                                @item.Author.Name
+                                @vm.Model.Author.Name
                                 <span
-                                    class="mumble-card__role">@(item.Author.Permissions?.HasFlag(Permissions.System) == true ? "管理员" : "成员")</span>
+                                    class="mumble-card__role">@(vm.Model.Author.Permissions?.HasFlag(Permissions.System) == true ? "管理员" : "成员")</span>
                             </div>
-                            <ShowDateTime Class="mumble-card__time timeago" DateTime="@item.CreateTime"></ShowDateTime>
+                            <ShowDateTime Class="mumble-card__time timeago" DateTime="@vm.Model.CreateTime"></ShowDateTime>
                         </div>
                     </div>
 
-                    <div class="mumble-card__content markdown-body">
-                        <MarkdownPreview Markdown="@item.Markdown"></MarkdownPreview>
+                    <div @ref="vm.ContentRef" class="mumble-card__content markdown-body @(vm.IsExpanded || !vm.NeedExpand ? "" : "is-collapsed")">
+                        <MarkdownPreview Markdown="@vm.Model.Markdown"></MarkdownPreview>
                     </div>
 
+                    @if (vm.NeedExpand)
+                    {
+                        <div class="mumble-card__read-more @(vm.IsExpanded ? "is-expanded" : "")" style="display: block;">
+                            <button class="mumble-card__read-more-btn" @onclick="() => vm.IsExpanded = !vm.IsExpanded">
+                                @(vm.IsExpanded ? "收起" : "展开全文")
+                            </button>
+                        </div>
+                    }
+
                     <div class="mumble-card__footer">
-                        <a href="/mumble-comment" class="mumble-action" title="详情" data-pjax>
+                        <a href="javascript:void(0)" @onclick="() => OnDetail(vm)" class="mumble-action" title="详情">
                             <i class="fa fa-info-circle"></i>
                             <span>详情</span>
                         </a>
 
-                        <button class="mumble-action" data-comment-toggle="@item.Id" title="评论">
+                        <button class="mumble-action" @onclick="() => vm.ShowComments = !vm.ShowComments" title="评论">
                             <i class="fa fa-commenting"></i>
-                            <span data-comment-count>@item.CommentCount</span>
+                            <span>@vm.Model.CommentCount</span>
                         </button>
 
-                        <button type="button" class="mumble-action" @onclick="() => LikeAsync(item.Id)" title="点赞">
+                        <button type="button" class="mumble-action @(vm.IsLiked ? "mumble-action--active" : "")" @onclick="() => LikeAsync(vm)" title="点赞">
                             <i class="fa fa-thumbs-up"></i>
-                            <span data-like-count>@item.Like</span>
+                            <span>@vm.Model.Like</span>
                         </button>
                     </div>
 
                     <!-- Comments Container -->
-                    <div class="mumble-comments is-hidden" id="comments-@item.Id">
-                        <!-- Content loaded via JS -->
-                        <div class="text-center text-muted p-3">
-                            <i class="fa fa-spinner fa-spin"></i> 加载评论中...
+                    @if (vm.ShowComments)
+                    {
+                        <div class="mumble-comments">
+                            <Comment Node="CommentNode.Mumble" Relation="@vm.Model.Id" />
                         </div>
-                    </div>
+                    }
                 </article>
             }
 

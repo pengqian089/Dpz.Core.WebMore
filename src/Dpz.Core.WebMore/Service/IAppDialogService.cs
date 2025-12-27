@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components;
 
 namespace Dpz.Core.WebMore.Service;
 
@@ -9,6 +10,14 @@ public interface IAppDialogService
     Task<bool> ConfirmAsync(string message, string title = "确认");
 
     Task<string?> PromptAsync(string message, string title = "输入", string defaultValue = "");
+    
+    Task<TResult?> ShowComponentAsync<TResult>(
+        string title,
+        RenderFragment childContent,
+        string width = ""
+    );
+    
+    Task ShowComponentAsync(string title, RenderFragment childContent, string width = "");
 
     void Toast(string message, ToastType type = ToastType.Info, int duration = 3000);
 
@@ -62,6 +71,8 @@ public class DialogModel
     public string Message { get; set; } = "";
     public DialogType Type { get; set; }
     public string DefaultValue { get; set; } = "";
+    public RenderFragment? Content { get; set; }
+    public string Width { get; set; } = "";
     public TaskCompletionSource<object?> TaskSource { get; set; } = new();
 }
 
@@ -70,6 +81,7 @@ public enum DialogType
     Alert,
     Confirm,
     Prompt,
+    Component,
 }
 
 public class ToastModel

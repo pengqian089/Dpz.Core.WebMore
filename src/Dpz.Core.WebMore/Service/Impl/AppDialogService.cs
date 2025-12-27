@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components;
 
 namespace Dpz.Core.WebMore.Service.Impl;
 
@@ -60,6 +61,47 @@ public class AppDialogService : IAppDialogService
         OnDialogShow?.Invoke(model);
         var result = await tcs.Task;
         return result as string;
+    }
+
+    public Task<TResult?> ShowComponentAsync<TResult>(
+        string title,
+        RenderFragment childContent,
+        string width = ""
+    )
+    {
+        var tcs = new TaskCompletionSource<object?>();
+        var model = new DialogModel
+        {
+            Title = title,
+            Type = DialogType.Component,
+            Content = childContent,
+            Width = width,
+            TaskSource = tcs,
+        };
+
+        OnDialogShow?.Invoke(model);
+        // Cast result to TResult
+        return tcs.Task.ContinueWith(t => t.Result is TResult r ? r : default);
+    }
+
+    public async Task ShowComponentAsync(
+        string title,
+        RenderFragment childContent,
+        string width = ""
+    )
+    {
+        var tcs = new TaskCompletionSource<object?>();
+        var model = new DialogModel
+        {
+            Title = title,
+            Type = DialogType.Component,
+            Content = childContent,
+            Width = width,
+            TaskSource = tcs,
+        };
+
+        OnDialogShow?.Invoke(model);
+        await tcs.Task;
     }
 
     public void Toast(string message, ToastType type = ToastType.Info, int duration = 3000)

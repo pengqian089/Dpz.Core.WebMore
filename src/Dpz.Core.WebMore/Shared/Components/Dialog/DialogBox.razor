@@ -1,7 +1,7 @@
 @implements IDisposable
 
 <div class="dialog-overlay @(_isVisible ? "dialog-overlay--visible" : "")">
-    <div class="dialog">
+    <div class="dialog @(Model.Type == DialogType.Component ? "dialog--component" : "")" style="@(!string.IsNullOrEmpty(Model.Width) ? $"width: {Model.Width}; max-width: none;" : "")">
         <div class="dialog__header">
             <span>@(Model.Title ?? "提示")</span>
             <button type="button" class="dialog__close" aria-label="关闭" @onclick="() => Close(null)">
@@ -10,30 +10,42 @@
         </div>
         
         <div class="dialog__body">
-            <div class="dialog__message">@((MarkupString)Model.Message)</div>
-            
-            @if (Model.Type == DialogType.Prompt)
+            @if (Model.Type == DialogType.Component)
             {
-                <div class="dialog__input-wrapper">
-                    <input type="text" class="dialog__input" autocomplete="off" 
-                           @bind="_inputValue" 
-                           @bind:event="oninput"
-                           @onkeydown="HandleKeyDown"
-                           @ref="_inputRef" />
+                <div class="dialog__content">
+                    @Model.Content
                 </div>
-            }
-        </div>
-        
-        <div class="dialog__footer">
-            @if (Model.Type == DialogType.Alert)
-            {
-                <button type="button" class="dialog__btn dialog__btn--primary" @onclick="() => Close(true)" @ref="_confirmBtnRef">确定</button>
             }
             else
             {
-                <button type="button" class="dialog__btn dialog__btn--default" @onclick="() => Close(null)">取消</button>
-                <button type="button" class="dialog__btn dialog__btn--primary" @onclick="() => Close(true)" @ref="_confirmBtnRef">确定</button>
+                <div class="dialog__message">@((MarkupString)Model.Message)</div>
+                
+                @if (Model.Type == DialogType.Prompt)
+                {
+                    <div class="dialog__input-wrapper">
+                        <input type="text" class="dialog__input" autocomplete="off" 
+                               @bind="_inputValue" 
+                               @bind:event="oninput"
+                               @onkeydown="HandleKeyDown"
+                               @ref="_inputRef" />
+                    </div>
+                }
             }
         </div>
+        
+        @if (Model.Type != DialogType.Component)
+        {
+            <div class="dialog__footer">
+                @if (Model.Type == DialogType.Alert)
+                {
+                    <button type="button" class="dialog__btn dialog__btn--primary" @onclick="() => Close(true)" @ref="_confirmBtnRef">确定</button>
+                }
+                else
+                {
+                    <button type="button" class="dialog__btn dialog__btn--default" @onclick="() => Close(null)">取消</button>
+                    <button type="button" class="dialog__btn dialog__btn--primary" @onclick="() => Close(true)" @ref="_confirmBtnRef">确定</button>
+                }
+            </div>
+        }
     </div>
 </div>

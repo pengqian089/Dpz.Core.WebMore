@@ -8,7 +8,7 @@
         <!-- 1. Left: Logo -->
         <div class="header-left">
             <a class="site-logo" href="/">
-                <img src="https://dpangzi.com/favicon.png" alt="logo" class="site-logo__img"/>
+                <img src="https://dpangzi.com/favicon.png" alt="logo" class="site-logo__img" />
                 <span class="site-logo__text">叫我阿胖</span>
             </a>
         </div>
@@ -65,20 +65,16 @@
                             <i class="fa fa-angle-down nav-menu__arrow"></i>
                         </span>
                         <div class="nav-dropdown">
-                            <NavLink href="albums"
-                                     class="nav-dropdown__item">
+                            <NavLink href="albums" class="nav-dropdown__item">
                                 <i class="fa-solid fa-photo-film"></i> 相册
                             </NavLink>
-                            <NavLink href="code"
-                                     class="nav-dropdown__item">
+                            <NavLink href="code" class="nav-dropdown__item">
                                 <i class="fa fa-code"></i> 网站源码
                             </NavLink>
-                            <NavLink href="timeline"
-                                     class="nav-dropdown__item">
+                            <NavLink href="timeline" class="nav-dropdown__item">
                                 <i class="fa fa-calendar"></i> 时间轴
                             </NavLink>
-                            <NavLink href="friends"
-                                     class="nav-dropdown__item">
+                            <NavLink href="friends" class="nav-dropdown__item">
                                 <i class="fa fa-address-book"></i> 友链
                             </NavLink>
                         </div>
@@ -114,14 +110,14 @@
         {
             _currentUrl = _currentUrl.Split('#')[0];
         }
-        
+
         Navigation.LocationChanged += OnLocationChanged;
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
         _currentUrl = Navigation.ToBaseRelativePath(e.Location);
-         if (_currentUrl.Contains('#'))
+        if (_currentUrl.Contains('#'))
         {
             _currentUrl = _currentUrl.Split('#')[0];
         }
@@ -142,19 +138,19 @@
         {
             return string.IsNullOrEmpty(path) ? "nav-menu__item--active" : "";
         }
-        
+
         if (string.IsNullOrEmpty(path)) return "";
-        
+
         return path.StartsWith(href, StringComparison.OrdinalIgnoreCase) ? "nav-menu__item--active" : "";
     }
-    
+
     private string MoreActive()
     {
         var path = _currentUrl.Split('?')[0];
         var moreLinks = new[] { "albums", "code", "timeline", "friends" };
-        foreach(var link in moreLinks)
+        foreach (var link in moreLinks)
         {
-            if(path.StartsWith(link, StringComparison.OrdinalIgnoreCase))
+            if (path.StartsWith(link, StringComparison.OrdinalIgnoreCase))
                 return "nav-menu__item--active";
         }
         return "";

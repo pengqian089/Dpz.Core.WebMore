@@ -24,15 +24,4 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <_ContentIncludedByDefault Remove="Pages\ArticleComponent\ArticleShow.razor" />
-    <_ContentIncludedByDefault Remove="Pages\ArticleComponent\Like.razor" />
-    <_ContentIncludedByDefault Remove="Pages\ArticleComponent\News.razor" />
-    <_ContentIncludedByDefault Remove="Comment\Index.cshtml" />
-    <_ContentIncludedByDefault Remove="Comment\_AvatarPartial.cshtml" />
-    <_ContentIncludedByDefault Remove="Comment\_CommentListPartial.cshtml" />
-    <_ContentIncludedByDefault Remove="Comment\_CommentTextPartial.cshtml" />
-    <_ContentIncludedByDefault Remove="Comment\_NickNamePartial.cshtml" />
-  </ItemGroup>
-
 </Project>

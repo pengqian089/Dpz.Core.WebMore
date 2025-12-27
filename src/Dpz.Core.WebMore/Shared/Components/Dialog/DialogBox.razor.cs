@@ -34,7 +34,7 @@ public partial class DialogBox
             {
                 await _inputRef.FocusAsync();
             }
-            else
+            else if (Model.Type != DialogType.Component)
             {
                 await _confirmBtnRef.FocusAsync();
             }
@@ -79,7 +79,6 @@ public partial class DialogBox
 
     public void Dispose()
     {
-        // Ensure task is completed if component is removed unexpectedly
-        Model.TaskSource.TrySetResult(null);
+        
     }
 }
