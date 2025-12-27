@@ -15,8 +15,8 @@ else
             <div class="tag-cloud">
                 @foreach (var tag in _tags)
                 {
-                    <a href="/article/list/tag/@(WebUtility.UrlEncode(tag))"
-                       class="article__tag @(Tag == tag ? "tag--active" : "")" data-pjax>@tag</a>
+                    <a href="/article/list/tag/@(Uri.EscapeDataString(tag))"
+                       class="article__tag @(Tag == tag ? "tag--active" : "")">@tag</a>
                 }
             </div>
         </div>

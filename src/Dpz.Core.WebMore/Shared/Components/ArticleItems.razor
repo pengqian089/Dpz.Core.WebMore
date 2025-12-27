@@ -47,7 +47,7 @@
                 <div class="article-card__tags">
                     @foreach (var tag in item.Tags.Take(3))
                     {
-                        <a href="/article/list/tag/@(WebUtility.UrlEncode(tag))"
+                        <a href="/article/list/tag/@(Uri.EscapeDataString(tag))"
                            class="article__tag">
                             #@tag
                         </a>
