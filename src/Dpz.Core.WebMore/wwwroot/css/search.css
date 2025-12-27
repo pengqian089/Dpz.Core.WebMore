@@ -287,6 +287,10 @@
     z-index: 1;
 }
 
+.search-card__excerpt pre {
+    display: none;
+}
+
 /* Highlight Mark Style - Cyberpunk */
 mark {
     background: transparent;
