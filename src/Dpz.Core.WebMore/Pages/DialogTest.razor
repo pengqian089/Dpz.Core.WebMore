@@ -1,55 +1,96 @@
 @page "/test/dialog"
+@using NotificationType = Dpz.Core.WebMore.Service.NotificationType
 @inject IAppDialogService DialogService
 
+<PageTitle>对话框测试 - 个人文章分享</PageTitle>
+
 <div class="container mt-4">
-    <h2 class="mb-4">Dialog Service Test</h2>
+    <h2 class="mb-4">Dialog Service 完整测试</h2>
 
     <div class="test-section">
-        <h3>Workflow Scenarios</h3>
+        <h3>基础对话框测试</h3>
         <div class="btn-group">
-            <button class="btn btn-danger" @onclick="DeleteWorkflow">Delete Workflow</button>
-            <button class="btn btn-primary" @onclick="ComplexProcess">Complex Process</button>
+            <button class="btn btn-primary" @onclick="TestAlert">Alert 提示框</button>
+            <button class="btn btn-secondary" @onclick="TestConfirm">Confirm 确认框</button>
+            <button class="btn btn-info" @onclick="TestPrompt">Prompt 输入框</button>
+            <button class="btn btn-success" @onclick="TestPromptWithDefault">Prompt (带默认值)</button>
         </div>
-        <div class="mt-2">Result: <span id="last-result">@_lastResult</span></div>
+        <div class="mt-2">结果: <span id="last-result" class="result-value">@_lastResult</span></div>
     </div>
 
     <div class="test-section">
-        <h3>Notifications & Progress</h3>
+        <h3>自定义组件对话框</h3>
         <div class="btn-group">
-            <button class="btn btn-info" @onclick="SimulateDownload">Simulate Download</button>
-            <button class="btn btn-success" @onclick="SimulateMultiTask">Multi-Task Progress</button>
-            <button class="btn btn-secondary" @onclick="ShowRichNotification">Rich HTML Content</button>
-            <button class="btn btn-warning" @onclick="@(() => DialogService.CloseAllNotifications())">Close All</button>
+            <button class="btn btn-primary" @onclick="TestCustomComponent">简单表单组件</button>
+            <button class="btn btn-success" @onclick="TestCustomComponentWithResult">带返回值的组件</button>
+            <button class="btn btn-info" @onclick="TestComplexForm">复杂表单</button>
+            <button class="btn btn-warning" @onclick="TestCustomWidth">自定义宽度</button>
+        </div>
+        <div class="mt-2">
+            @if (_componentResult != null)
+            {
+                <div class="result-card">
+                    <strong>组件返回结果:</strong>
+                    <pre>@_componentResult</pre>
+                </div>
+            }
         </div>
     </div>
 
     <div class="test-section">
-        <h3>Basic Tests</h3>
-        <div class="btn-group">
-            <button class="btn btn-primary" @onclick="TestAlert">Alert</button>
-            <button class="btn btn-secondary" @onclick="TestConfirm">Confirm</button>
-            <button class="btn btn-info" @onclick="TestPrompt">Prompt</button>
-            <button class="btn btn-warning" @onclick="MultipleToasts">Multiple Toasts</button>
-        </div>
-    </div>
-    
-    <div class="test-section">
-        <h3>Toast Types</h3>
+        <h3>Toast 消息提示</h3>
         <div class="btn-group">
             <button class="btn btn-info" @onclick="@(() => DialogService.Toast("这是一条普通消息"))">Info</button>
             <button class="btn btn-success" @onclick="@(() => DialogService.Toast("操作成功！", ToastType.Success))">Success</button>
             <button class="btn btn-warning" @onclick="@(() => DialogService.Toast("请注意...", ToastType.Warning))">Warning</button>
             <button class="btn btn-danger" @onclick="@(() => DialogService.Toast("发生错误！", ToastType.Error))">Error</button>
+            <button class="btn btn-secondary" @onclick="MultipleToasts">批量显示</button>
+            <button class="btn btn-primary" @onclick="TestToastDuration">自定义时长</button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>Notification 通知</h3>
+        <div class="btn-group">
+            <button class="btn btn-info" @onclick="TestBasicNotification">基础通知</button>
+            <button class="btn btn-success" @onclick="TestPersistentNotification">持久通知</button>
+            <button class="btn btn-warning" @onclick="TestProgressNotification">进度条通知</button>
+            <button class="btn btn-primary" @onclick="TestMultiProgressNotification">多进度条</button>
+            <button class="btn btn-secondary" @onclick="TestRichNotification">富文本内容</button>
+            <button class="btn btn-danger" @onclick="@(() => DialogService.CloseAllNotifications())">关闭全部</button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>实际场景模拟</h3>
+        <div class="btn-group">
+            <button class="btn btn-danger" @onclick="DeleteWorkflow">删除工作流</button>
+            <button class="btn btn-primary" @onclick="ComplexProcess">复杂流程</button>
+            <button class="btn btn-info" @onclick="SimulateDownload">模拟下载</button>
+            <button class="btn btn-success" @onclick="SimulateMultiTask">多任务处理</button>
+            <button class="btn btn-warning" @onclick="UserRegistration">用户注册</button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>边界测试</h3>
+        <div class="btn-group">
+            <button class="btn btn-secondary" @onclick="TestLongMessage">超长消息</button>
+            <button class="btn btn-info" @onclick="TestEmptyInput">空输入处理</button>
+            <button class="btn btn-warning" @onclick="TestNestedDialogs">嵌套对话框</button>
+            <button class="btn btn-danger" @onclick="TestRapidFire">快速连续触发</button>
+            <button class="btn btn-primary" @onclick="TestSpecialCharacters">特殊字符</button>
         </div>
     </div>
 </div>
 
 <style>
     .container {
-        max-width: 800px;
+        max-width: 1200px;
         margin: 0 auto;
         padding: 20px;
     }
+    
     .test-section {
         background: var(--color-bg-surface);
         border: 1px solid var(--color-border);
@@ -58,18 +99,22 @@
         margin-bottom: 20px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
+    
     .test-section h3 {
         margin-top: 0;
         margin-bottom: 15px;
         font-size: 1.25rem;
-        border-bottom: 1px solid var(--color-border);
+        border-bottom: 2px solid var(--color-border);
         padding-bottom: 10px;
+        color: var(--color-text-main);
     }
+    
     .btn-group {
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
     }
+    
     .btn {
         padding: 8px 16px;
         border: none;
@@ -77,36 +122,89 @@
         cursor: pointer;
         font-size: 14px;
         font-weight: 500;
-        transition: opacity 0.2s;
+        transition: all 0.2s;
         color: white;
+        font-family: var(--font-stack-base);
     }
+    
     .btn:hover {
         opacity: 0.9;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
-    .btn-primary { background-color: var(--color-primary); }
+    
+    .btn:active {
+        transform: translateY(0);
+    }
+    
+    .btn-primary { background-color: #3b82f6; }
     .btn-secondary { background-color: #64748b; }
     .btn-success { background-color: #10b981; }
     .btn-danger { background-color: #ef4444; }
     .btn-warning { background-color: #f59e0b; }
-    .btn-info { background-color: #3b82f6; }
+    .btn-info { background-color: #06b6d4; }
+    
     .mt-2 { margin-top: 0.5rem; }
     .mt-4 { margin-top: 1.5rem; }
     .mb-4 { margin-bottom: 1.5rem; }
+    
+    .result-value {
+        color: var(--color-accent);
+        font-weight: bold;
+        font-family: var(--font-stack-mono);
+    }
+    
+    .result-card {
+        margin-top: 10px;
+        padding: 15px;
+        background: var(--color-bg-surface-alt);
+        border: 1px solid var(--color-border);
+        border-radius: 6px;
+        font-family: var(--font-stack-mono);
+        font-size: 0.9rem;
+    }
+    
+    .result-card pre {
+        margin: 10px 0 0 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+    
+    @@media (max-width: 768px) {
+        .container {
+            padding: 10px;
+        }
+        
+        .test-section {
+            padding: 15px;
+        }
+        
+        .btn-group {
+            gap: 8px;
+        }
+        
+        .btn {
+            font-size: 13px;
+            padding: 6px 12px;
+        }
+    }
 </style>
 
 @code {
     private string _lastResult = "-";
+    private string? _componentResult;
 
+    // ========== 基础对话框测试 ==========
     private async Task TestAlert()
     {
-        await DialogService.AlertAsync("这是一个 Alert 弹窗测试。", "测试 Alert");
-        _lastResult = "Alert Closed";
+        await DialogService.AlertAsync("这是一个 Alert 提示框测试。\n点击确定关闭。", "测试 Alert");
+        _lastResult = "Alert 已关闭";
     }
 
     private async Task TestConfirm()
     {
-        var result = await DialogService.ConfirmAsync("确定要执行此操作吗？", "确认操作");
-        _lastResult = $"Confirm Result: {result}";
+        var result = await DialogService.ConfirmAsync("确定要执行此操作吗？\n这是一个测试操作。", "确认操作");
+        _lastResult = $"Confirm 结果: {(result ? "确定" : "取消")}";
         
         if (result)
         {
@@ -120,141 +218,522 @@
 
     private async Task TestPrompt()
     {
-        var result = await DialogService.PromptAsync("请输入您的名字：", "输入测试", "默认值");
+        var result = await DialogService.PromptAsync("请输入您的名字：", "输入测试");
         if (result == null)
         {
-            _lastResult = "Prompt Cancelled";
+            _lastResult = "Prompt 已取消";
             DialogService.Toast("取消输入", ToastType.Warning);
         }
         else
         {
-            _lastResult = $"Prompt Result: {result}";
+            _lastResult = $"Prompt 结果: {result}";
             DialogService.Toast($"您输入了: {result}", ToastType.Success);
         }
     }
-    
-    private void MultipleToasts()
+
+    private async Task TestPromptWithDefault()
     {
-        DialogService.Toast("Info Message", ToastType.Info);
-        DialogService.Toast("Success Message", ToastType.Success);
-        DialogService.Toast("Warning Message", ToastType.Warning);
-        DialogService.Toast("Error Message", ToastType.Error);
+        var result = await DialogService.PromptAsync("请输入邮箱地址：", "输入测试", "user@example.com");
+        if (result != null)
+        {
+            _lastResult = $"输入的邮箱: {result}";
+            DialogService.Toast($"邮箱: {result}", ToastType.Success);
+        }
+        else
+        {
+            _lastResult = "取消输入";
+        }
     }
 
-    // Scenario 1: Delete Workflow
-    // Confirm -> Prompt for confirmation text -> Toast Loading -> Success
+    // ========== 自定义组件对话框 ==========
+    private async Task TestCustomComponent()
+    {
+        await DialogService.ShowComponentAsync(
+            "简单表单",
+            @<div style="padding: 20px;">
+                <p style="margin-bottom: 15px;">这是一个自定义组件对话框示例。</p>
+                <div style="margin-bottom: 10px;">
+                    <label>姓名:</label>
+                    <input type="text" style="width: 100%; padding: 5px; margin-top: 5px;" />
+                </div>
+                <div>
+                    <label>备注:</label>
+                    <textarea style="width: 100%; padding: 5px; margin-top: 5px; min-height: 60px;"></textarea>
+                </div>
+            </div>
+        );
+        _lastResult = "自定义组件对话框已关闭";
+    }
+
+    private async Task TestCustomComponentWithResult()
+    {
+        var userName = "";
+        var userEmail = "";
+
+        var result = await DialogService.ShowComponentAsync<bool>(
+            "用户信息",
+            @<div style="padding: 20px;">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">姓名:</label>
+                    <input type="text" @bind="userName" style="width: 100%; padding: 8px; border: 1px solid var(--color-border); border-radius: 4px;" />
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">邮箱:</label>
+                    <input type="email" @bind="userEmail" style="width: 100%; padding: 8px; border: 1px solid var(--color-border); border-radius: 4px;" />
+                </div>
+                <p style="color: var(--color-text-muted); font-size: 0.9em;">点击确定按钮将返回 true</p>
+            </div>,
+            "500px"
+        );
+
+        if (result == true)
+        {
+            _componentResult = $"姓名: {userName}\n邮箱: {userEmail}\n返回值: true";
+            DialogService.Toast("表单已提交", ToastType.Success);
+        }
+        else
+        {
+            _componentResult = "用户取消了操作";
+        }
+    }
+
+    private async Task TestComplexForm()
+    {
+        var formData = new FormData();
+
+        await DialogService.ShowComponentAsync(
+            "复杂表单示例",
+            @<div style="padding: 20px;">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px;">用户名:</label>
+                    <input type="text" @bind="formData.Username" style="width: 100%; padding: 8px; border: 1px solid var(--color-border); border-radius: 4px;" />
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px;">类型:</label>
+                    <select @bind="formData.UserType" style="width: 100%; padding: 8px; border: 1px solid var(--color-border); border-radius: 4px;">
+                        <option value="普通用户">普通用户</option>
+                        <option value="VIP用户">VIP用户</option>
+                        <option value="管理员">管理员</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: flex; align-items: center;">
+                        <input type="checkbox" @bind="formData.AcceptTerms" style="margin-right: 8px;" />
+                        同意服务条款
+                    </label>
+                </div>
+                <div style="background: var(--color-bg-surface-alt); padding: 10px; border-radius: 4px;">
+                    <strong>当前选择:</strong>
+                    <p>用户名: @formData.Username</p>
+                    <p>类型: @formData.UserType</p>
+                    <p>同意条款: @(formData.AcceptTerms ? "是" : "否")</p>
+                </div>
+            </div>,
+            "600px"
+        );
+
+        _componentResult = $"用户名: {formData.Username}\n类型: {formData.UserType}\n同意条款: {formData.AcceptTerms}";
+    }
+
+    private async Task TestCustomWidth()
+    {
+        await DialogService.ShowComponentAsync(
+            "自定义宽度 (800px)",
+            @<div style="padding: 20px; text-align: center;">
+                <h3 style="margin-bottom: 20px;">这是一个 800px 宽的对话框</h3>
+                <p>您可以在 ShowComponentAsync 方法中指定对话框宽度。</p>
+                <div style="margin-top: 30px; padding: 20px; background: var(--color-bg-surface-alt); border-radius: 8px;">
+                    <p>这里可以放置更多内容...</p>
+                    <p>比如表格、图表、复杂表单等。</p>
+                </div>
+            </div>,
+            "800px"
+        );
+    }
+
+    // ========== Toast 测试 ==========
+    private void MultipleToasts()
+    {
+        DialogService.Toast("Info 消息", ToastType.Info);
+        DialogService.Toast("Success 消息", ToastType.Success);
+        DialogService.Toast("Warning 消息", ToastType.Warning);
+        DialogService.Toast("Error 消息", ToastType.Error);
+    }
+
+    private void TestToastDuration()
+    {
+        DialogService.Toast("这条消息会显示 1 秒", ToastType.Info, 1000);
+        DialogService.Toast("这条消息会显示 5 秒", ToastType.Success, 5000);
+        DialogService.Toast("这条消息会显示 10 秒", ToastType.Warning, 10000);
+    }
+
+    // ========== Notification 测试 ==========
+    private void TestBasicNotification()
+    {
+        DialogService.ShowNotification(
+            "这是一条基础通知消息，3秒后自动关闭。",
+            "基础通知",
+            NotificationType.Info,
+            3000
+        );
+    }
+
+    private void TestPersistentNotification()
+    {
+        DialogService.ShowNotification(
+            "这是一条持久通知，不会自动关闭。需要手动点击关闭按钮。",
+            "持久通知",
+            NotificationType.Warning,
+            0
+        );
+    }
+
+    private async Task TestProgressNotification()
+    {
+        var notification = DialogService.ShowNotification(
+            new NotificationOptions
+            {
+                Title = "文件上传",
+                Content = "准备上传...",
+                Type = NotificationType.Info,
+                Bars = [0],
+                AutoClose = 0
+            }
+        );
+
+        await Task.Delay(500);
+        notification.UpdateContent?.Invoke("正在上传...");
+
+        for (int i = 0; i <= 100; i += 5)
+        {
+            await Task.Delay(100);
+            notification.UpdateProgress?.Invoke([i]);
+            notification.UpdateContent?.Invoke($"上传进度: {i}%");
+        }
+
+        notification.UpdateTitle?.Invoke("上传完成");
+        notification.UpdateContent?.Invoke("文件已成功上传！");
+        notification.UpdateType?.Invoke(NotificationType.Success);
+
+        await Task.Delay(2000);
+        notification.Close?.Invoke();
+    }
+
+    private async Task TestMultiProgressNotification()
+    {
+        var notification = DialogService.ShowNotification(
+            new NotificationOptions
+            {
+                Title = "批量处理",
+                Content = "初始化任务...",
+                Type = NotificationType.Info,
+                Bars = [0, 0, 0],
+                AutoClose = 0
+            }
+        );
+
+        double[] progress = [0, 0, 0];
+
+        for (int i = 0; i <= 100; i += 2)
+        {
+            await Task.Delay(50);
+            progress[0] = Math.Min(100, i * 1.2);
+            progress[1] = Math.Min(100, i * 0.8);
+            progress[2] = Math.Min(100, i * 1.5);
+
+            notification.UpdateProgress?.Invoke(progress);
+            notification.UpdateContent?.Invoke($"任务A: {progress[0]:F0}% | 任务B: {progress[1]:F0}% | 任务C: {progress[2]:F0}%");
+        }
+
+        notification.UpdateTitle?.Invoke("全部完成");
+        notification.UpdateContent?.Invoke("所有任务处理完毕！");
+        notification.UpdateType?.Invoke(NotificationType.Success);
+
+        await Task.Delay(3000);
+        notification.Close?.Invoke();
+    }
+
+    private void TestRichNotification()
+    {
+        var html = @"
+            <div style='line-height: 1.6;'>
+                <p><strong>富文本通知示例</strong></p>
+                <p style='color: var(--color-text-secondary);'>支持 HTML 格式的内容：</p>
+                <ul style='margin-left: 20px; list-style-type: disc;'>
+                    <li><span style='color: #ef4444;'>红色文字</span></li>
+                    <li><span style='color: #10b981;'>绿色文字</span></li>
+                    <li><span style='color: #3b82f6;'>蓝色文字</span></li>
+                </ul>
+                <p style='margin-top: 10px;'>
+                    <code style='background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 3px;'>代码块</code>
+                </p>
+            </div>
+        ";
+        
+        DialogService.ShowNotification(html, "富文本通知", NotificationType.Info, 0);
+    }
+
+    // ========== 实际场景模拟 ==========
     private async Task DeleteWorkflow()
     {
-        var confirmed = await DialogService.ConfirmAsync("此操作不可恢复，确定要删除吗？", "删除确认");
-        if (!confirmed) return;
+        var confirmed = await DialogService.ConfirmAsync(
+            "此操作不可恢复，确定要删除该工作流吗？\n所有相关数据将被永久删除。",
+            "删除确认"
+        );
+        
+        if (!confirmed)
+        {
+            _lastResult = "取消删除";
+            return;
+        }
 
-        var input = await DialogService.PromptAsync("请输入 'DELETE' 以确认删除：", "安全确认");
+        var input = await DialogService.PromptAsync(
+            "请输入 'DELETE' 以确认删除：",
+            "安全确认"
+        );
+        
         if (input == "DELETE")
         {
-            DialogService.Toast("正在删除...", ToastType.Info);
-            await Task.Delay(1500); // Simulate network request
+            var notification = DialogService.ShowNotification("正在删除...", "删除工作流", NotificationType.Warning);
+            await Task.Delay(1500);
+            notification.Close?.Invoke();
+            
             DialogService.Toast("删除成功", ToastType.Success);
-            _lastResult = "Delete Success";
+            _lastResult = "删除成功";
         }
         else if (input != null)
         {
             DialogService.Toast("输入错误，取消删除", ToastType.Error);
-            _lastResult = "Delete Failed (Wrong Input)";
+            _lastResult = "删除失败 (输入错误)";
         }
         else
         {
-             _lastResult = "Delete Cancelled";
+            _lastResult = "删除已取消";
         }
     }
 
-    // Scenario 2: Simulate Download with Progress Updates
+    private async Task ComplexProcess()
+    {
+        await DialogService.AlertAsync("第一步：准备数据\n\n正在检查系统环境...", "流程开始");
+        
+        var proceed = await DialogService.ConfirmAsync(
+            "数据准备就绪，系统检查完成。\n\n是否继续执行下一步？",
+            "确认继续"
+        );
+        
+        if (!proceed)
+        {
+            DialogService.Toast("流程已终止", ToastType.Warning);
+            _lastResult = "流程已终止";
+            return;
+        }
+
+        var notification = DialogService.ShowNotification("处理中...", "执行流程", NotificationType.Info);
+        await Task.Delay(2000);
+        notification.Close?.Invoke();
+        
+        await DialogService.AlertAsync(
+            "处理完成！\n\n结果已生成并保存到系统。",
+            "执行成功"
+        );
+        
+        _lastResult = "流程执行成功";
+    }
+
     private async Task SimulateDownload()
     {
-        var notification = DialogService.ShowNotification("正在连接服务器...", "文件下载", Service.NotificationType.Info);
+        var notification = DialogService.ShowNotification(
+            new NotificationOptions
+            {
+                Title = "文件下载",
+                Content = "正在连接服务器...",
+                Type = NotificationType.Info,
+                Bars = [0],
+                AutoClose = 0
+            }
+        );
         
         await Task.Delay(1000);
         notification.UpdateContent?.Invoke("开始下载...");
-        notification.UpdateProgress?.Invoke([0]);
 
         for (int i = 0; i <= 100; i += 10)
         {
             await Task.Delay(300);
             notification.UpdateProgress?.Invoke([i]);
-            notification.UpdateContent?.Invoke($"下载中... {i}%");
+            notification.UpdateContent?.Invoke($"下载中... {i}%\n文件大小: 25.6 MB");
         }
 
         notification.UpdateTitle?.Invoke("下载完成");
-        notification.UpdateContent?.Invoke("文件已保存到本地。");
-        notification.UpdateType?.Invoke(Service.NotificationType.Success);
+        notification.UpdateContent?.Invoke("文件已保存到本地。\n位置: C:\\Downloads\\file.zip");
+        notification.UpdateType?.Invoke(NotificationType.Success);
         
-        // Close after 3 seconds
         await Task.Delay(3000);
         notification.Close?.Invoke();
+        
+        _lastResult = "下载完成";
     }
 
-    // Scenario 3: Multi-Task Progress
     private async Task SimulateMultiTask()
     {
-        var notification = DialogService.ShowNotification("正在处理多个任务...", "批处理", Service.NotificationType.Warning);
+        var notification = DialogService.ShowNotification(
+            new NotificationOptions
+            {
+                Title = "批处理任务",
+                Content = "正在处理多个任务...",
+                Type = NotificationType.Warning,
+                Bars = [0, 0],
+                AutoClose = 0
+            }
+        );
         
         double[] progress = [0, 0];
         
         for (int i = 0; i <= 20; i++)
         {
             await Task.Delay(200);
-            progress[0] = Math.Min(100, i * 5); // Task A speed
-            progress[1] = Math.Min(100, i * 3); // Task B speed
+            progress[0] = Math.Min(100, i * 5);
+            progress[1] = Math.Min(100, i * 3);
             
             notification.UpdateProgress?.Invoke(progress);
-            notification.UpdateContent?.Invoke($"任务A: {progress[0]}% | 任务B: {progress[1]}%");
+            notification.UpdateContent?.Invoke($"任务A: {progress[0]:F0}% | 任务B: {progress[1]:F0}%");
         }
         
-        // Finish Task B
         for (int i = 0; i <= 15; i++)
         {
-             await Task.Delay(100);
-             progress[1] = Math.Min(100, 60 + i * 3);
-             notification.UpdateProgress?.Invoke(progress);
-             notification.UpdateContent?.Invoke($"任务A: Done | 任务B: {progress[1]:F0}%");
+            await Task.Delay(100);
+            progress[1] = Math.Min(100, 60 + i * 3);
+            notification.UpdateProgress?.Invoke(progress);
+            notification.UpdateContent?.Invoke($"任务A: 完成 | 任务B: {progress[1]:F0}%");
         }
 
         notification.UpdateContent?.Invoke("所有任务处理完毕！");
-        notification.UpdateType?.Invoke(Service.NotificationType.Success);
-    }
-    
-    // Scenario 4: Rich Content Notification
-    private void ShowRichNotification()
-    {
-        var html = @"
-            <div>
-                <strong>粗体文本</strong> 和 <em>斜体文本</em><br/>
-                <span style='color: #ef4444'>红色文字</span> 和 <span style='color: #3b82f6'>蓝色文字</span><br/>
-                <ul style='margin-left: 20px; list-style-type: disc;'>
-                    <li>列表项 1</li>
-                    <li>列表项 2</li>
-                </ul>
-                <a href='javascript:void(0)' style='color: var(--color-primary); text-decoration: underline;'>模拟链接</a>
-            </div>
-        ";
+        notification.UpdateType?.Invoke(NotificationType.Success);
         
-        DialogService.ShowNotification(html, "富文本通知", Service.NotificationType.Info, 0);
-    }
-    
-    // Scenario 5: Complex Process (Alert chain)
-    private async Task ComplexProcess()
-    {
-        await DialogService.AlertAsync("第一步：准备数据", "流程开始");
+        await Task.Delay(2000);
+        notification.Close?.Invoke();
         
-        var proceed = await DialogService.ConfirmAsync("数据准备就绪，是否继续？", "确认");
-        if (proceed)
+        _lastResult = "批处理完成";
+    }
+
+    private async Task UserRegistration()
+    {
+        var username = await DialogService.PromptAsync("请输入用户名：", "用户注册", "");
+        if (string.IsNullOrWhiteSpace(username))
         {
-            DialogService.Toast("处理中...", ToastType.Info);
-            await Task.Delay(1000);
-            await DialogService.AlertAsync("处理完成！结果已生成。", "成功");
+            DialogService.Toast("用户名不能为空", ToastType.Error);
+            return;
+        }
+
+        var email = await DialogService.PromptAsync("请输入邮箱：", "用户注册", "");
+        if (string.IsNullOrWhiteSpace(email) || !email.Contains("@"))
+        {
+            DialogService.Toast("邮箱格式不正确", ToastType.Error);
+            return;
+        }
+
+        var confirmed = await DialogService.ConfirmAsync(
+            $"用户名: {username}\n邮箱: {email}\n\n确认注册？",
+            "确认信息"
+        );
+
+        if (confirmed)
+        {
+            var notification = DialogService.ShowNotification("正在创建账户...", "注册中", NotificationType.Info);
+            await Task.Delay(2000);
+            notification.Close?.Invoke();
+
+            await DialogService.AlertAsync("注册成功！\n\n激活邮件已发送到您的邮箱。", "注册成功");
+            _lastResult = $"注册成功: {username}";
+        }
+    }
+
+    // ========== 边界测试 ==========
+    private async Task TestLongMessage()
+    {
+        var longMessage = @"这是一条非常长的消息内容，用于测试对话框在处理长文本时的表现。
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+测试内容包括：
+1. 多行文本显示
+2. 中英文混合
+3. 特殊符号 @#$%^&*()
+4. 换行处理
+
+这段文本应该能够正确显示并支持滚动。";
+
+        await DialogService.AlertAsync(longMessage, "超长消息测试");
+        _lastResult = "长消息测试完成";
+    }
+
+    private async Task TestEmptyInput()
+    {
+        var result = await DialogService.PromptAsync("尝试直接点击确定（不输入任何内容）：", "空输入测试", "");
+        if (string.IsNullOrEmpty(result))
+        {
+            DialogService.Toast("检测到空输入", ToastType.Warning);
+            _lastResult = "输入为空";
+        }
+        else if (result == null)
+        {
+            _lastResult = "取消输入";
         }
         else
         {
-            DialogService.Toast("流程已终止", ToastType.Warning);
+            _lastResult = $"输入了: '{result}'";
         }
+    }
+
+    private async Task TestNestedDialogs()
+    {
+        await DialogService.AlertAsync("这是第一层对话框", "嵌套测试 - 层级 1");
+        
+        var result = await DialogService.ConfirmAsync("这是第二层对话框\n是否继续打开第三层？", "嵌套测试 - 层级 2");
+        
+        if (result)
+        {
+            var input = await DialogService.PromptAsync("这是第三层对话框\n请输入任意内容：", "嵌套测试 - 层级 3", "测试");
+            _lastResult = $"嵌套测试完成，输入: {input}";
+            DialogService.Toast("嵌套对话框测试完成", ToastType.Success);
+        }
+    }
+
+    private async Task TestRapidFire()
+    {
+        DialogService.Toast("第1条消息", ToastType.Info);
+        await Task.Delay(100);
+        DialogService.Toast("第2条消息", ToastType.Success);
+        await Task.Delay(100);
+        DialogService.Toast("第3条消息", ToastType.Warning);
+        await Task.Delay(100);
+        DialogService.Toast("第4条消息", ToastType.Error);
+        await Task.Delay(100);
+        DialogService.Toast("第5条消息", ToastType.Info);
+        
+        _lastResult = "快速触发5条消息";
+    }
+
+    private async Task TestSpecialCharacters()
+    {
+        var message = @"特殊字符测试：
+< > & "" '
+\n \t \r
+😀 😃 😄 😁 🎉
+HTML: <script>alert('test')</script>
+SQL: '; DROP TABLE users; --
+路径: C:\Windows\System32\test.txt";
+
+        await DialogService.AlertAsync(message, "特殊字符测试");
+        _lastResult = "特殊字符测试完成";
+    }
+
+    // 辅助类
+    private class FormData
+    {
+        public string Username { get; set; } = "";
+        public string UserType { get; set; } = "普通用户";
+        public bool AcceptTerms { get; set; } = false;
     }
 }

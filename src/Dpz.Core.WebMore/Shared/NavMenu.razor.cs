@@ -87,7 +87,15 @@ public partial class NavMenu(NavigationManager navigation, IJSRuntime jsRuntime)
     private string MoreActive()
     {
         var path = _currentUrl.Split('?')[0];
-        var moreLinks = new[] { "albums", "code", "timeline", "friends" };
+        var moreLinks = new[]
+        {
+            "albums",
+            "code",
+            "timeline",
+            "friends",
+            "bson-to-json",
+            "test/dialog",
+        };
         foreach (var link in moreLinks)
         {
             if (path.StartsWith(link, StringComparison.OrdinalIgnoreCase))
