@@ -280,9 +280,9 @@
         position: fixed;
         top: 0;
         right: 0;
-        width: 85%;
-        max-width: 320px;
-        height: 100vh; /* Restore 100vh to ensure full visibility */
+        width: 100vw; /* Use 100vw for full width, allowing clip-path to work */
+        max-width: 100vw;
+        height: 100vh;
         background-color: var(--color-bg-surface);
         background-image: var(--noise-bg);
         border-left: 2px solid var(--color-rust);
@@ -298,13 +298,16 @@
         
         padding: calc(var(--header-height) + 2rem) 0 4rem;
         box-shadow: -10px 0 30px rgba(0,0,0,0.8);
-        transform: translateX(100%);
+        
+        /* Start fully off-screen to the right with clip-path preserved */
+        transform: translateX(100%); 
         visibility: hidden;
         transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0.4s;
         will-change: transform;
         z-index: 100;
         display: block;
         overflow-y: auto;
+        overflow-x: hidden;
     }
 
     /* Decorative Tech Lines (Top Strip) */
@@ -343,7 +346,7 @@
         display: flex;
         flex-direction: column;
         gap: 0;
-        width: 100%;
+        width: 100vw;
         padding: 0;
     }
 
@@ -353,7 +356,7 @@
         height: auto;
         border-bottom: 1px solid var(--color-border);
         opacity: 0;
-        transform: translateX(20px);
+        transform: translateX(0);
         transition: opacity 0.3s ease, transform 0.3s ease;
         background: rgba(0,0,0,0.02);
     }
@@ -474,6 +477,7 @@
         transform: translateX(0);
         visibility: visible;
         transition-delay: 0s;
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .mobile-menu-overlay {
