@@ -140,21 +140,8 @@
     flex: 1;
     overflow-y: auto;
     padding: var(--spacing-sm) 0;
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-rust) var(--color-bg-surface);
 }
 
-/* Scrollbar Styling */
-.code-explorer__tree::-webkit-scrollbar {
-    width: 6px;
-}
-.code-explorer__tree::-webkit-scrollbar-track {
-    background: var(--color-bg-surface);
-}
-.code-explorer__tree::-webkit-scrollbar-thumb {
-    background-color: var(--color-rust);
-    border-radius: 0;
-}
 
 /* ==========================================================================
    Tree Nodes
@@ -355,6 +342,7 @@ mark {
 
 .code-explorer__content {
     padding: var(--spacing-lg);
+    max-width: 100%;
 }
 
 /* File List - Data Grid Style */
@@ -454,6 +442,7 @@ mark {
     color: var(--code-block-text);
     padding: var(--spacing-md);
     overflow-x: auto;
+    max-width: 100%;
     border: 1px solid var(--code-block-border);
     border-left: 4px solid var(--color-accent);
     font-family: 'Fira Code', Consolas, monospace !important;
@@ -529,6 +518,12 @@ mark {
         flex-direction: column;
     }
 
+    .code-explorer__main {
+        width: 100%;
+        min-width: 0; /* 确保Flex项目能收缩 */
+        overflow-x: hidden; /* 防止横向溢出 */
+    }
+
     .code-explorer__sidebar {
         width: 100%;
         height: auto;
@@ -543,8 +538,30 @@ mark {
         display: none;
     }
     
+    .code-explorer__breadcrumbs {
+        position: static; /* 移除sticky定位，防止与内容重叠或被内容遮挡 */
+        width: 100%;
+        overflow-x: auto;
+    }
+
     .code-explorer__content {
         padding: var(--spacing-sm);
+        width: 100%;
+        padding-top: var(--spacing-md); /* 增加顶部间距，与面包屑拉开距离 */
+    }
+
+    .readme-main, 
+    .code-preview-container {
+        max-width: 100%;
+        min-width: 0; /* 关键：允许Flex容器内的元素收缩 */
+        padding: var(--spacing-xs);
+    }
+
+    .code-preview__pre,
+    .readme-main pre {
+        max-width: 100%;
+        overflow-x: auto !important; /* 强制启用滚动 */
+        white-space: pre; /* 确保不换行 */
     }
     
     .code-explorer__content .row .desc,

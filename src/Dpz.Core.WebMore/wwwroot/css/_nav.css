@@ -280,12 +280,11 @@
         position: fixed;
         top: 0;
         right: 0;
-        width: 100vw; /* Use 100vw for full width, allowing clip-path to work */
-        max-width: 100vw;
-        height: 100vh;
+        width: 0;
+        height: 100vh; /* Restore 100vh to ensure full visibility */
         background-color: var(--color-bg-surface);
         background-image: var(--noise-bg);
-        border-left: 2px solid var(--color-rust);
+        
         
         /* Cyberpunk Shape: Angled bottom-left cut */
         clip-path: polygon(
@@ -296,16 +295,24 @@
             0 calc(100% - 40px)
         );
         
-        padding: calc(var(--header-height) + 2rem) 0 4rem;
+        padding: 0; /* Padding moved to .nav-container to separate scroll/clip from shadow */
         box-shadow: -10px 0 30px rgba(0,0,0,0.8);
         
-        /* Start fully off-screen to the right with clip-path preserved */
-        transform: translateX(100%); 
-        visibility: hidden;
-        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0.4s;
-        will-change: transform;
+        /* Start with width 0, no transform needed */
+        transform: none; 
+        visibility: visible;
+        transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        will-change: width;
         z-index: 100;
         display: block;
+        white-space: nowrap; /* Prevent content wrapping during transition */
+    }
+
+    /* Inner Container for Scrolling & Clipping */
+    .nav-container {
+        width: 100%;
+        height: 100%;
+        padding: calc(var(--header-height) + 2rem) 0 4rem;
         overflow-y: auto;
         overflow-x: hidden;
     }
@@ -346,7 +353,7 @@
         display: flex;
         flex-direction: column;
         gap: 0;
-        width: 100vw;
+        width: 100%;
         padding: 0;
     }
 
@@ -474,10 +481,10 @@
 
     /* Mobile Menu Open State */
     .header-center.is-open {
-        transform: translateX(0);
-        visibility: visible;
+        width: 85%;
+        border-left: 2px solid var(--color-rust);
+        max-width: 320px;
         transition-delay: 0s;
-        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     .mobile-menu-overlay {
