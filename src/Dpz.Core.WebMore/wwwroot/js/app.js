@@ -11,9 +11,10 @@ class App {
         // 文档参考: https://github.com/verlok/vanilla-lazyload
         this.lazyLoadInstance = new LazyLoad({
             elements_selector: ".lazy",
-            // 可以在这里配置淡入效果等
-            // class_loading: "lzl-loading",
-            // class_loaded: "lzl-loaded",
+            // 骨架屏效果相关类
+            class_loading: "lazy-loading",
+            class_loaded: "lazy-loaded",
+            class_error: "lazy-error",
         });
 
         // 使用 MutationObserver 监听 DOM 变化

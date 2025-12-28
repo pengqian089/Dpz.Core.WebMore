@@ -166,3 +166,167 @@
     flex-direction: column;
     gap: 0.5rem;
 }
+
+/* Lazy Image Loading States */
+img.lazy {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* 加载中状态 - 完全隐藏 SVG 占位图 */
+img.lazy-loading {
+    opacity: 0 !important;
+}
+
+/* 图片容器在加载时显示骨架屏 */
+.article-card__cover:has(img.lazy-loading),
+.search-card__cover:has(img.lazy-loading),
+.bookmark-card__image-wrapper:has(img.lazy-loading) {
+    position: relative;
+    background: linear-gradient(
+        90deg, 
+        var(--skeleton-base, #1a1a1a) 0%, 
+        var(--skeleton-base, #1a1a1a) 40%, 
+        var(--skeleton-highlight, rgba(0, 243, 255, 0.1)) 50%, 
+        var(--skeleton-base, #1a1a1a) 60%, 
+        var(--skeleton-base, #1a1a1a) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-scan 2s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+    overflow: hidden;
+}
+
+/* Markdown 内容中的图片容器 */
+.markdown-body p:has(img.lazy-loading),
+.markdown-body figure:has(img.lazy-loading) {
+    position: relative;
+    background: linear-gradient(
+        90deg, 
+        var(--skeleton-base, #1a1a1a) 0%, 
+        var(--skeleton-base, #1a1a1a) 40%, 
+        var(--skeleton-highlight, rgba(0, 243, 255, 0.1)) 50%, 
+        var(--skeleton-base, #1a1a1a) 60%, 
+        var(--skeleton-base, #1a1a1a) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-scan 2s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+    overflow: hidden;
+    /* Markdown 图片需要最小高度防止容器塌陷 */
+    min-height: 200px;
+}
+
+
+/* 加载完成状态 - 显示图片并淡入 */
+img.lazy-loaded {
+    opacity: 1 !important;
+}
+
+/* 图片加载完成后，移除容器的骨架屏背景 */
+.article-card__cover:has(img.lazy-loaded),
+.search-card__cover:has(img.lazy-loaded),
+.bookmark-card__image-wrapper:has(img.lazy-loaded) {
+    background: none;
+    animation: none;
+}
+
+.markdown-body p:has(img.lazy-loaded),
+.markdown-body figure:has(img.lazy-loaded) {
+    background: none;
+    animation: none;
+    min-height: unset;
+}
+
+/* 加载错误状态 */
+img.lazy-error {
+    opacity: 1 !important;
+    /* 如果加载失败，显示一个占位背景 */
+}
+
+.article-card__cover:has(img.lazy-error),
+.search-card__cover:has(img.lazy-error),
+.bookmark-card__image-wrapper:has(img.lazy-error) {
+    background: var(--skeleton-base, #1a1a1a);
+    animation: none;
+}
+
+.markdown-body p:has(img.lazy-error),
+.markdown-body figure:has(img.lazy-error) {
+    background: var(--skeleton-base, #1a1a1a);
+    animation: none;
+    min-height: 200px;
+}
+
+/* Light Mode Adaptation for Lazy Images */
+@media (prefers-color-scheme: light) {
+    .article-card__cover:has(img.lazy-loading),
+    .search-card__cover:has(img.lazy-loading),
+    .bookmark-card__image-wrapper:has(img.lazy-loading) {
+        --skeleton-base: #e2e8f0;
+        --skeleton-highlight: rgba(0, 0, 0, 0.05);
+        background: linear-gradient(
+            90deg, 
+            var(--skeleton-base) 0%, 
+            var(--skeleton-base) 40%, 
+            #cbd5e1 50%, 
+            var(--skeleton-base) 60%, 
+            var(--skeleton-base) 100%
+        );
+        background-size: 200% 100%;
+    }
+    
+    .markdown-body p:has(img.lazy-loading),
+    .markdown-body figure:has(img.lazy-loading) {
+        --skeleton-base: #e2e8f0;
+        --skeleton-highlight: rgba(0, 0, 0, 0.05);
+        background: linear-gradient(
+            90deg, 
+            var(--skeleton-base) 0%, 
+            var(--skeleton-base) 40%, 
+            #cbd5e1 50%, 
+            var(--skeleton-base) 60%, 
+            var(--skeleton-base) 100%
+        );
+        background-size: 200% 100%;
+    }
+    
+    .article-card__cover:has(img.lazy-error),
+    .search-card__cover:has(img.lazy-error),
+    .bookmark-card__image-wrapper:has(img.lazy-error) {
+        background: #e2e8f0;
+    }
+    
+    .markdown-body p:has(img.lazy-error),
+    .markdown-body figure:has(img.lazy-error) {
+        background: #e2e8f0;
+    }
+}
+
+/* Dark Mode Adaptation for Lazy Images */
+@media (prefers-color-scheme: dark) {
+    .article-card__cover:has(img.lazy-loading),
+    .search-card__cover:has(img.lazy-loading),
+    .bookmark-card__image-wrapper:has(img.lazy-loading) {
+        --skeleton-base: #0f0f0f;
+        --skeleton-highlight: rgba(255, 0, 60, 0.15);
+    }
+    
+    .markdown-body p:has(img.lazy-loading),
+    .markdown-body figure:has(img.lazy-loading) {
+        --skeleton-base: #0f0f0f;
+        --skeleton-highlight: rgba(255, 0, 60, 0.15);
+    }
+    
+    .article-card__cover:has(img.lazy-error),
+    .search-card__cover:has(img.lazy-error),
+    .bookmark-card__image-wrapper:has(img.lazy-error) {
+        background: #0f0f0f;
+    }
+    
+    .markdown-body p:has(img.lazy-error),
+    .markdown-body figure:has(img.lazy-error) {
+        background: #0f0f0f;
+    }
+}
