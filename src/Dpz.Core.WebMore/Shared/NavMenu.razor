@@ -1,6 +1,4 @@
 ﻿@implements IDisposable
-@inject NavigationManager Navigation
-@using Microsoft.AspNetCore.Components.Routing
 
 <header class="site-header">
     <div class="container site-header__inner">
@@ -14,7 +12,7 @@
         </div>
 
         <!-- 2. Center: Navigation Menu -->
-        <div class="header-center">
+        <div class="header-center @(_isMobileMenuOpen ? "is-open" : "")">
             <nav class="nav-container">
                 <ul class="nav-menu">
                     <li class="nav-menu__item @IsActive("", true)">
@@ -59,8 +57,8 @@
                     </li>
 
                     <!-- Dropdown -->
-                    <li class="nav-menu__item nav-menu__item--has-sub @MoreActive()">
-                        <span class="nav-menu__link" style="cursor: default">
+                    <li class="nav-menu__item nav-menu__item--has-sub @MoreActive() @(_isSubMenuExpanded ? "nav-menu__item--expanded" : "")">
+                        <span class="nav-menu__link" style="cursor: pointer" @onclick="ToggleSubMenu">
                             <span class="nav-menu__text">更多</span>
                             <i class="fa fa-angle-down nav-menu__arrow"></i>
                         </span>
@@ -87,7 +85,10 @@
         <div class="header-right">
 
             <!-- Mobile Toggle -->
-            <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
+            <button class="nav-toggle @(_isMobileMenuOpen ? "nav-toggle--active" : "")" 
+                    aria-label="Menu" 
+                    aria-expanded="@(_isMobileMenuOpen ? "true" : "false")"
+                    @onclick="ToggleMobileMenu">
                 <span class="nav-toggle__icon"></span>
             </button>
         </div>
@@ -96,63 +97,4 @@
 </header>
 
 <!-- Mobile Menu Overlay -->
-<div class="mobile-menu-overlay"></div>
-
-@code {
-    private string _currentUrl = "";
-
-    protected override void OnInitialized()
-    {
-        // Get initial URL (relative)
-        _currentUrl = Navigation.ToBaseRelativePath(Navigation.Uri);
-        // Remove fragment if any (optional)
-        if (_currentUrl.Contains('#'))
-        {
-            _currentUrl = _currentUrl.Split('#')[0];
-        }
-
-        Navigation.LocationChanged += OnLocationChanged;
-    }
-
-    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
-    {
-        _currentUrl = Navigation.ToBaseRelativePath(e.Location);
-        if (_currentUrl.Contains('#'))
-        {
-            _currentUrl = _currentUrl.Split('#')[0];
-        }
-        StateHasChanged();
-    }
-
-    public void Dispose()
-    {
-        Navigation.LocationChanged -= OnLocationChanged;
-    }
-
-    private string IsActive(string href, bool matchAll = false)
-    {
-        // Remove query string for comparison
-        var path = _currentUrl.Split('?')[0];
-
-        if (matchAll)
-        {
-            return string.IsNullOrEmpty(path) ? "nav-menu__item--active" : "";
-        }
-
-        if (string.IsNullOrEmpty(path)) return "";
-
-        return path.StartsWith(href, StringComparison.OrdinalIgnoreCase) ? "nav-menu__item--active" : "";
-    }
-
-    private string MoreActive()
-    {
-        var path = _currentUrl.Split('?')[0];
-        var moreLinks = new[] { "albums", "code", "timeline", "friends" };
-        foreach (var link in moreLinks)
-        {
-            if (path.StartsWith(link, StringComparison.OrdinalIgnoreCase))
-                return "nav-menu__item--active";
-        }
-        return "";
-    }
-}
+<div class="mobile-menu-overlay @(_isMobileMenuOpen ? "is-open" : "")" @onclick="CloseMobileMenu"></div>
