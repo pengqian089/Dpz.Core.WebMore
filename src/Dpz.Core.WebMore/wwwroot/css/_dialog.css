@@ -505,3 +505,65 @@
 .notification-box--success { border-left: 4px solid #10b981; }
 .notification-box--warning { border-left: 4px solid var(--color-accent); }
 .notification-box--error { border-left: 4px solid var(--color-accent-alert); }
+
+/* Added missing styles for Notification Box */
+
+.notification-box__close {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    color: var(--color-text-muted);
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+    z-index: 10;
+    transition: color 0.2s;
+}
+
+.notification-box__close:hover {
+    color: var(--color-accent-alert);
+}
+
+.notification-box__content-container {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Notification Progress Bar */
+.notification-box__progress {
+    padding: 0 var(--spacing-md) var(--spacing-md);
+    margin-top: -5px; /* Pull closer to content if needed */
+}
+
+.notification-box__progress-track {
+    background-color: var(--color-bg-surface-alt);
+    height: 4px;
+    width: 100%;
+    position: relative;
+    border: 1px solid var(--color-border);
+    margin-top: 1.2rem; /* Space for text */
+}
+
+.notification-box__progress-bar {
+    height: 100%;
+    background-color: var(--color-accent);
+    transition: width 0.3s ease;
+}
+
+.notification-box__progress-text {
+    font-family: var(--font-stack-mono);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    position: absolute;
+    right: 0;
+    top: -1.4em;
+    line-height: 1;
+}
+
+/* Type specific progress colors */
+.notification-box--success .notification-box__progress-bar { background-color: #10b981; }
+.notification-box--warning .notification-box__progress-bar { background-color: var(--color-accent); }
+.notification-box--error .notification-box__progress-bar { background-color: var(--color-accent-alert); }
+.notification-box--info .notification-box__progress-bar { background-color: var(--color-accent-secondary); }
