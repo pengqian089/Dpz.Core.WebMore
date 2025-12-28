@@ -1,37 +1,42 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Dpz.Core.WebMore.Service;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace Dpz.Core.WebMore.Shared.Components.Dialog;
 
-public partial class DialogContainer
+public partial class DialogContainer(IAppDialogService dialogService, IJSRuntime jsRuntime)
 {
-    [Inject]
-    public IAppDialogService DialogService { get; set; } = default!;
-
-    private readonly List<DialogModel> _dialogs = new();
-    private readonly List<ToastModel> _toasts = new();
-    private readonly List<NotificationModel> _notifications = new();
+    private readonly List<DialogModel> _dialogs = [];
+    private readonly List<ToastModel> _toasts = [];
+    private readonly List<NotificationModel> _notifications = [];
 
     protected override void OnInitialized()
     {
-        DialogService.OnDialogShow += ShowDialog;
-        DialogService.OnToastShow += ShowToast;
-        DialogService.OnNotificationShow += ShowNotification;
-        DialogService.OnCloseAllNotifications += CloseAllNotifications;
+        dialogService.OnDialogShow += ShowDialog;
+        dialogService.OnToastShow += ShowToast;
+        dialogService.OnNotificationShow += ShowNotification;
+        dialogService.OnCloseAllNotifications += CloseAllNotifications;
     }
 
-    private void ShowDialog(DialogModel model)
+    private async void ShowDialog(DialogModel model)
     {
         _dialogs.Add(model);
-        InvokeAsync(StateHasChanged);
+        await InvokeAsync(StateHasChanged);
+        await jsRuntime.InvokeVoidAsync("dialogInterop.disableBodyScroll");
     }
 
-    private void RemoveDialog(DialogModel model)
+    private async void RemoveDialog(DialogModel model)
     {
         _dialogs.Remove(model);
-        InvokeAsync(StateHasChanged);
+        await InvokeAsync(StateHasChanged);
+
+        if (_dialogs.Count == 0)
+        {
+            await jsRuntime.InvokeVoidAsync("dialogInterop.enableBodyScroll");
+        }
     }
 
     private void ShowToast(ToastModel model)
@@ -70,9 +75,9 @@ public partial class DialogContainer
 
     public void Dispose()
     {
-        DialogService.OnDialogShow -= ShowDialog;
-        DialogService.OnToastShow -= ShowToast;
-        DialogService.OnNotificationShow -= ShowNotification;
-        DialogService.OnCloseAllNotifications -= CloseAllNotifications;
+        dialogService.OnDialogShow -= ShowDialog;
+        dialogService.OnToastShow -= ShowToast;
+        dialogService.OnNotificationShow -= ShowNotification;
+        dialogService.OnCloseAllNotifications -= CloseAllNotifications;
     }
 }

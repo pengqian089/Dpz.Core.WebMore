@@ -410,23 +410,31 @@
     }
     
     .dialog--component {
-        width: 100% !important;
-        height: 100%;
-        max-width: 100% !important;
-        margin: 0;
+        width: 95% !important;
+        height: auto;
+        max-height: 90vh;
+        max-width: 95% !important;
+        margin: 0 auto;
         border-radius: 0;
-        transform: none !important;
-        clip-path: none; /* Full screen on mobile needs regular rect */
-        border: none;
+        transform: scale(0.95) translateY(10px);
+        clip-path: polygon(
+            0 0, 
+            100% 0, 
+            100% calc(100% - 20px), 
+            calc(100% - 20px) 100%, 
+            0 100%
+        );
+        border: 2px solid var(--color-border);
     }
     
     .dialog-overlay--visible .dialog--component {
-        top: 0;
-        bottom: 0;
+        top: auto;
+        bottom: auto;
+        transform: scale(1) translateY(0) !important;
     }
     
     .dialog__content {
-        max-height: calc(100vh - 120px);
+        max-height: 60vh;
     }
     
     .toast-container {
@@ -441,6 +449,25 @@
     .toast {
         width: 100%;
         min-width: 0;
+    }
+
+    /* Notification Box Mobile */
+    .notification-box {
+        width: calc(100% - 20px);
+        right: auto;
+        left: 10px;
+        top: 60px;
+        transform: translateY(-150%);
+    }
+
+    .notification-box--enter {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .notification-box--exit {
+        opacity: 0;
+        transform: translateY(-150%);
     }
 }
 

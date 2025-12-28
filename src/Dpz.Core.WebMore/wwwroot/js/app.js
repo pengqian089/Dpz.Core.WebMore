@@ -92,3 +92,13 @@ if (document.readyState === 'loading') {
 } else {
     new App();
 }
+
+// Dialog Interop
+window.dialogInterop = {
+    disableBodyScroll: function () {
+        document.body.style.overflow = 'hidden';
+    },
+    enableBodyScroll: function () {
+        document.body.style.overflow = '';
+    }
+};
