@@ -22,6 +22,7 @@ export class Gallery {
         this._isClosedByNavigation = false;
         this._isClosing = false;
         this._clickHandlers = new Map(); // 存储事件处理器，用于清理
+        this._loadHandlers = new Map(); // 存储加载事件处理器，用于清理
         this._loadingIndicator = null; // 加载提示元素
 
         this.init();
@@ -75,11 +76,6 @@ export class Gallery {
             // 当前图片就是原图，可以直接使用尺寸
             item.w = img.naturalWidth;
             item.h = img.naturalHeight;
-            console.log(`[Gallery] 图片 ${index} 初始化时获取尺寸:`, item.w, 'x', item.h);
-        } else if (img.dataset.origin) {
-            console.log(`[Gallery] 图片 ${index} 有 data-origin，需要加载原图尺寸`);
-        } else if (isPlaceholder) {
-            console.log(`[Gallery] 图片 ${index} 是占位符，需要加载原图尺寸`);
         }
         
         this.items.push(item);
@@ -88,6 +84,11 @@ export class Gallery {
         const clickHandler = (e) => this.handleClick(e, index);
         this._clickHandlers.set(img, clickHandler);
         img.addEventListener('click', clickHandler);
+        
+        // 添加 load 事件监听器，确保图片加载完成后更新光标
+        const loadHandler = () => this.updateImageCursor(img);
+        this._loadHandlers.set(img, loadHandler);
+        img.addEventListener('load', loadHandler);
         
         // 根据图片加载状态设置光标样式
         this.updateImageCursor(img);
@@ -101,19 +102,9 @@ export class Gallery {
      * 更新所有图片的光标状态（用于 LazyLoad 完成后）
      */
     updateAllCursors() {
-        let loadedCount = 0;
-        let loadingCount = 0;
-        let waitingCount = 0;
-        
         this.images.forEach(img => {
-            if (img.classList.contains('lazy-loaded')) loadedCount++;
-            else if (img.classList.contains('lazy-loading')) loadingCount++;
-            else if (img.classList.contains('lazy')) waitingCount++;
-            
             this.updateImageCursor(img);
         });
-        
-        console.log(`[Gallery] 光标更新完成 - 已加载: ${loadedCount}, 加载中: ${loadingCount}, 等待: ${waitingCount}`);
     }
     
     /**
@@ -126,6 +117,12 @@ export class Gallery {
             delete img.dataset.pswpBound;
         });
         this._clickHandlers.clear();
+        
+        // 移除所有加载事件监听器
+        this._loadHandlers.forEach((handler, img) => {
+            img.removeEventListener('load', handler);
+        });
+        this._loadHandlers.clear();
         
         // 关闭可能打开的 lightbox
         if (this.lightbox && this.lightbox.pswp) {
@@ -189,54 +186,30 @@ export class Gallery {
      * @param {HTMLImageElement} img 
      */
     updateImageCursor(img) {
-        const DEBUG = false; // 设置为 true 启用详细调试日志
-        
-        const classes = Array.from(img.classList);
-        const complete = img.complete;
-        const naturalWidth = img.naturalWidth;
-        
         let cursor = 'wait';
-        let reason = '默认等待';
         
         // 正在加载中
         if (img.classList.contains('lazy-loading')) {
             cursor = 'wait';
-            reason = '正在加载';
         }
         // 已加载完成（优先检查，因为 lazy 类不会被移除）
         else if (img.classList.contains('lazy-loaded')) {
             cursor = 'zoom-in';
-            reason = 'LazyLoad 已完成';
         }
         // 加载失败
         else if (img.classList.contains('lazy-error')) {
             cursor = 'not-allowed';
-            reason = 'LazyLoad 失败';
         }
         // 还未开始加载（未进入视口）
         else if (img.classList.contains('lazy')) {
             cursor = 'wait';
-            reason = '等待 LazyLoad';
         }
         // 非 LazyLoad 图片，检查实际加载状态
-        else if (complete && naturalWidth === 0) {
+        else if (img.complete && img.naturalWidth === 0) {
             cursor = 'not-allowed';
-            reason = '图片加载失败';
         }
-        else if (complete && naturalWidth > 0) {
+        else if (img.complete && img.naturalWidth > 0) {
             cursor = 'zoom-in';
-            reason = '图片已加载';
-        }
-        
-        if (DEBUG) {
-            console.log('[Cursor]', {
-                src: img.src.substring(img.src.lastIndexOf('/') + 1),
-                classes: classes,
-                complete: complete,
-                naturalWidth: naturalWidth,
-                cursor: cursor,
-                reason: reason
-            });
         }
         
         img.style.cursor = cursor;
@@ -348,15 +321,12 @@ export class Gallery {
 
     handleClick(e, index) {
         e.preventDefault();
-        
-        console.time('[Gallery] 从点击到首次渲染');
 
         const item = this.items[index];
         const imgElement = item.element;
         
         // 检查图片是否正在延迟加载中
         if (imgElement.classList.contains('lazy-loading')) {
-            console.log('[Gallery] 图片正在加载中，请稍候...');
             return;
         }
         
@@ -364,19 +334,16 @@ export class Gallery {
         if (imgElement.classList.contains('lazy') && 
             !imgElement.classList.contains('lazy-loaded') && 
             !imgElement.classList.contains('lazy-error')) {
-            console.log('[Gallery] 图片还未加载，请等待图片进入可视区域');
             return;
         }
         
         // 检查图片是否加载失败
         if (imgElement.complete && imgElement.naturalWidth === 0) {
-            console.warn('[Gallery] 图片加载失败');
             return;
         }
 
         // 如果 item 已有尺寸信息，直接打开
         if (item.w > 0 && item.h > 0) {
-            console.log('[Gallery] 使用缓存的尺寸信息:', item.w, 'x', item.h);
             this.open(index);
             return;
         }
@@ -384,18 +351,15 @@ export class Gallery {
         // 关键修复：如果有 data-origin，说明当前显示的是缩略图
         // 不能使用当前图片元素的尺寸，必须加载原图获取正确尺寸
         if (imgElement.dataset.origin) {
-            console.log('[Gallery] 检测到 data-origin，需要加载原图尺寸');
             // 跳过使用当前元素尺寸的逻辑，直接进入加载原图
         } else if (imgElement.complete && imgElement.naturalWidth > 0 && !imgElement.src.includes('loaders/oval.svg')) {
             // 没有 data-origin 且不是占位符，当前图片就是原图，可以直接使用尺寸
-            console.log('[Gallery] 使用图片元素的尺寸信息:', imgElement.naturalWidth, 'x', imgElement.naturalHeight);
             item.w = imgElement.naturalWidth;
             item.h = imgElement.naturalHeight;
             
             // 确保 item.src 是正确的
             const actualSrc = this.getActualImageSrc(imgElement);
             if (actualSrc !== item.src) {
-                console.log('[Gallery] 更新图片 URL:', actualSrc);
                 item.src = actualSrc;
             }
             
@@ -407,11 +371,9 @@ export class Gallery {
         // 确保使用正确的原图 URL
         if (item.src.includes('loaders/oval.svg')) {
             const actualSrc = this.getImageSrc(imgElement);
-            console.log('[Gallery] 修正图片 URL:', item.src, '->', actualSrc);
             item.src = actualSrc;
         }
         
-        console.log('[Gallery] 加载原图获取尺寸:', item.src);
         this.showLoadingIndicator();
         
         const img = new Image();
@@ -420,13 +382,10 @@ export class Gallery {
             item.w = img.naturalWidth;
             item.h = img.naturalHeight;
             this.hideLoadingIndicator();
-            console.log('[Gallery] 尺寸加载完成:', item.w, 'x', item.h);
             this.open(index);
         };
         img.onerror = () => {
             this.hideLoadingIndicator();
-            console.error('[Gallery] 原图加载失败:', item.src);
-            // 即使加载失败，也尝试打开（PhotoSwipe 会显示错误信息）
             this.open(index);
         };
     }
@@ -444,26 +403,7 @@ export class Gallery {
         if (window.appDOMManager) {
             window.appDOMManager.pause();
         }
-        
-        // 调试信息：打印当前要打开的图片信息
-        const currentItem = this.items[index];
-        console.log('[Gallery] 打开画廊 - 当前图片:', {
-            index: index,
-            src: currentItem.src,
-            w: currentItem.w,
-            h: currentItem.h
-        });
-        
-        // 调试信息：检查所有图片的 URL 是否正确
-        console.log('[Gallery] 所有图片信息:', this.items.map((item, i) => ({
-            index: i,
-            src: item.src.includes('loaders') ? '❌占位符' : '✅正常',
-            url: item.src,
-            w: item.w,
-            h: item.h
-        })));
 
-        console.time('[Gallery] PhotoSwipe 初始化耗时');
         const lightbox = new PhotoSwipeLightbox({
             dataSource: this.items,
             pswpModule: PhotoSwipe,
@@ -521,15 +461,12 @@ export class Gallery {
             };
             
             img.onerror = () => {
-                console.error('Failed to load image:', content.data.src);
+                // 图片加载失败，PhotoSwipe 会显示错误信息
             };
         });
 
         // 当画廊打开后，隐藏加载提示
         lightbox.on('firstUpdate', () => {
-            // firstUpdate 在画廊首次渲染后触发
-            console.timeEnd('[Gallery] PhotoSwipe 初始化耗时');
-            console.timeEnd('[Gallery] 从点击到首次渲染');
             this.hideLoadingIndicator();
         });
 
@@ -538,7 +475,6 @@ export class Gallery {
             
             // 清除 hash（如果是当前画廊的 hash）
             if (!this._isClosedByNavigation && window.location.hash.includes(`gid=${this.options.galleryId}`)) {
-                console.log('[Gallery] 清除 hash');
                 this.clearHash();
             }
             
@@ -559,9 +495,7 @@ export class Gallery {
             this.pushHash(index);
         }
 
-        console.log('[Gallery] 开始初始化 PhotoSwipe...');
         lightbox.init();
-        console.log('[Gallery] lightbox.init() 调用完成');
     }
 
     // Hash Helper Methods
@@ -613,7 +547,6 @@ export class Gallery {
      * @param {number} index 
      */
     openFromHash(index) {
-        console.log('[Gallery] 从 hash 打开画廊，index:', index);
         const item = this.items[index];
         const imgElement = item.element;
         
@@ -626,14 +559,12 @@ export class Gallery {
         // 检查图片元素是否已经加载完成（LazyLoad 可能已完成）
         // 但如果有 data-origin，说明当前是缩略图，不能使用其尺寸
         if (imgElement.complete && imgElement.naturalWidth > 0 && !imgElement.dataset.origin && !imgElement.src.includes('loaders/oval.svg')) {
-            console.log('[Gallery] 从 hash 打开：使用图片元素的尺寸');
             item.w = imgElement.naturalWidth;
             item.h = imgElement.naturalHeight;
             
             // 更新 item.src 为实际图片 URL
             const actualSrc = this.getActualImageSrc(imgElement);
             if (actualSrc !== item.src) {
-                console.log('[Gallery] 从 hash 打开：更新图片 URL:', actualSrc);
                 item.src = actualSrc;
             }
             
@@ -642,13 +573,11 @@ export class Gallery {
         }
 
         // 需要加载图片获取尺寸
-        console.log('[Gallery] 从 hash 打开：加载图片尺寸');
         this.showLoadingIndicator();
         
         // 确保使用正确的原图 URL
         if (item.src.includes('loaders/oval.svg') || imgElement.dataset.origin) {
             const actualSrc = this.getImageSrc(imgElement);
-            console.log('[Gallery] 从 hash 打开：使用原图 URL:', actualSrc);
             item.src = actualSrc;
         }
         
@@ -659,14 +588,11 @@ export class Gallery {
             item.w = img.naturalWidth;
             item.h = img.naturalHeight;
             this.hideLoadingIndicator();
-            console.log('[Gallery] 从 hash 打开：尺寸加载完成');
             this.open(index, true);
         };
         
         img.onerror = () => {
             this.hideLoadingIndicator();
-            console.error('[Gallery] 从 hash 加载图片失败:', item.src);
-            // 即使加载失败，也尝试打开
             this.open(index, true);
         };
     }

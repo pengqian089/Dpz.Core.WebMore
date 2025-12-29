@@ -14,7 +14,6 @@ export class DOMChangeManager {
      * 暂停 DOM 监听（例如在 PhotoSwipe 打开时）
      */
     pause() {
-        console.log('[DOMChangeManager] ⏸️ 暂停 DOM 监听');
         this.paused = true;
     }
     
@@ -22,7 +21,6 @@ export class DOMChangeManager {
      * 恢复 DOM 监听
      */
     resume() {
-        console.log('[DOMChangeManager] ▶️ 恢复 DOM 监听');
         this.paused = false;
     }
 

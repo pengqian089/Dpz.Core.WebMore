@@ -95,23 +95,17 @@ class App {
     }
     
     initGallery() {
-        console.time('[App] initGallery() 总耗时');
         const articleImages = document.querySelectorAll('.article-card__cover img, .markdown-body img');
         
         if (articleImages.length > 0) {
             // 清理旧实例
             if (this.galleryInstance) {
-                console.time('[App] gallery.cleanup() 耗时');
                 this.galleryInstance.cleanup();
-                console.timeEnd('[App] gallery.cleanup() 耗时');
             }
             
             // 创建新实例
-            console.time('[App] new Gallery() 耗时');
             this.galleryInstance = new Gallery(articleImages);
-            console.timeEnd('[App] new Gallery() 耗时');
         }
-        console.timeEnd('[App] initGallery() 总耗时');
     }
     
     updateGallery() {
@@ -128,7 +122,6 @@ class App {
         
         if (currentCount !== previousCount) {
             // 有新图片添加或删除，需要重新初始化
-            console.log(`[Gallery] 图片数量变化: ${previousCount} -> ${currentCount}，重新初始化`);
             this.initGallery();
         } else {
             // 只是属性变化（如 lazy-loaded 类添加），只更新光标
