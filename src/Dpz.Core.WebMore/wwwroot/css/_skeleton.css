@@ -222,6 +222,7 @@ img.lazy-loading {
 /* 加载完成状态 - 显示图片并淡入 */
 img.lazy-loaded {
     opacity: 1 !important;
+    width: auto;
 }
 
 /* 图片加载完成后，移除容器的骨架屏背景 */
