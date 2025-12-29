@@ -22,7 +22,6 @@ export class Gallery {
         this._isClosedByNavigation = false;
         this._isClosing = false;
         this._clickHandlers = new Map(); // 存储事件处理器，用于清理
-        this._loadHandlers = new Map(); // 存储加载事件处理器，用于清理
         this._loadingIndicator = null; // 加载提示元素
 
         this.init();
@@ -47,11 +46,12 @@ export class Gallery {
     bindImage(img, index) {
         // Prevent duplicate binding
         if (img.dataset.pswpBound) {
-            // 如果已经绑定过，只更新光标
-            this.updateImageCursor(img);
             return;
         }
         img.dataset.pswpBound = "true";
+        
+        // 添加标记类，让 CSS 控制光标状态
+        img.classList.add('pswp-gallery-image');
 
         // Determine image sources
         // 获取原图 URL（优先使用 data-origin）
@@ -84,14 +84,6 @@ export class Gallery {
         const clickHandler = (e) => this.handleClick(e, index);
         this._clickHandlers.set(img, clickHandler);
         img.addEventListener('click', clickHandler);
-        
-        // 添加 load 事件监听器，确保图片加载完成后更新光标
-        const loadHandler = () => this.updateImageCursor(img);
-        this._loadHandlers.set(img, loadHandler);
-        img.addEventListener('load', loadHandler);
-        
-        // 根据图片加载状态设置光标样式
-        this.updateImageCursor(img);
 
         if (this.options.preloadAll) {
             this.preloadImage(item);
@@ -99,30 +91,16 @@ export class Gallery {
     }
     
     /**
-     * 更新所有图片的光标状态（用于 LazyLoad 完成后）
-     */
-    updateAllCursors() {
-        this.images.forEach(img => {
-            this.updateImageCursor(img);
-        });
-    }
-    
-    /**
      * 清理事件监听器和相关资源
      */
     cleanup() {
-        // 移除所有存储的事件监听器
+        // 移除所有存储的事件监听器和标记类
         this._clickHandlers.forEach((handler, img) => {
             img.removeEventListener('click', handler);
+            img.classList.remove('pswp-gallery-image');
             delete img.dataset.pswpBound;
         });
         this._clickHandlers.clear();
-        
-        // 移除所有加载事件监听器
-        this._loadHandlers.forEach((handler, img) => {
-            img.removeEventListener('load', handler);
-        });
-        this._loadHandlers.clear();
         
         // 关闭可能打开的 lightbox
         if (this.lightbox && this.lightbox.pswp) {
@@ -181,40 +159,6 @@ export class Gallery {
         return currentSrc;
     }
     
-    /**
-     * 根据图片加载状态更新光标样式
-     * @param {HTMLImageElement} img 
-     */
-    updateImageCursor(img) {
-        let cursor = 'wait';
-        
-        // 正在加载中
-        if (img.classList.contains('lazy-loading')) {
-            cursor = 'wait';
-        }
-        // 已加载完成（优先检查，因为 lazy 类不会被移除）
-        else if (img.classList.contains('lazy-loaded')) {
-            cursor = 'zoom-in';
-        }
-        // 加载失败
-        else if (img.classList.contains('lazy-error')) {
-            cursor = 'not-allowed';
-        }
-        // 还未开始加载（未进入视口）
-        else if (img.classList.contains('lazy')) {
-            cursor = 'wait';
-        }
-        // 非 LazyLoad 图片，检查实际加载状态
-        else if (img.complete && img.naturalWidth === 0) {
-            cursor = 'not-allowed';
-        }
-        else if (img.complete && img.naturalWidth > 0) {
-            cursor = 'zoom-in';
-        }
-        
-        img.style.cursor = cursor;
-    }
-
     /**
      * 显示加载提示
      */

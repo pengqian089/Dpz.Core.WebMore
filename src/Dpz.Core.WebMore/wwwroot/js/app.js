@@ -123,10 +123,8 @@ class App {
         if (currentCount !== previousCount) {
             // 有新图片添加或删除，需要重新初始化
             this.initGallery();
-        } else {
-            // 只是属性变化（如 lazy-loaded 类添加），只更新光标
-            this.galleryInstance.updateAllCursors();
         }
+        // 属性变化（如 lazy-loaded 类添加）由 CSS 自动处理光标状态，无需手动更新
     }
 }
 
