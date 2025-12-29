@@ -181,13 +181,3 @@ window.notifyBlazorStarted = function() {
         window.appInstance.onBlazorStarted();
     }
 };
-
-// Dialog Interop
-window.dialogInterop = {
-    disableBodyScroll: function () {
-        document.body.style.overflow = 'hidden';
-    },
-    enableBodyScroll: function () {
-        document.body.style.overflow = '';
-    }
-};

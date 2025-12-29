@@ -7,7 +7,7 @@
 else
 {
     <PageTitle>@_model.Name - 游戏成就 - 个人文章分享</PageTitle>
-    <div class="steam-container @(IsCyberpunk2077 || _model.Name.Contains("Cyberpunk 2077") ? "theme-cyberpunk" : "")">
+    <div class="steam-container @(IsCyberpunk2077 ? "theme-cyberpunk" : "")">
     <a href="/steam" class="steam-back-btn">
         <i class="fa fa-arrow-left"></i> 返回游戏列表
     </a>

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,10 +9,12 @@ using Microsoft.JSInterop;
 namespace Dpz.Core.WebMore.Shared.Components.Dialog;
 
 public partial class DialogContainer(IAppDialogService dialogService, IJSRuntime jsRuntime)
+    : IAsyncDisposable
 {
     private readonly List<DialogModel> _dialogs = [];
     private readonly List<ToastModel> _toasts = [];
     private readonly List<NotificationModel> _notifications = [];
+    private IJSObjectReference? _dialogModule;
 
     protected override void OnInitialized()
     {
@@ -21,11 +24,33 @@ public partial class DialogContainer(IAppDialogService dialogService, IJSRuntime
         dialogService.OnCloseAllNotifications += CloseAllNotifications;
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _dialogModule = await jsRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./js/modules/dialog-interop.js"
+            );
+        }
+    }
+
     private async void ShowDialog(DialogModel model)
     {
         _dialogs.Add(model);
         await InvokeAsync(StateHasChanged);
-        await jsRuntime.InvokeVoidAsync("dialogInterop.disableBodyScroll");
+
+        if (_dialogModule != null)
+        {
+            try
+            {
+                await _dialogModule.InvokeVoidAsync("disableBodyScroll", model.DisableBodyScroll);
+            }
+            catch
+            {
+                // Fallback if module not loaded
+            }
+        }
     }
 
     private async void RemoveDialog(DialogModel model)
@@ -33,9 +58,16 @@ public partial class DialogContainer(IAppDialogService dialogService, IJSRuntime
         _dialogs.Remove(model);
         await InvokeAsync(StateHasChanged);
 
-        if (_dialogs.Count == 0)
+        if (_dialogs.Count == 0 && _dialogModule != null)
         {
-            await jsRuntime.InvokeVoidAsync("dialogInterop.enableBodyScroll");
+            try
+            {
+                await _dialogModule.InvokeVoidAsync("enableBodyScroll");
+            }
+            catch
+            {
+                // Ignore if module disposed
+            }
         }
     }
 
@@ -73,11 +105,23 @@ public partial class DialogContainer(IAppDialogService dialogService, IJSRuntime
         }
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         dialogService.OnDialogShow -= ShowDialog;
         dialogService.OnToastShow -= ShowToast;
         dialogService.OnNotificationShow -= ShowNotification;
         dialogService.OnCloseAllNotifications -= CloseAllNotifications;
+
+        if (_dialogModule != null)
+        {
+            try
+            {
+                await _dialogModule.DisposeAsync();
+            }
+            catch
+            {
+                // Ignore disposal errors
+            }
+        }
     }
 }

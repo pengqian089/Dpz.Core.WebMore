@@ -66,7 +66,8 @@ public class AppDialogService : IAppDialogService
     public Task<TResult?> ShowComponentAsync<TResult>(
         string title,
         RenderFragment childContent,
-        string width = ""
+        string width = "",
+        bool disableBodyScroll = true
     )
     {
         var tcs = new TaskCompletionSource<object?>();
@@ -76,6 +77,7 @@ public class AppDialogService : IAppDialogService
             Type = DialogType.Component,
             Content = childContent,
             Width = width,
+            DisableBodyScroll = disableBodyScroll,
             TaskSource = tcs,
         };
 
@@ -87,7 +89,8 @@ public class AppDialogService : IAppDialogService
     public async Task ShowComponentAsync(
         string title,
         RenderFragment childContent,
-        string width = ""
+        string width = "",
+        bool disableBodyScroll = true
     )
     {
         var tcs = new TaskCompletionSource<object?>();
@@ -97,6 +100,7 @@ public class AppDialogService : IAppDialogService
             Type = DialogType.Component,
             Content = childContent,
             Width = width,
+            DisableBodyScroll = disableBodyScroll,
             TaskSource = tcs,
         };
 

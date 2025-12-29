@@ -10,14 +10,20 @@ public interface IAppDialogService
     Task<bool> ConfirmAsync(string message, string title = "确认");
 
     Task<string?> PromptAsync(string message, string title = "输入", string defaultValue = "");
-    
+
     Task<TResult?> ShowComponentAsync<TResult>(
         string title,
         RenderFragment childContent,
-        string width = ""
+        string width = "",
+        bool disableBodyScroll = true
     );
-    
-    Task ShowComponentAsync(string title, RenderFragment childContent, string width = "");
+
+    Task ShowComponentAsync(
+        string title,
+        RenderFragment childContent,
+        string width = "",
+        bool disableBodyScroll = true
+    );
 
     void Toast(string message, ToastType type = ToastType.Info, int duration = 3000);
 
@@ -73,6 +79,12 @@ public class DialogModel
     public string DefaultValue { get; set; } = "";
     public RenderFragment? Content { get; set; }
     public string Width { get; set; } = "";
+
+    /// <summary>
+    /// 是否禁用滚动条
+    /// 默认禁用滚动
+    /// </summary>
+    public bool DisableBodyScroll { get; set; } = true;
     public TaskCompletionSource<object?> TaskSource { get; set; } = new();
 }
 
