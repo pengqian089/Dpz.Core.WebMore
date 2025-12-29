@@ -52,6 +52,23 @@ public partial class MainLayout(
         await base.OnInitializedAsync();
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // 通知 JS：Blazor 已启动并完成首次渲染
+            try
+            {
+                await jsRuntime.InvokeVoidAsync("notifyBlazorStarted");
+            }
+            catch (Exception)
+            {
+                // JS 可能还没准备好，忽略错误
+            }
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
     private void HandlePushMessage(PushMessageModel model)
     {
         _ = InvokeAsync(async () =>

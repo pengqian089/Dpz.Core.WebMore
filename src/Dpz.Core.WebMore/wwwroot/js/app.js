@@ -9,23 +9,56 @@ class App {
         this.domManager = new DOMChangeManager();
         // 暴露到 window，让 Gallery 可以访问
         window.appDOMManager = this.domManager;
+        this.lazyLoadInstance = null; // 延迟初始化
+        
+        // 创建 Promise 等待 Blazor 启动通知
+        this.blazorStartedPromise = new Promise((resolve) => {
+            this.blazorStartedResolver = resolve;
+        });
+        
         this.init();
     }
 
     init() {
-        // 初始化 LazyLoad
+        // 注册各个功能模块的处理器
+        this.registerHandlers();
+
+        // 开始监听 DOM 变化
+        this.domManager.start();
+        
+        // 等待 Blazor 启动完成后再初始化 LazyLoad
+        this.blazorStartedPromise.then(() => {
+            this.initLazyLoad();
+        });
+    }
+    
+    /**
+     * 由 Blazor MainLayout 首次渲染后调用
+     * 通知 JS 应用已启动完成
+     */
+    onBlazorStarted() {
+        if (this.blazorStartedResolver) {
+            this.blazorStartedResolver();
+        }
+    }
+    
+    /**
+     * 初始化 LazyLoad
+     */
+    initLazyLoad() {
+        if (this.lazyLoadInstance) {
+            // 如果已经存在，更新即可
+            this.lazyLoadInstance.update();
+            return;
+        }
+        
+        // 创建 LazyLoad 实例
         this.lazyLoadInstance = new LazyLoad({
             elements_selector: ".lazy",
             class_loading: "lazy-loading",
             class_loaded: "lazy-loaded",
             class_error: "lazy-error",
         });
-
-        // 注册各个功能模块的处理器
-        this.registerHandlers();
-
-        // 开始监听 DOM 变化
-        this.domManager.start();
     }
 
     /**
@@ -37,11 +70,16 @@ class App {
             name: 'LazyLoad',
             selectors: ['.lazy'],
             onInit: () => {
-                // 首次加载时更新
-                this.lazyLoadInstance.update();
+                // 首次加载时初始化（Blazor 可能还没准备好）
+                this.initLazyLoad();
             },
             onUpdate: () => {
-                this.lazyLoadInstance.update();
+                // DOM 变化时更新（确保实例存在）
+                if (this.lazyLoadInstance) {
+                    this.lazyLoadInstance.update();
+                } else {
+                    this.initLazyLoad();
+                }
             }
         });
 
@@ -130,10 +168,19 @@ class App {
 
 // 确保在 DOM 加载完成后执行
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => new App());
+    document.addEventListener('DOMContentLoaded', () => {
+        window.appInstance = new App();
+    });
 } else {
-    new App();
+    window.appInstance = new App();
 }
+
+// Blazor 启动通知（由 MainLayout.OnAfterRenderAsync 调用）
+window.notifyBlazorStarted = function() {
+    if (window.appInstance && typeof window.appInstance.onBlazorStarted === 'function') {
+        window.appInstance.onBlazorStarted();
+    }
+};
 
 // Dialog Interop
 window.dialogInterop = {
