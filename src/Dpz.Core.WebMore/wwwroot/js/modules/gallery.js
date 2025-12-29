@@ -535,9 +535,13 @@ export class Gallery {
 
         lightbox.on('close', () => {
             this._isClosing = true;
+            
+            // 清除 hash（如果是当前画廊的 hash）
             if (!this._isClosedByNavigation && window.location.hash.includes(`gid=${this.options.galleryId}`)) {
-                window.history.back();
+                console.log('[Gallery] 清除 hash');
+                this.clearHash();
             }
+            
             this.lightbox = null;
             this._isClosedByNavigation = false;
             
@@ -609,6 +613,7 @@ export class Gallery {
      * @param {number} index 
      */
     openFromHash(index) {
+        console.log('[Gallery] 从 hash 打开画廊，index:', index);
         const item = this.items[index];
         const imgElement = item.element;
         
@@ -670,13 +675,20 @@ export class Gallery {
         const hash = `&gid=${this.options.galleryId}&pid=${index + 1}`;
         // 保留当前的 pathname 和 search，只添加 hash
         const newUrl = `${window.location.pathname}${window.location.search}#${hash}`;
-        window.history.pushState(null, '', newUrl);
+        // 使用 replaceState 而不是 pushState，避免添加到历史记录
+        window.history.replaceState(null, '', newUrl);
     }
 
     updateHash(index) {
         const hash = `&gid=${this.options.galleryId}&pid=${index + 1}`;
         // 保留当前的 pathname 和 search，只更新 hash
         const newUrl = `${window.location.pathname}${window.location.search}#${hash}`;
+        window.history.replaceState(null, '', newUrl);
+    }
+    
+    clearHash() {
+        // 清除 hash，恢复到原始 URL
+        const newUrl = `${window.location.pathname}${window.location.search}`;
         window.history.replaceState(null, '', newUrl);
     }
 }
