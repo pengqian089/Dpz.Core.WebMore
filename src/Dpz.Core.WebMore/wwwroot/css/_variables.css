@@ -57,6 +57,18 @@
     --color-status-disconnected: #8c8279;
     --color-status-error: #ff2a2a;
     
+    /* Message Status Colors - Intuitive Semantic Colors */
+    --color-msg-info: #0ea5e9;           /* Sky Blue - 信息蓝 */
+    --color-msg-success: #10b981;        /* Emerald Green - 成功绿 */
+    --color-msg-warning: #f59e0b;        /* Amber Orange - 警告橙 */
+    --color-msg-error: #ef4444;          /* Red - 错误红 */
+    
+    /* Message Status Colors with Alpha - for shadows/glows */
+    --color-msg-info-alpha: rgba(14, 165, 233, 0.2);
+    --color-msg-success-alpha: rgba(16, 185, 129, 0.2);
+    --color-msg-warning-alpha: rgba(245, 158, 11, 0.25);
+    --color-msg-error-alpha: rgba(239, 68, 68, 0.3);
+    
     /* Fonts */
     --font-stack-base: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
     --font-stack-display: 'Rajdhani', 'Segoe UI', sans-serif; /* Tech feel */
@@ -113,5 +125,17 @@
             rgba(0,0,0,0.5) 10px,
             rgba(0,0,0,0.5) 20px
         );
+        
+        /* Message Status Colors - Keep same for consistency */
+        --color-msg-info: #0ea5e9;
+        --color-msg-success: #10b981;
+        --color-msg-warning: #f59e0b;
+        --color-msg-error: #ef4444;
+        
+        /* Enhanced glow in dark mode */
+        --color-msg-info-alpha: rgba(14, 165, 233, 0.25);
+        --color-msg-success-alpha: rgba(16, 185, 129, 0.25);
+        --color-msg-warning-alpha: rgba(245, 158, 11, 0.3);
+        --color-msg-error-alpha: rgba(239, 68, 68, 0.35);
     }
 }

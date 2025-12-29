@@ -2,6 +2,10 @@
 
 <div class="notification-box notification-box--@GetClass() @(_isLeaving ? "notification-box--exit" : "notification-box--enter")"
     style="position: relative; opacity: 1; transform: none; margin-bottom: 15px;">
+    
+    <!-- Status Indicator Stripe -->
+    <div class="notification-box__status-indicator"></div>
+    
     @if (!string.IsNullOrEmpty(Model.Options.Title))
     {
         <div class="notification-box__title">@Model.Options.Title</div>
