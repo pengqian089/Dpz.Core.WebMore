@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Mumble (碎碎念) Module Styles
+   Mumble (碎碎念) Module Styles - Cyberpunk Wasteland Theme
    ========================================================================== */
 
 :root {
@@ -10,64 +10,27 @@
     --mumble-spacing-lg: 1.5rem;
     --mumble-spacing-xl: 2rem;
 
-    /* Radius */
-    --mumble-radius-sm: 4px;
-    --mumble-radius-md: 8px;
-    --mumble-radius-lg: 12px;
-    --mumble-radius-xl: 16px;
+    /* No radius for Cyberpunk */
+    --mumble-radius-sm: 0;
+    --mumble-radius-md: 0;
+    --mumble-radius-lg: 0;
+    --mumble-radius-xl: 0;
 
     /* Transitions */
     --mumble-transition-fast: 0.2s ease;
     --mumble-transition-normal: 0.3s ease;
 
-    /* Light Theme Colors (Default) */
-    --mumble-color-primary: #2563eb;
-    --mumble-color-primary-hover: #1d4ed8;
-    --mumble-color-text-main: #1f2937;
-    --mumble-color-text-secondary: #4b5563;
-    --mumble-color-text-muted: #9ca3af;
-    --mumble-color-bg-body: #f3f4f6;
-    --mumble-color-bg-surface: #ffffff;
-    --mumble-color-bg-surface-alt: #f9fafb;
-    --mumble-color-border: #e5e7eb;
-    --mumble-color-shadow: rgba(0, 0, 0, 0.05);
-    --mumble-color-shadow-hover: rgba(0, 0, 0, 0.1);
-}
-
-/* Dark Theme Adaptation */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --mumble-color-text-main: #e5e7eb;
-        --mumble-color-text-secondary: #d1d5db;
-        --mumble-color-text-muted: #6b7280;
-        --mumble-color-bg-body: #111827;
-        --mumble-color-bg-surface: #1f2937;
-        --mumble-color-bg-surface-alt: #374151;
-        --mumble-color-border: #374151;
-        --mumble-color-shadow: rgba(0, 0, 0, 0.3);
-        --mumble-color-shadow-hover: rgba(0, 0, 0, 0.5);
-    }
-}
-
-[data-theme="dark"] {
-    --mumble-color-text-main: #e5e7eb;
-    --mumble-color-text-secondary: #d1d5db;
-    --mumble-color-text-muted: #6b7280;
-    --mumble-color-bg-body: #111827;
-    --mumble-color-bg-surface: #1f2937;
-    --mumble-color-bg-surface-alt: #374151;
-    --mumble-color-border: #374151;
-    --mumble-color-shadow: rgba(0, 0, 0, 0.3);
-    --mumble-color-shadow-hover: rgba(0, 0, 0, 0.5);
-}
-
-/* Mobile Spacing Optimization */
-@media (max-width: 768px) {
-    :root {
-        --mumble-spacing-md: 0.75rem;
-        --mumble-spacing-lg: 1rem;
-        --mumble-spacing-xl: 1.25rem;
-    }
+    /* Use Global Variables */
+    --mumble-color-primary: var(--color-rust);
+    --mumble-color-primary-hover: #a34e00;
+    --mumble-color-text-main: var(--color-text-main);
+    --mumble-color-text-secondary: var(--color-text-secondary);
+    --mumble-color-text-muted: var(--color-text-muted);
+    --mumble-color-bg-body: var(--color-bg-body);
+    --mumble-color-bg-surface: var(--color-bg-surface);
+    --mumble-color-bg-surface-alt: var(--color-bg-surface-alt);
+    --mumble-color-border: var(--color-border);
+    --mumble-color-shadow: 4px 4px 0 rgba(0,0,0,0.2);
 }
 
 /* ==========================================================================
@@ -107,31 +70,49 @@
 
 .mumble-card {
     background-color: var(--mumble-color-bg-surface);
-    border-radius: var(--mumble-radius-lg);
-    border: 1px solid var(--mumble-color-border);
+    border: 2px solid var(--mumble-color-border);
     padding: var(--mumble-spacing-lg);
-    box-shadow: 0 1px 2px var(--mumble-color-shadow);
+    box-shadow: var(--mumble-color-shadow);
     transition: transform var(--mumble-transition-fast), box-shadow var(--mumble-transition-fast);
     position: relative;
     overflow: hidden;
+    background-image: var(--noise-bg);
+    /* Cut corners */
+    clip-path: polygon(
+        0 0, 
+        100% 0, 
+        100% calc(100% - 20px), 
+        calc(100% - 20px) 100%, 
+        0 100%
+    );
 }
 
-@media (max-width: 768px) {
-    .mumble-card {
-        padding: var(--mumble-spacing-md);
-        border-radius: var(--mumble-radius-md);
-    }
+/* Decorative strip */
+.mumble-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background-image: var(--hazard-stripes);
+}
+
+@keyframes mumble-glitch {
+    0% { transform: translate(-2px, -2px); }
+    20% { transform: translate(-4px, 2px); filter: hue-rotate(90deg); }
+    40% { transform: translate(-2px, -2px); filter: none; }
+    60% { transform: translate(2px, -4px); filter: hue-rotate(-90deg); }
+    80% { transform: translate(-2px, 0px); }
+    100% { transform: translate(-2px, -2px); }
 }
 
 .mumble-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px var(--mumble-color-shadow-hover);
-    border-color: transparent;
-}
-
-.mumble-card--detail:hover {
-    transform: none;
-    box-shadow: 0 1px 2px var(--mumble-color-shadow);
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--mumble-color-primary);
+    border-color: var(--mumble-color-primary);
+    z-index: 1;
+    animation: mumble-glitch 0.4s cubic-bezier(.25, .46, .45, .94) both;
 }
 
 .mumble-card__header {
@@ -139,22 +120,17 @@
     align-items: center;
     gap: var(--mumble-spacing-md);
     margin-bottom: var(--mumble-spacing-md);
+    padding-left: var(--mumble-spacing-sm);
 }
 
 .mumble-card__avatar {
     width: 48px;
     height: 48px;
-    border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--mumble-color-bg-surface-alt);
+    border: 2px solid var(--mumble-color-border);
     background-color: var(--mumble-color-bg-surface-alt);
-}
-
-@media (max-width: 768px) {
-    .mumble-card__avatar {
-        width: 40px;
-        height: 40px;
-    }
+    clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);
+    filter: sepia(0.2);
 }
 
 .mumble-card__meta {
@@ -164,25 +140,30 @@
 }
 
 .mumble-card__author {
+    font-family: var(--font-stack-display);
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 1.1rem;
     color: var(--mumble-color-text-main);
     display: flex;
     align-items: center;
     gap: var(--mumble-spacing-sm);
+    text-transform: uppercase;
 }
 
 .mumble-card__role {
+    font-family: var(--font-stack-mono);
     font-size: 0.75rem;
-    padding: 0.1rem 0.5rem;
-    border-radius: 999px;
-    background-color: var(--mumble-color-bg-surface-alt);
-    color: var(--mumble-color-text-secondary);
-    font-weight: 500;
+    padding: 2px 6px;
+    background-color: var(--mumble-color-primary);
+    color: #fff;
+    font-weight: 700;
+    text-transform: uppercase;
+    border: 1px solid var(--mumble-color-border);
 }
 
 .mumble-card__time {
-    font-size: 0.85rem;
+    font-family: var(--font-stack-mono);
+    font-size: 0.8rem;
     color: var(--mumble-color-text-muted);
 }
 
@@ -193,6 +174,8 @@
     margin-bottom: var(--mumble-spacing-lg);
     position: relative;
     word-break: break-word;
+    border-left: 1px dashed var(--mumble-color-border);
+    padding-left: var(--mumble-spacing-md);
 }
 
 .mumble-card__content.is-collapsed {
@@ -205,11 +188,11 @@
 .mumble-card__content img {
     max-width: 100%;
     height: auto;
-    border-radius: var(--mumble-radius-md);
+    border: 2px solid var(--mumble-color-border);
     margin: var(--mumble-spacing-sm) 0;
-    box-shadow: 0 2px 4px var(--mumble-color-shadow);
     cursor: zoom-in;
     display: block;
+    filter: grayscale(0.2);
 }
 
 .mumble-card__content a {
@@ -236,10 +219,12 @@
     border: 1px solid var(--mumble-color-border);
     color: var(--mumble-color-text-secondary);
     padding: var(--mumble-spacing-sm) var(--mumble-spacing-xl);
-    border-radius: 99px;
+    font-family: var(--font-stack-display);
     font-size: 0.875rem;
     cursor: pointer;
     transition: all var(--mumble-transition-fast);
+    text-transform: uppercase;
+    font-weight: 700;
 }
 
 .mumble-card__read-more-btn:hover {
@@ -253,7 +238,7 @@
     align-items: center;
     gap: var(--mumble-spacing-lg);
     padding-top: var(--mumble-spacing-md);
-    border-top: 1px solid var(--mumble-color-bg-surface-alt);
+    border-top: 1px dashed var(--mumble-color-border);
 }
 
 .mumble-action {
@@ -264,32 +249,33 @@
     font-size: 0.9rem;
     cursor: pointer;
     background: transparent;
-    border: none;
-    padding: var(--mumble-spacing-xs) var(--mumble-spacing-sm);
-    border-radius: var(--mumble-radius-md);
+    border: 1px solid transparent;
+    padding: 4px 8px;
     transition: all var(--mumble-transition-fast);
-    font-family: inherit;
+    font-family: var(--font-stack-mono);
     text-decoration: none;
 }
 
 .mumble-action:hover {
-    background-color: var(--mumble-color-bg-surface-alt);
     color: var(--mumble-color-primary);
+    border-color: var(--mumble-color-primary);
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 .mumble-action--active {
-    color: var(--mumble-color-primary);
-    background-color: rgba(37, 99, 235, 0.1);
+    color: #fff;
+    background-color: var(--mumble-color-primary);
+    border-color: var(--mumble-color-primary);
 }
 
 /* ==========================================================================
-   Comments Section (Universal Adaption)
+   Comments Section
    ========================================================================== */
 
 .mumble-comments {
     margin-top: var(--mumble-spacing-lg);
     padding-top: var(--mumble-spacing-lg);
-    border-top: 1px dashed var(--mumble-color-border);
+    border-top: 2px solid var(--mumble-color-border);
     animation: mumbleFadeIn var(--mumble-transition-normal);
 }
 
@@ -298,8 +284,8 @@
 }
 
 @keyframes mumbleFadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity: 0; clip-path: inset(0 100% 0 0); }
+    to { opacity: 1; clip-path: inset(0 0 0 0); }
 }
 
 /* Header */
@@ -308,13 +294,18 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: var(--mumble-spacing-md);
+    background-color: var(--mumble-color-bg-surface-alt);
+    padding: 8px;
+    border: 1px solid var(--mumble-color-border);
 }
 
 .comment-section__title {
+    font-family: var(--font-stack-display);
     font-size: 1rem;
     font-weight: 700;
     margin: 0;
     color: var(--mumble-color-text-main);
+    text-transform: uppercase;
 }
 
 .comment-section__refresh-btn {
@@ -327,15 +318,30 @@
 
 .comment-section__refresh-btn:hover {
     color: var(--mumble-color-primary);
+    animation: spin 1s linear infinite;
 }
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
 
 /* Form */
 .comment-form {
     background-color: var(--mumble-color-bg-surface-alt);
     padding: var(--mumble-spacing-md);
-    border-radius: var(--mumble-radius-md);
     margin-bottom: var(--mumble-spacing-lg);
     border: 1px solid var(--mumble-color-border);
+    position: relative;
+}
+
+/* Corner marker */
+.comment-form::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    background-color: var(--mumble-color-primary);
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
 }
 
 .comment-form__header {
@@ -352,9 +358,11 @@
 }
 
 .comment-form__label {
-    font-size: 0.8rem;
+    font-family: var(--font-stack-mono);
+    font-size: 0.75rem;
     font-weight: 600;
     color: var(--mumble-color-text-secondary);
+    text-transform: uppercase;
 }
 
 .comment-form__input,
@@ -362,11 +370,10 @@
     width: 100%;
     padding: var(--mumble-spacing-sm) var(--mumble-spacing-md);
     border: 1px solid var(--mumble-color-border);
-    border-radius: var(--mumble-radius-sm);
     background-color: var(--mumble-color-bg-surface);
     color: var(--mumble-color-text-main);
-    font-family: inherit;
-    font-size: 0.95rem;
+    font-family: var(--font-stack-mono);
+    font-size: 0.9rem;
     transition: all var(--mumble-transition-fast);
     box-sizing: border-box;
 }
@@ -375,13 +382,14 @@
     min-height: 100px;
     resize: vertical;
     display: block;
+    font-family: var(--font-stack-base);
 }
 
 .comment-form__input:focus,
 .comment-form__editor:focus {
     outline: none;
     border-color: var(--mumble-color-primary);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
 .comment-form__footer {
@@ -399,9 +407,8 @@
 .comment-form__action-btn {
     color: var(--mumble-color-text-muted);
     background: none;
-    border: none;
-    padding: var(--mumble-spacing-xs);
-    border-radius: var(--mumble-radius-sm);
+    border: 1px solid transparent;
+    padding: 4px;
     cursor: pointer;
     transition: all var(--mumble-transition-fast);
     display: flex;
@@ -410,7 +417,7 @@
 
 .comment-form__action-btn:hover {
     color: var(--mumble-color-primary);
-    background-color: rgba(37, 99, 235, 0.1);
+    border-color: var(--mumble-color-primary);
 }
 
 .comment-form__submit-btn {
@@ -418,22 +425,22 @@
     color: #fff;
     border: none;
     padding: var(--mumble-spacing-sm) var(--mumble-spacing-lg);
-    border-radius: var(--mumble-radius-sm);
     cursor: pointer;
-    font-weight: 600;
+    font-family: var(--font-stack-display);
+    font-weight: 700;
+    text-transform: uppercase;
     display: flex;
     align-items: center;
     gap: var(--mumble-spacing-sm);
-    transition: background-color var(--mumble-transition-fast);
+    transition: all var(--mumble-transition-fast);
+    clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px);
 }
 
 .comment-form__submit-btn:hover {
-    background-color: var(--mumble-color-primary-hover);
-}
-
-.comment-form__submit-btn:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
+    background-color: var(--color-accent);
+    color: #000;
+    transform: translate(-1px, -1px);
+    box-shadow: 2px 2px 0 var(--color-text-main);
 }
 
 /* Comment List & Items */
@@ -446,7 +453,13 @@
 .comment-item {
     display: flex;
     gap: var(--mumble-spacing-md);
-    animation: mumbleFadeIn 0.5s ease;
+    padding: var(--mumble-spacing-sm);
+    border-left: 2px solid var(--mumble-color-border);
+    transition: border-color 0.2s;
+}
+
+.comment-item:hover {
+    border-left-color: var(--mumble-color-primary);
 }
 
 .comment-item__avatar {
@@ -458,18 +471,18 @@
 .comment-item__avatar img {
     width: 100%;
     height: 100%;
-    border-radius: 50%;
     object-fit: cover;
-    border: 1px solid var(--mumble-color-border);
+    clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);
+    filter: grayscale(0.5);
 }
 
 .comment-item__body {
     flex: 1;
     background-color: var(--mumble-color-bg-surface-alt);
     padding: var(--mumble-spacing-md);
-    border-radius: var(--mumble-radius-md);
-    border-top-left-radius: 2px;
-    min-width: 0; /* Text wrap fix */
+    border: 1px solid var(--mumble-color-border);
+    min-width: 0;
+    position: relative;
 }
 
 .comment-item__header {
@@ -478,6 +491,7 @@
     align-items: center;
     margin-bottom: var(--mumble-spacing-xs);
     font-size: 0.85rem;
+    font-family: var(--font-stack-mono);
 }
 
 .comment-item__date {
@@ -493,7 +507,7 @@
 
 .comment-item__content img {
     max-width: 100%;
-    border-radius: var(--mumble-radius-sm);
+    border: 1px solid var(--mumble-color-border);
     margin: var(--mumble-spacing-sm) 0;
 }
 
@@ -501,10 +515,12 @@
     margin-top: var(--mumble-spacing-sm);
     display: flex;
     gap: var(--mumble-spacing-md);
+    border-top: 1px dashed var(--mumble-color-border);
+    padding-top: 4px;
 }
 
 .comment-item__reply-btn {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--mumble-color-text-muted);
     background: none;
     border: none;
@@ -513,6 +529,8 @@
     display: flex;
     align-items: center;
     gap: 4px;
+    font-family: var(--font-stack-mono);
+    text-transform: uppercase;
 }
 
 .comment-item__reply-btn:hover {
@@ -523,7 +541,7 @@
 .comment-replies {
     margin-top: var(--mumble-spacing-md);
     padding-left: var(--mumble-spacing-md);
-    border-left: 2px solid var(--mumble-color-border);
+    border-left: 1px dashed var(--mumble-color-border);
     display: flex;
     flex-direction: column;
     gap: var(--mumble-spacing-md);
@@ -540,14 +558,17 @@
     border: 1px solid var(--mumble-color-border);
     color: var(--mumble-color-text-secondary);
     padding: var(--mumble-spacing-sm) var(--mumble-spacing-xl);
-    border-radius: 99px;
     cursor: pointer;
     transition: all var(--mumble-transition-fast);
+    font-family: var(--font-stack-mono);
+    text-transform: uppercase;
 }
 
 .comment-load-more__btn:hover {
     border-color: var(--mumble-color-primary);
     color: var(--mumble-color-primary);
+    box-shadow: 2px 2px 0 var(--mumble-color-primary);
+    transform: translate(-1px, -1px);
 }
 
 /* Empty State */
@@ -555,6 +576,9 @@
     text-align: center;
     padding: var(--mumble-spacing-xl);
     color: var(--mumble-color-text-muted);
+    font-family: var(--font-stack-mono);
+    border: 1px dashed var(--mumble-color-border);
+    background: var(--mumble-color-bg-surface-alt);
 }
 
 /* ==========================================================================
@@ -563,21 +587,33 @@
 
 .history-widget {
     background-color: var(--mumble-color-bg-surface);
-    border-radius: var(--mumble-radius-lg);
-    border: 1px solid var(--mumble-color-border);
+    border: 2px solid var(--mumble-color-border);
     padding: var(--mumble-spacing-lg);
     position: sticky;
     top: var(--mumble-spacing-lg);
+    background-image: var(--noise-bg);
 }
 
 .history-widget__title {
-    font-size: 1.1rem;
+    font-family: var(--font-stack-display);
+    font-size: 1.25rem;
     font-weight: 700;
     color: var(--mumble-color-text-main);
     margin-top: 0;
     margin-bottom: var(--mumble-spacing-md);
     padding-bottom: var(--mumble-spacing-sm);
-    border-bottom: 2px solid var(--mumble-color-bg-surface-alt);
+    border-bottom: 2px dashed var(--mumble-color-border);
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.history-widget__title::after {
+    content: '[ARCHIVE]';
+    font-size: 0.7rem;
+    font-family: var(--font-stack-mono);
+    color: var(--mumble-color-text-muted);
 }
 
 .history-widget__list {
@@ -588,7 +624,7 @@
 
 .history-item {
     padding-bottom: var(--mumble-spacing-md);
-    border-bottom: 1px dashed var(--mumble-color-border);
+    border-bottom: 1px solid var(--mumble-color-border);
     transition: transform var(--mumble-transition-fast);
 }
 
@@ -599,6 +635,8 @@
 
 .history-item:hover {
     transform: translateX(4px);
+    border-left: 2px solid var(--mumble-color-primary);
+    padding-left: 8px;
 }
 
 .history-item__content {
@@ -607,6 +645,7 @@
     margin-bottom: var(--mumble-spacing-xs);
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     line-height: 1.5;
@@ -617,7 +656,5 @@
     color: var(--mumble-color-text-muted);
     text-align: right;
     display: block;
-    font-style: italic;
+    font-family: var(--font-stack-mono);
 }
-
-

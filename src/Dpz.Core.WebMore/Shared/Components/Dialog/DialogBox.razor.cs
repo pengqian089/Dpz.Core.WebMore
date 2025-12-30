@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Dpz.Core.WebMore.Service;
+using Dpz.Core.WebMore.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
@@ -17,10 +17,15 @@ public partial class DialogBox
     private string _inputValue = "";
     private ElementReference _inputRef;
     private ElementReference _confirmBtnRef;
+    private ElementReference _dialogRef;
 
     protected override async Task OnInitializedAsync()
     {
         _inputValue = Model.DefaultValue;
+
+        // 注册关闭操作
+        Model.RequestCloseAction = () => Close(null);
+
         // Trigger animation
         await Task.Delay(10);
         _isVisible = true;
@@ -41,15 +46,22 @@ public partial class DialogBox
         }
     }
 
+    private void HandleOverlayClick()
+    {
+        if (Model.MaskToClose)
+        {
+            Close(null);
+        }
+    }
+
     private void HandleKeyDown(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
         {
-            Close(true);
-        }
-        else if (e.Key == "Escape")
-        {
-            Close(null);
+            if (Model.Type != DialogType.Component)
+            {
+                Close(true);
+            }
         }
     }
 
@@ -77,8 +89,5 @@ public partial class DialogBox
         await OnClose.InvokeAsync(Model);
     }
 
-    public void Dispose()
-    {
-        
-    }
+    public void Dispose() { }
 }

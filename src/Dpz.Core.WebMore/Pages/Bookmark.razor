@@ -10,6 +10,11 @@ else
 }
 
 <div class="bookmark">
+    <div class="bookmark__header">
+        <h1 class="bookmark__title" data-text="BOOKMARKS">BOOKMARKS</h1>
+        <div class="bookmark__decoration"></div>
+    </div>
+
     <div class="bookmark__search">
         <div class="bookmark__search-wrapper">
             <input type="search" class="bookmark__search-input" placeholder="搜索书签..."
@@ -62,16 +67,22 @@ else
             {
                 <div class="bookmark-card">
                     <a href="@item.Url" target="_blank" class="bookmark-card__link">
-                        @if (!string.IsNullOrEmpty(item.Image))
-                        {
-                            <img class="bookmark-card__preview lazy" data-src="@(item.Image + "!bookmark")" src="@Program.LibraryHost/loaders/puff.svg" alt="@item.Title" loading="lazy" />
-                        }
+                        <div class="bookmark-card__image-wrapper" style="@(string.IsNullOrEmpty(item.Image) ? "" : $"--card-img: url('{item.Image}!bookmark');")">
+                            @if (!string.IsNullOrEmpty(item.Image))
+                            {
+                                <img class="bookmark-card__preview lazy" data-src="@(item.Image + "!bookmark")" src="@Program.LibraryHost/loaders/puff.svg" alt="@item.Title" loading="lazy" />
+                            }
+                            else
+                            {
+                                <div class="bookmark-card__no-image">NO SIGNAL</div>
+                            }
+                        </div>
                         <div class="bookmark-card__content">
                             @if (!string.IsNullOrEmpty(item.Icon))
                             {
                                 <img class="bookmark-card__icon" src="@item.Icon" alt="icon" />
                             }
-                            <h3 class="bookmark-card__title">@item.Title</h3>
+                            <h3 class="bookmark-card__title" data-text="@item.Title">@item.Title</h3>
                         </div>
                     </a>
                     <div class="bookmark-card__footer">

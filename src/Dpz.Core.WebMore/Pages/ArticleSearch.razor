@@ -1,0 +1,152 @@
+﻿@page "/article/search"
+@using System.Net
+
+<PageTitle>@Keyword - 文章搜索 - 个人文章分享</PageTitle>
+<div class="search-page">
+    <div class="search-page__layout">
+        <main class="search-page__content">
+            <header class="search-header">
+                <div class="search-header__info">
+                    <h1 class="search-header__title">
+                        搜索结果
+                        @if (!string.IsNullOrEmpty(Keyword))
+                        {
+                            <span class="search-header__keyword">“@Keyword”</span>
+                        }
+                    </h1>
+                </div>
+                @if (!_loading && !string.IsNullOrEmpty(Keyword))
+                {
+                    <div class="search-header__meta">
+                        共找到 @_searchResult.Count 篇文章
+                    </div>
+                }
+            </header>
+
+            @if (_loading)
+            {
+                <div class="search-results">
+                    @for (int i = 0; i < 3; i++)
+                    {
+                        <div class="search-card-skeleton skeleton-wrapper">
+                            <div class="skeleton skeleton--block" style="height: 200px; margin-bottom: 1rem;"></div>
+                            <div class="skeleton skeleton--text skeleton--w-50"></div>
+                            <div class="skeleton skeleton--text skeleton--w-30"></div>
+                            <div class="skeleton skeleton--text skeleton--w-100" style="margin-top: 1rem;"></div>
+                            <div class="skeleton skeleton--text skeleton--w-80"></div>
+                        </div>
+                    }
+                </div>
+            }
+            else if (string.IsNullOrWhiteSpace(Keyword))
+            {
+                <div class="search-results search-results--empty">
+                    <i class="fa-regular fa-keyboard fa-3x"
+                       style="margin-bottom: 1rem; color: var(--color-text-muted);"></i>
+                    <p>请输入关键字开始搜索</p>
+                </div>
+            }
+            else if (_searchResult.Count == 0)
+            {
+                <div class="search-results search-results--empty">
+                    <i class="fa-regular fa-face-frown-open fa-3x"
+                       style="margin-bottom: 1rem; color: var(--color-text-muted);"></i>
+                    <p>没有找到与“@Keyword”相关的内容。</p>
+                    <p>尝试更换关键词，或者浏览下方的标签云。</p>
+                </div>
+            }
+            else
+            {
+                <div class="search-results">
+                    @foreach (var item in _searchResult)
+                    {
+                        <article class="search-card">
+                            @if (!string.IsNullOrEmpty(item.MainImage))
+                            {
+                                <div class="search-card__cover">
+                                    <a href="/article/read/@item.Id?text=@(WebUtility.UrlEncode(Keyword))"
+                                       aria-label="@item.Title">
+                                        @if (!item.MainImage.StartsWith(Program.UpyunHost ?? "", StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            <img src="@Program.LibraryHost/loaders/oval.svg"
+                                                 data-src="@item.MainImage"
+                                                 alt="@item.Title"
+                                                 class="lazy"
+                                                 loading="lazy"/>
+                                        }
+                                        else
+                                        {
+                                            <img src="@Program.LibraryHost/loaders/oval.svg"
+                                                 data-src="@(item.MainImage + "!article.list")"
+                                                 data-origin="@item.MainImage"
+                                                 alt="@item.Title"
+                                                 class="lazy"
+                                                 loading="lazy"/>
+                                        }
+                                    </a>
+                                </div>
+                            }
+
+                            <div class="search-card__content">
+                                <div class="search-card__header">
+                                    <div class="search-card__meta">
+                                        <span class="search-card__meta-item" title="发布时间">
+                                            <i class="fa-regular fa-calendar-alt"></i>
+                                            <time
+                                                datetime="@item.CreateTime.ToString("yyyy-MM-ddTHH:mm:ss")">@item.CreateTime.ToString("yyyy-MM-dd")</time>
+                                        </span>
+                                        <span class="search-card__meta-item" title="作者">
+                                            <i class="fa-regular fa-user"></i>
+                                            @item.Author.Name
+                                        </span>
+                                    </div>
+
+                                    <h2 class="search-card__title">
+                                        <a href="/article/read/@item.Id?text=@(WebUtility.UrlEncode(Keyword))"
+                                           title="@item.Title">
+                                            @((MarkupString)item.HighlightTitle())
+                                        </a>
+                                    </h2>
+                                </div>
+
+                                <div class="search-card__excerpt">
+                                    @{
+                                        var highlightedContent = item.HighlightContent();
+                                        var contentDisplay = string.IsNullOrWhiteSpace(highlightedContent)
+                                            ? item.Introduction
+                                            : highlightedContent.MarkdownToHtml(disableHtml: false);
+                                    }
+                                    @((MarkupString)contentDisplay)
+                                </div>
+
+                                <footer class="search-card__footer">
+                                    <div class="search-card__tags">
+                                        @foreach (var tag in item.Tags.Take(3))
+                                        {
+                                            <a href="/article/list/tag/@(Uri.EscapeDataString(tag))">
+                                                #@tag
+                                            </a>
+                                        }
+                                    </div>
+                                    <div class="search-card__stats">
+                                        <span class="search-card__meta-item" title="浏览量">
+                                            <i class="fa-regular fa-eye"></i> @item.ViewCount
+                                        </span>
+                                        <span class="search-card__meta-item" title="评论">
+                                            <i class="fa-regular fa-comment-dots"></i> @item.CommentCount
+                                        </span>
+                                    </div>
+                                </footer>
+                            </div>
+                        </article>
+                    }
+                </div>
+            }
+        </main>
+
+        <aside class="search-page__sidebar">
+            <SearchBox Keyword="@Keyword"/>
+            <TagCloud/>
+        </aside>
+    </div>
+</div>

@@ -1,51 +1,97 @@
-/* Search Page Container */
-.search-page {
-    padding: var(--spacing-lg) 0;
-    max-width: var(--container-width);
-    margin: 0 auto;
-    width: 100%;
+/* Search Page - Cyberpunk Wasteland Style (Refined) */
+
+:root {
+    --search-card-bg: var(--color-bg-surface);
+    --search-card-border: var(--color-border);
+    --search-highlight: var(--color-accent);
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        --search-card-bg: #ffffff;
+        --search-card-border: #e2e8f0;
+    }
 }
 
 .search-page__layout {
     display: grid;
-    grid-template-columns: 1fr 320px;
+    grid-template-columns: 1fr;
     gap: var(--spacing-xl);
-    align-items: start;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--spacing-md);
 }
 
-@media (max-width: 992px) {
+@media (min-width: 992px) {
     .search-page__layout {
-        grid-template-columns: 1fr;
+        grid-template-columns: 3fr 1fr;
     }
 }
 
-/* Search Header (Result Count etc.) */
+/* Header */
 .search-header {
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+    border-bottom: 2px solid var(--color-border);
     padding-bottom: var(--spacing-md);
-    border-bottom: 1px solid var(--color-border);
+    position: relative;
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.search-header::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    right: 0;
+    width: 30%;
+    height: 2px;
+    background: var(--color-accent);
+    box-shadow: 0 0 10px var(--color-accent);
 }
 
 .search-header__title {
-    font-size: 1.5rem;
+    font-family: var(--font-stack-display);
+    font-size: 2.5rem;
+    font-weight: 800;
     color: var(--color-text-main);
-    font-weight: 600;
+    text-transform: uppercase;
+    margin: 0;
+    line-height: 1;
 }
 
 .search-header__keyword {
-    color: var(--color-primary);
-    font-style: italic;
+    color: var(--color-accent);
+    text-shadow: 0 0 5px rgba(var(--color-accent-rgb), 0.5);
+    margin-left: 0.5rem;
+    position: relative;
+    display: inline-block;
+}
+
+.search-header__keyword::before {
+    content: '[';
+    margin-right: 5px;
+    color: var(--color-text-muted);
+}
+.search-header__keyword::after {
+    content: ']';
+    margin-left: 5px;
+    color: var(--color-text-muted);
 }
 
 .search-header__meta {
+    font-family: var(--font-stack-mono);
     color: var(--color-text-muted);
     font-size: 0.9rem;
+    background: var(--color-bg-surface-alt);
+    padding: 4px 12px;
+    border: 1px solid var(--color-border);
+    clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px);
 }
 
-/* Search Results Grid */
+/* Search Results */
 .search-results {
     display: flex;
     flex-direction: column;
@@ -54,179 +100,287 @@
 
 .search-results--empty {
     text-align: center;
-    padding: var(--spacing-xl);
-    background: var(--color-bg-surface);
-    border-radius: var(--radius-lg);
+    padding: 4rem 2rem;
+    background: var(--color-bg-surface-alt);
     border: 1px dashed var(--color-border);
     color: var(--color-text-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
 }
 
-/* Search Result Card */
+/* Search Card */
 .search-card {
-    background: var(--color-bg-surface);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    display: grid;
-    grid-template-columns: 240px 1fr;
-    gap: 0;
-    border: 1px solid var(--color-border);
-    transition: transform var(--transition-normal), box-shadow var(--transition-normal), border-color var(--transition-normal);
+    background: var(--search-card-bg);
+    border: 1px solid var(--search-card-border);
+    display: flex;
+    flex-direction: column; /* Mobile first */
     position: relative;
-    height: 200px; /* Fixed height for consistency */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    overflow: hidden;
+    /* Tech corners */
+    clip-path: polygon(
+        20px 0, 100% 0, 
+        100% calc(100% - 20px), calc(100% - 20px) 100%, 
+        0 100%, 0 20px
+    );
+}
+
+/* Desktop horizontal layout */
+@media (min-width: 768px) {
+    .search-card {
+        flex-direction: row;
+        height: 220px; /* Fixed height for consistent list */
+    }
+    
+    .search-card__cover {
+        width: 35%;
+        max-width: 300px;
+        height: 100% !important;
+        border-bottom: none !important;
+        border-right: 1px solid var(--color-border);
+        clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%); /* Slanted divider */
+    }
 }
 
 .search-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 30px -10px var(--color-shadow);
-    border-color: var(--color-primary);
-    z-index: 1;
+    transform: translateX(5px);
+    border-color: var(--color-rust);
+    box-shadow: -5px 5px 0 var(--color-rust);
+    z-index: 10;
 }
 
-@media (max-width: 768px) {
-    .search-card {
-        grid-template-columns: 1fr;
-        height: auto;
+/* Light mode shadow */
+@media (prefers-color-scheme: light) {
+    .search-card:hover {
+        box-shadow: -5px 5px 0 var(--color-rust);
     }
 }
 
 /* Card Cover */
 .search-card__cover {
-    position: relative;
+    height: 180px;
     overflow: hidden;
-    background-color: var(--color-bg-surface-alt);
-    height: 100%;
+    position: relative;
+    border-bottom: 1px solid var(--color-border);
+    background: #000;
 }
 
 .search-card__cover img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform var(--transition-normal);
+    transition: transform 0.5s ease;
 }
 
 .search-card:hover .search-card__cover img {
-    transform: scale(1.05);
+    transform: scale(1.1);
+}
+
+/* Glitch overlay on hover */
+.search-card__cover::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(0,0,0,0) 50%, rgba(var(--color-accent-rgb), 0.2) 50%), linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06));
+    background-size: 100% 2px, 3px 100%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+.search-card:hover .search-card__cover::after {
+    opacity: 1;
 }
 
 /* Card Content */
 .search-card__content {
-    padding: var(--spacing-lg);
+    padding: 1.25rem;
+    flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    min-width: 0; /* Fix flex child overflow */
+    position: relative;
 }
 
-/* Meta Info (Top) */
+/* Background grid pattern for content */
+.search-card__content::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: 
+        linear-gradient(rgba(128, 128, 128, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(128, 128, 128, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.search-card__header {
+    margin-bottom: 0.75rem;
+    position: relative;
+    z-index: 1;
+}
+
 .search-card__meta {
     display: flex;
-    gap: var(--spacing-md);
-    font-size: 0.85rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.75rem;
     color: var(--color-text-muted);
-    margin-bottom: var(--spacing-xs);
+    font-family: var(--font-stack-mono);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
 }
 
 .search-card__meta-item {
     display: flex;
     align-items: center;
-    gap: var(--spacing-xs);
+    gap: 0.4rem;
 }
 
-/* Title */
+.search-card__meta-item i {
+    color: var(--color-rust);
+}
+
 .search-card__title {
-    font-size: 1.25rem;
+    font-family: var(--font-stack-display);
+    font-size: 1.4rem;
+    margin: 0;
+    line-height: 1.2;
     font-weight: 700;
-    margin-bottom: var(--spacing-sm);
-    line-height: 1.4;
-    color: var(--color-text-main);
-    
-    /* Ensure single line */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .search-card__title a {
-    color: inherit;
+    color: var(--color-text-main);
     text-decoration: none;
-    background-image: linear-gradient(var(--color-primary), var(--color-primary));
+    transition: color 0.2s;
+    background-image: linear-gradient(var(--color-rust), var(--color-rust));
     background-size: 0% 2px;
-    background-position: 0% 100%;
+    background-position: left bottom;
     background-repeat: no-repeat;
-    transition: background-size var(--transition-normal);
+    transition: background-size 0.3s, color 0.3s;
 }
 
 .search-card:hover .search-card__title a {
+    color: var(--color-rust);
     background-size: 100% 2px;
-    color: var(--color-primary);
 }
 
 /* Excerpt */
 .search-card__excerpt {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: var(--color-text-secondary);
-    line-height: 1.6;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    flex: 1;
     overflow: hidden;
-    margin-bottom: var(--spacing-md);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    position: relative;
+    z-index: 1;
 }
 
-/* Highlighting */
-.search-card__excerpt mark,
-.search-card__title mark {
-    background-color: var(--color-mark-bg);
-    color: var(--color-mark-text);
+.search-card__excerpt pre {
+    display: none;
+}
+
+/* Highlight Mark Style - Cyberpunk */
+mark {
+    background: transparent;
+    color: var(--color-accent);
+    text-shadow: 0 0 5px var(--color-accent);
+    font-weight: bold;
     padding: 0 2px;
-    border-radius: 2px;
+    border-bottom: 1px solid var(--color-accent);
 }
 
-/* Footer (Tags & Stats) */
+@media (prefers-color-scheme: light) {
+    mark {
+        background: rgba(var(--color-accent-rgb), 0.2);
+        text-shadow: none;
+        color: #000;
+        border-bottom: none;
+    }
+}
+
+/* Footer */
 .search-card__footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px dashed var(--color-border);
+    position: relative;
+    z-index: 1;
     margin-top: auto;
-    border-top: 1px solid var(--color-bg-surface-alt);
-    padding-top: var(--spacing-sm);
 }
 
 .search-card__tags {
     display: flex;
+    gap: 0.5rem;
     flex-wrap: wrap;
-    gap: var(--spacing-xs);
 }
 
-.search-card__tag {
-    font-size: 0.8rem;
+.search-card__tags a {
+    font-size: 0.7rem;
+    font-family: var(--font-stack-mono);
     color: var(--color-text-muted);
     text-decoration: none;
-    padding: 2px 8px;
+    padding: 2px 6px;
+    border: 1px solid var(--color-border);
+    transition: all 0.2s;
     background: var(--color-bg-surface-alt);
-    border-radius: 12px;
-    transition: all var(--transition-fast);
 }
 
-.search-card__tag:hover {
-    background: var(--color-primary);
-    color: #fff;
+.search-card__tags a:hover {
+    color: var(--color-rust);
+    border-color: var(--color-rust);
+    box-shadow: 0 0 8px rgba(183, 65, 14, 0.2);
 }
 
 .search-card__stats {
     display: flex;
-    gap: var(--spacing-md);
-    font-size: 0.85rem;
+    gap: 1rem;
+    font-size: 0.75rem;
     color: var(--color-text-muted);
 }
 
-/* Skeleton / Loading State (Optional reuse) */
-.search-card--skeleton {
-    pointer-events: none;
+/* Skeleton Specifics */
+.search-card-skeleton {
+    padding: 1.5rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-surface);
+    /* Same clip-path as card */
+    clip-path: polygon(
+        20px 0, 100% 0, 
+        100% calc(100% - 20px), calc(100% - 20px) 100%, 
+        0 100%, 0 20px
+    );
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
-/* Sidebar Specifics if needed, though usually global */
-.search-page__sidebar .widget {
-    margin-bottom: var(--spacing-lg);
+@media (min-width: 768px) {
+    .search-card-skeleton {
+        flex-direction: row;
+        height: 220px;
+    }
+    
+    .search-card-skeleton__img {
+        width: 35%;
+        height: 100%;
+    }
+    
+    .search-card-skeleton__content {
+        width: 65%;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
 }
-

@@ -5,7 +5,7 @@
         <div class="friends-page__header">
             <h1 class="friends-page__title">
                 <i class="fa fa-address-book fa-fw"></i>
-                友情链接
+                <span data-text="友情链接">友情链接</span>
             </h1>
         </div>
 
@@ -50,7 +50,7 @@
                                 <img src="@item.Avatar" alt="@item.Name" loading="lazy"/>
                             </div>
                             <div class="friend-card__info">
-                                <div class="friend-card__name">@item.Name</div>
+                                <div class="friend-card__name" data-text="@item.Name">@item.Name</div>
                                 <div class="friend-card__desc">@item.Description</div>
                             </div>
                         </a>

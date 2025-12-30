@@ -2,13 +2,17 @@ export class MumbleObserver {
     constructor() {
         this.observer = null;
         this.dotNetRef = null;
-        this.observedIds = new Set();
         this.stateMap = new Map();
     }
 
     init(dotNetRef) {
         this.dotNetRef = dotNetRef;
         this.observer = new ResizeObserver(entries => {
+            // Skip if DOM processing is paused (e.g., dialog is open)
+            if (window.appDOMManager && window.appDOMManager.paused) {
+                return;
+            }
+
             for (const entry of entries) {
                 const target = entry.target;
                 const id = target.getAttribute('data-mumble-id');
@@ -21,11 +25,10 @@ export class MumbleObserver {
                 // Trigger if state changed or if it's the first time (undefined)
                 if (lastState !== needExpand) {
                     this.stateMap.set(id, needExpand);
-                    // Use try-catch to avoid unhandled promise rejections if component disposed
                     try {
                         this.dotNetRef.invokeMethodAsync('UpdateExpandState', id, needExpand);
                     } catch (e) {
-                        console.debug("Failed to invoke UpdateExpandState", e);
+                        // Silently ignore if component disposed
                     }
                 }
             }
@@ -37,7 +40,6 @@ export class MumbleObserver {
         
         element.setAttribute('data-mumble-id', id);
         this.observer.observe(element);
-        this.observedIds.add(id);
     }
 
     dispose() {
@@ -46,7 +48,6 @@ export class MumbleObserver {
             this.observer = null;
         }
         this.dotNetRef = null;
-        this.observedIds.clear();
         this.stateMap.clear();
     }
 }

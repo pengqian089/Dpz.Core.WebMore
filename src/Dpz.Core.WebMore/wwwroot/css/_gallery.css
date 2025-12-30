@@ -1,0 +1,27 @@
+/* Gallery 图片光标样式 */
+
+/* 等待加载中 */
+img.pswp-gallery-image.lazy.lazy-loading {
+    cursor: wait;
+}
+
+/* 可以点击放大 */
+img.pswp-gallery-image.lazy.lazy-loaded {
+    cursor: zoom-in;
+}
+
+/* 加载失败，禁止点击 */
+img.pswp-gallery-image.lazy.lazy-error {
+    cursor: not-allowed;
+}
+
+/* 非 LazyLoad 图片（已加载） */
+img.pswp-gallery-image:not(.lazy) {
+    cursor: zoom-in;
+}
+
+/* 非 LazyLoad 图片（未加载） */
+img.pswp-gallery-image.lazy:not(.lazy-loading):not(.lazy-loaded):not(.lazy-error) {
+    cursor: wait;
+}
+

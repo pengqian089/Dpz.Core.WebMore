@@ -3,8 +3,8 @@
 
 <div class="timeline-page">
     <div class="timeline-page__header">
-        <h1 class="timeline-page__title">时光轴</h1>
-        <p class="timeline-page__subtitle">记录点滴，见证成长</p>
+        <h1 class="timeline-page__title" data-text="时光轴">时光轴</h1>
+        <p class="timeline-page__subtitle" data-text="记录点滴，见证成长">记录点滴，见证成长</p>
     </div>
     
     <div class="timeline">
@@ -34,7 +34,7 @@
                     <div class="timeline__marker"></div>
                     <div class="timeline__content">
                         <div class="timeline__date">@item.Model.Date.ToString("yyyy-MM-dd")</div>
-                        <h2 class="timeline__title">@item.Model.Title</h2>
+                        <h2 class="timeline__title" data-text="@item.Model.Title">@item.Model.Title</h2>
                         @if (!string.IsNullOrEmpty(item.Model.Content))
                         {
                             <MarkdownPreview Markdown="@item.Model.Content" Class="timeline__body markdown-body" />

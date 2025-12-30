@@ -1,17 +1,26 @@
 :root {
-    /* Color Palette - Light Mode */
-    --color-primary: #2563eb;
-    --color-primary-hover: #1d4ed8;
-    --color-bg-body: #f8fafc;
-    --color-bg-surface: #ffffff;
-    --color-bg-surface-alt: #f1f5f9;
-    --color-text-main: #0f172a;
-    --color-text-secondary: #475569;
-    --color-text-muted: #94a3b8;
-    --color-mark-bg: #fef08a;
-    --color-mark-text: #854d0e;
-    --color-border: #e2e8f0;
-    --color-shadow: rgba(0, 0, 0, 0.05);
+    /* Cyberpunk Wasteland Palette - Light Mode (Scavenger / Desert Day) */
+    --color-primary: #3d342b; /* Dark Dust */
+    --color-primary-hover: #5e5044;
+    
+    --color-accent: #ffb700; /* Hazard Yellow (Worn) */
+    --color-accent-secondary: #00d9f7; /* Old Tech Blue (Faded) */
+    --color-accent-alert: #ff2a2a; /* Alarm Red */
+    --color-rust: #c25e00; /* Heavy Rust */
+    
+    --color-bg-body: #e6e2dd; /* Dust Storm White */
+    --color-bg-surface: #f0ebe6; /* Worn Plaster */
+    --color-bg-surface-alt: #dcd6ce; /* Dirty Metal */
+    
+    --color-text-main: #2b2626; /* Oil Black */
+    --color-text-secondary: #59524b; /* Grimy Grey */
+    --color-text-muted: #8c8279; /* Faded Text */
+    
+    --color-mark-bg: #ffb700;
+    --color-mark-text: #2b2626;
+    
+    --color-border: #8c8279; /* Rusted Metal Border */
+    --color-shadow: 4px 4px 0px rgba(43, 38, 38, 0.2);
     
     /* Spacing & Layout */
     --spacing-xs: 0.25rem;
@@ -20,20 +29,60 @@
     --spacing-lg: 1.5rem;
     --spacing-xl: 2rem;
     --container-width: 1200px;
-    --header-height: 64px;
-    --radius-sm: 0.25rem;
-    --radius-md: 0.5rem;
-    --radius-lg: 1rem;
+    --header-height: 70px;
+    
+    /* Shapes - Rough & Jagged */
+    --radius-sm: 0px;
+    --radius-md: 1px; /* Micro bevel */
+    --radius-lg: 0px;
+    
+    --clip-path-slant: polygon(0 0, 100% 0, 100% 90%, 95% 100%, 0 100%);
+    --clip-path-btn: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+    --clip-path-card: polygon(
+        0 0, 
+        100% 0, 
+        100% calc(100% - 20px), 
+        calc(100% - 20px) 100%, 
+        20px 100%,
+        0 100%
+    );
     
     /* Transitions */
-    --transition-fast: 150ms ease;
-    --transition-normal: 300ms ease;
+    --transition-fast: 0.1s cubic-bezier(0, 0, 0.2, 1);
+    --transition-normal: 0.2s cubic-bezier(0, 0, 0.2, 1);
 
     /* Status Colors */
-    --color-status-connected: #22c55e;
-    --color-status-connected-shadow: rgba(34, 197, 94, 0.4);
-    --color-status-disconnected: #94a3b8;
-    --color-status-error: #ef4444;
+    --color-status-connected: #00d9f7;
+    --color-status-connected-shadow: rgba(0, 217, 247, 0.4);
+    --color-status-disconnected: #8c8279;
+    --color-status-error: #ff2a2a;
+    
+    /* Message Status Colors - Intuitive Semantic Colors */
+    --color-msg-info: #0ea5e9;           /* Sky Blue - 信息蓝 */
+    --color-msg-success: #10b981;        /* Emerald Green - 成功绿 */
+    --color-msg-warning: #f59e0b;        /* Amber Orange - 警告橙 */
+    --color-msg-error: #ef4444;          /* Red - 错误红 */
+    
+    /* Message Status Colors with Alpha - for shadows/glows */
+    --color-msg-info-alpha: rgba(14, 165, 233, 0.2);
+    --color-msg-success-alpha: rgba(16, 185, 129, 0.2);
+    --color-msg-warning-alpha: rgba(245, 158, 11, 0.25);
+    --color-msg-error-alpha: rgba(239, 68, 68, 0.3);
+    
+    /* Fonts */
+    --font-stack-base: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    --font-stack-display: 'Rajdhani', 'Segoe UI', sans-serif; /* Tech feel */
+    --font-stack-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+    
+    /* Effects */
+    --noise-bg: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    --hazard-stripes: repeating-linear-gradient(
+        45deg,
+        var(--color-bg-surface-alt),
+        var(--color-bg-surface-alt) 10px,
+        var(--color-border) 10px,
+        var(--color-border) 20px
+    );
 }
 
 @media (max-width: 768px) {
@@ -46,18 +95,47 @@
 
 @media (prefers-color-scheme: dark) {
     :root {
-        /* Color Palette - Dark Mode */
-        --color-primary: #3b82f6;
-        --color-primary-hover: #60a5fa;
-        --color-bg-body: #0f172a;
-        --color-bg-surface: #1e293b;
-        --color-bg-surface-alt: #334155;
-        --color-text-main: #f1f5f9;
-        --color-text-secondary: #cbd5e1;
-        --color-text-muted: #64748b;
-        --color-mark-bg: rgba(234, 179, 8, 0.2);
-        --color-mark-text: #fde047;
-        --color-border: #334155;
-        --color-shadow: rgba(0, 0, 0, 0.3);
+        /* Cyberpunk Wasteland Palette - Dark Mode (Nomad Night) */
+        --color-primary: #ffb700; /* Hazard Yellow */
+        --color-primary-hover: #ffcc33;
+        
+        --color-accent: #00ffea; /* Neon Cyan */
+        --color-accent-secondary: #ff0055; /* Neon Pink/Red */
+        --color-rust: #d96c00; /* Glowing Rust */
+        
+        --color-bg-body: #0d0c0b; /* Oil Slick Black */
+        --color-bg-surface: #1a1816; /* Dark Metal */
+        --color-bg-surface-alt: #262320; /* Worn Tire */
+        
+        --color-text-main: #e6e2dd; /* Dirty White */
+        --color-text-secondary: #a69e96; /* Ash Grey */
+        --color-text-muted: #66605a; /* Deep Dust */
+        
+        --color-mark-bg: rgba(255, 183, 0, 0.2);
+        --color-mark-text: #ffb700;
+        
+        --color-border: #3d3833; /* Dark Rust Border */
+        --color-shadow: 4px 4px 0px #00ffea; /* Neon Shadow */
+        
+        /* Darker hazard stripes */
+        --hazard-stripes: repeating-linear-gradient(
+            45deg,
+            var(--color-bg-surface-alt),
+            var(--color-bg-surface-alt) 10px,
+            rgba(0,0,0,0.5) 10px,
+            rgba(0,0,0,0.5) 20px
+        );
+        
+        /* Message Status Colors - Keep same for consistency */
+        --color-msg-info: #0ea5e9;
+        --color-msg-success: #10b981;
+        --color-msg-warning: #f59e0b;
+        --color-msg-error: #ef4444;
+        
+        /* Enhanced glow in dark mode */
+        --color-msg-info-alpha: rgba(14, 165, 233, 0.25);
+        --color-msg-success-alpha: rgba(16, 185, 129, 0.25);
+        --color-msg-warning-alpha: rgba(245, 158, 11, 0.3);
+        --color-msg-error-alpha: rgba(239, 68, 68, 0.35);
     }
 }

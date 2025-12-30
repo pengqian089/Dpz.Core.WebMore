@@ -56,7 +56,7 @@ else
                         <i class="fa fa-tags text-muted mr-1"></i>
                         @foreach (var tag in _article.Tags)
                         {
-                            <a href="/article/list/tag/@tag" class="article__tag">@tag</a>
+                            <a href="/article/list/tag/@(Uri.EscapeDataString(tag))" class="article__tag">@tag</a>
                         }
                     </div>
                     <div class="article-copyright mt-2">

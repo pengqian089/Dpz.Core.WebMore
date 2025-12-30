@@ -5,7 +5,7 @@
 <div class="albums">
 
     <div class="albums__header">
-        <h1 class="albums__title"><i class="fa fa-camera-retro"></i> 精彩瞬间</h1>
+        <h1 class="albums__title" data-text="精彩瞬间"><i class="fa fa-camera-retro"></i> 精彩瞬间</h1>
         <p class="albums__subtitle">记录生活，分享感动</p>
         <div class="albums__stats">
             <span>共 @_totalItemCount 张照片</span>
@@ -50,7 +50,7 @@
                 var picture = _pictures[i];
                 <div class="albums__item">
                     <div class="albums__card" @onclick="() => OpenGallery(index)">
-                        <div class="albums__image-wrapper">
+                        <div class="albums__image-wrapper" style="--card-img: url('@(picture.AccessUrl)!albums')">
                             <img class="albums__image is-loaded"
                                  src="@(picture.AccessUrl)!albums"
                                  alt="@picture.Description"

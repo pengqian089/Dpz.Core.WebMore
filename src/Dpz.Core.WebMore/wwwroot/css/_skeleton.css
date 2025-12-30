@@ -1,66 +1,122 @@
-/* Skeleton Loading Styles */
+/* Skeleton Loading Styles - Cyberpunk Glitch Edition */
 
-/* Base Animation */
-@keyframes skeleton-loading {
+/* Base Animation - Digital Scan */
+@keyframes skeleton-scan {
     0% {
-        background-position: 100% 50%;
+        background-position: 200% 0;
     }
     100% {
-        background-position: 0 50%;
+        background-position: -200% 0;
     }
+}
+
+@keyframes skeleton-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
 }
 
 /* Block Component: .skeleton */
 .skeleton {
-    /* Using variables from existing design system */
-    --skeleton-start: var(--color-bg-surface-alt, #f1f5f9);
-    --skeleton-mid: var(--color-border, #e2e8f0);
-    --skeleton-end: var(--color-bg-surface-alt, #f1f5f9);
-
-    background: linear-gradient(90deg, 
-        var(--skeleton-start) 25%, 
-        var(--skeleton-mid) 37%, 
-        var(--skeleton-end) 63%
-    );
-    background-size: 400% 100%;
-    animation: skeleton-loading 1.4s ease infinite;
+    /* Cyberpunk Colors */
+    --skeleton-base: var(--color-bg-surface-alt, #1a1a1a);
+    --skeleton-highlight: rgba(0, 243, 255, 0.1); /* Cyan scanline */
     
-    /* Defaults */
-    border-radius: var(--radius-md, 4px);
-    cursor: default;
-    pointer-events: none;
-    user-select: none;
+    background: linear-gradient(
+        90deg, 
+        var(--skeleton-base) 0%, 
+        var(--skeleton-base) 40%, 
+        var(--skeleton-highlight) 50%, 
+        var(--skeleton-base) 60%, 
+        var(--skeleton-base) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-scan 2s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+    
+    /* Glitchy border */
+    position: relative;
+    border-left: 2px solid transparent;
 }
 
-/* Dark Mode Adaptation */
+/* Random glitch effect via pseudo element */
+.skeleton::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: 100%;
+    background-color: var(--color-accent, #fce300);
+    opacity: 0;
+    animation: glitch-bar 3s infinite;
+}
+
+@keyframes glitch-bar {
+    0%, 90% { opacity: 0; }
+    92% { opacity: 1; height: 100%; top: 0; }
+    94% { opacity: 0; }
+    96% { opacity: 1; height: 20%; top: 40%; }
+    100% { opacity: 0; }
+}
+
+/* Dark Mode Adaptation - Handled by vars mostly, but specific tweaks */
 @media (prefers-color-scheme: dark) {
     .skeleton {
-        --skeleton-start: var(--color-bg-surface-alt, #1e293b);
-        --skeleton-mid: var(--color-border, #334155);
-        --skeleton-end: var(--color-bg-surface-alt, #1e293b);
+        --skeleton-base: #0f0f0f;
+        --skeleton-highlight: rgba(255, 0, 60, 0.15); /* Pink scanline for dark mode */
+    }
+}
+
+/* Light Mode Adaptation */
+@media (prefers-color-scheme: light) {
+    .skeleton {
+        --skeleton-base: #e2e8f0;
+        --skeleton-highlight: rgba(0, 0, 0, 0.05);
+        background: linear-gradient(
+            90deg, 
+            var(--skeleton-base) 0%, 
+            var(--skeleton-base) 40%, 
+            #cbd5e1 50%, 
+            var(--skeleton-base) 60%, 
+            var(--skeleton-base) 100%
+        );
+        background-size: 200% 100%;
+    }
+    
+    .skeleton::after {
+        background-color: var(--color-accent, #fce300); 
+        opacity: 0.5;
     }
 }
 
 /* Modifiers for Shape */
 .skeleton--circle {
-    border-radius: 50%;
+    border-radius: 0; /* Cyberpunk likes sharp edges, or maybe Hexagon? */
+    clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
 }
 
 .skeleton--text {
     height: 1em;
     margin-bottom: 0.5em;
-    border-radius: var(--radius-sm, 2px);
+    /* Tech stripe */
+    background: repeating-linear-gradient(
+        90deg, 
+        var(--skeleton-base), 
+        var(--skeleton-base) 4px,
+        transparent 4px, 
+        transparent 8px
+    ), linear-gradient(90deg, var(--skeleton-base) 0%, var(--skeleton-highlight) 50%, var(--skeleton-base) 100%);
+    background-size: 100% 100%, 200% 100%;
 }
 
 .skeleton--title {
     height: 1.5em;
     margin-bottom: 1rem;
-    border-radius: var(--radius-sm, 2px);
+    width: 60%;
 }
 
 .skeleton--button {
     height: 2.5rem;
-    border-radius: var(--radius-md, 4px);
+    clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px);
 }
 
 .skeleton--block {
@@ -83,9 +139,195 @@
 .skeleton--w-90 { width: 90%; }
 .skeleton--w-100 { width: 100%; }
 
-/* Helper to hide content and show skeleton instead */
+/* Wrapper */
 .skeleton-wrapper {
     position: relative;
     overflow: hidden;
+    padding: var(--spacing-md);
+    border: 1px dashed var(--color-border);
+    margin-bottom: var(--spacing-md);
 }
 
+/* Specific Skeleton Structure for Comments */
+.skeleton-comment {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.skeleton-comment__avatar {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+}
+
+.skeleton-comment__body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Lazy Image Loading States */
+img.lazy {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* 加载中状态 - 完全隐藏 SVG 占位图 */
+img.lazy-loading {
+    opacity: 0 !important;
+}
+
+/* 图片容器在加载时显示骨架屏 */
+.article-card__cover:has(img.lazy-loading),
+.search-card__cover:has(img.lazy-loading),
+.bookmark-card__image-wrapper:has(img.lazy-loading) {
+    position: relative;
+    background: linear-gradient(
+        90deg, 
+        var(--skeleton-base, #1a1a1a) 0%, 
+        var(--skeleton-base, #1a1a1a) 40%, 
+        var(--skeleton-highlight, rgba(0, 243, 255, 0.1)) 50%, 
+        var(--skeleton-base, #1a1a1a) 60%, 
+        var(--skeleton-base, #1a1a1a) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-scan 2s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+    overflow: hidden;
+}
+
+/* Markdown 内容中的图片容器 */
+.markdown-body p:has(img.lazy-loading),
+.markdown-body figure:has(img.lazy-loading) {
+    position: relative;
+    background: linear-gradient(
+        90deg, 
+        var(--skeleton-base, #1a1a1a) 0%, 
+        var(--skeleton-base, #1a1a1a) 40%, 
+        var(--skeleton-highlight, rgba(0, 243, 255, 0.1)) 50%, 
+        var(--skeleton-base, #1a1a1a) 60%, 
+        var(--skeleton-base, #1a1a1a) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-scan 2s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+    overflow: hidden;
+    /* Markdown 图片需要最小高度防止容器塌陷 */
+    min-height: 200px;
+}
+
+
+/* 加载完成状态 - 显示图片并淡入 */
+img.lazy-loaded {
+    opacity: 1 !important;
+    width: auto;
+}
+
+/* 图片加载完成后，移除容器的骨架屏背景 */
+.article-card__cover:has(img.lazy-loaded),
+.search-card__cover:has(img.lazy-loaded),
+.bookmark-card__image-wrapper:has(img.lazy-loaded) {
+    background: none;
+    animation: none;
+}
+
+.markdown-body p:has(img.lazy-loaded),
+.markdown-body figure:has(img.lazy-loaded) {
+    background: none;
+    animation: none;
+    min-height: unset;
+}
+
+/* 加载错误状态 */
+img.lazy-error {
+    opacity: 1 !important;
+    /* 如果加载失败，显示一个占位背景 */
+}
+
+.article-card__cover:has(img.lazy-error),
+.search-card__cover:has(img.lazy-error),
+.bookmark-card__image-wrapper:has(img.lazy-error) {
+    background: var(--skeleton-base, #1a1a1a);
+    animation: none;
+}
+
+.markdown-body p:has(img.lazy-error),
+.markdown-body figure:has(img.lazy-error) {
+    background: var(--skeleton-base, #1a1a1a);
+    animation: none;
+    min-height: 200px;
+}
+
+/* Light Mode Adaptation for Lazy Images */
+@media (prefers-color-scheme: light) {
+    .article-card__cover:has(img.lazy-loading),
+    .search-card__cover:has(img.lazy-loading),
+    .bookmark-card__image-wrapper:has(img.lazy-loading) {
+        --skeleton-base: #e2e8f0;
+        --skeleton-highlight: rgba(0, 0, 0, 0.05);
+        background: linear-gradient(
+            90deg, 
+            var(--skeleton-base) 0%, 
+            var(--skeleton-base) 40%, 
+            #cbd5e1 50%, 
+            var(--skeleton-base) 60%, 
+            var(--skeleton-base) 100%
+        );
+        background-size: 200% 100%;
+    }
+    
+    .markdown-body p:has(img.lazy-loading),
+    .markdown-body figure:has(img.lazy-loading) {
+        --skeleton-base: #e2e8f0;
+        --skeleton-highlight: rgba(0, 0, 0, 0.05);
+        background: linear-gradient(
+            90deg, 
+            var(--skeleton-base) 0%, 
+            var(--skeleton-base) 40%, 
+            #cbd5e1 50%, 
+            var(--skeleton-base) 60%, 
+            var(--skeleton-base) 100%
+        );
+        background-size: 200% 100%;
+    }
+    
+    .article-card__cover:has(img.lazy-error),
+    .search-card__cover:has(img.lazy-error),
+    .bookmark-card__image-wrapper:has(img.lazy-error) {
+        background: #e2e8f0;
+    }
+    
+    .markdown-body p:has(img.lazy-error),
+    .markdown-body figure:has(img.lazy-error) {
+        background: #e2e8f0;
+    }
+}
+
+/* Dark Mode Adaptation for Lazy Images */
+@media (prefers-color-scheme: dark) {
+    .article-card__cover:has(img.lazy-loading),
+    .search-card__cover:has(img.lazy-loading),
+    .bookmark-card__image-wrapper:has(img.lazy-loading) {
+        --skeleton-base: #0f0f0f;
+        --skeleton-highlight: rgba(255, 0, 60, 0.15);
+    }
+    
+    .markdown-body p:has(img.lazy-loading),
+    .markdown-body figure:has(img.lazy-loading) {
+        --skeleton-base: #0f0f0f;
+        --skeleton-highlight: rgba(255, 0, 60, 0.15);
+    }
+    
+    .article-card__cover:has(img.lazy-error),
+    .search-card__cover:has(img.lazy-error),
+    .bookmark-card__image-wrapper:has(img.lazy-error) {
+        background: #0f0f0f;
+    }
+    
+    .markdown-body p:has(img.lazy-error),
+    .markdown-body figure:has(img.lazy-error) {
+        background: #0f0f0f;
+    }
+}

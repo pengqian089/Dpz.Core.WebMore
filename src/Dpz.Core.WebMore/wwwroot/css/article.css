@@ -1,31 +1,69 @@
+/* Article Styles - Wasteland Theme */
+
 .article-read {
     background-color: var(--color-bg-surface);
-    border-radius: var(--radius-lg);
     padding: var(--spacing-xl);
     border: 1px solid var(--color-border);
+    position: relative;
+    box-shadow: 10px 10px 0 rgba(0,0,0,0.1); /* Heavy drop shadow */
+    background-image: var(--noise-bg);
+}
+
+/* Corner decorations - Screws/Rivets */
+.article-read::before {
+    content: '+';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: var(--color-border);
+    font-family: var(--font-stack-mono);
+}
+
+.article-read::after {
+    content: '+';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: var(--color-border);
+    font-family: var(--font-stack-mono);
 }
 
 .article-header {
     text-align: center;
     margin-bottom: var(--spacing-xl);
     padding-bottom: var(--spacing-lg);
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 2px dashed var(--color-border);
 }
 
 .article-title {
-    font-size: 2rem;
+    font-family: var(--font-stack-display);
+    font-size: 2.5rem;
     font-weight: 800;
     color: var(--color-text-main);
     margin-bottom: var(--spacing-md);
-    line-height: 1.3;
+    line-height: 1.2;
+    text-transform: uppercase;
+    /* Stamp effect */
+    opacity: 0.9;
+    transform: rotate(-0.5deg);
 }
 
 .article-meta {
-    font-size: 0.9rem;
+    font-family: var(--font-stack-mono);
+    font-size: 0.85rem;
     color: var(--color-text-muted);
     display: flex;
     justify-content: center;
     gap: var(--spacing-lg);
+    text-transform: uppercase;
+    background: var(--color-bg-surface-alt);
+    padding: 0.5rem;
+    border: 1px solid var(--color-border);
+    display: inline-flex;
+}
+
+.article-meta i {
+    color: var(--color-rust);
 }
 
 /* Typography for Article Content (Markdown) */
@@ -38,10 +76,16 @@
 .article-content h1,
 .article-content h2,
 .article-content h3 {
+    font-family: var(--font-stack-display);
     margin-top: var(--spacing-xl);
     margin-bottom: var(--spacing-md);
     font-weight: 700;
     color: var(--color-text-main);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    position: relative;
+    padding-left: 1rem;
+    border-left: 5px solid var(--color-accent);
 }
 
 .article-content p {
@@ -49,134 +93,125 @@
 }
 
 .article-content img {
-    border-radius: var(--radius-md);
     margin: var(--spacing-lg) 0;
-    box-shadow: 0 4px 6px var(--color-shadow);
+    border: 2px solid var(--color-border);
+    filter: sepia(20%);
 }
 
 .article-intro {
     position: relative;
     margin: var(--spacing-xl) 0;
-    padding: 1.5rem 1.5rem 1.5rem 4.5rem; /* Left padding for the icon */
+    padding: 1.5rem;
     background-color: var(--color-bg-surface-alt);
-    border-radius: var(--radius-lg);
     color: var(--color-text-secondary);
-    font-size: 1.05rem;
-    line-height: 1.75;
-    /* Clean look without border */
-    border: none; 
+    font-family: var(--font-stack-mono);
+    font-size: 1rem;
+    line-height: 1.6;
+    border: 1px solid var(--color-border);
+    border-left: 4px solid var(--color-rust);
 }
 
 /* Icon decoration */
 .article-intro::before {
-    content: '\f10d'; /* fa-quote-left */
-    font-family: "Font Awesome 6 Free", "Font Awesome 5 Free", "FontAwesome";
-    font-weight: 900;
-    
-    position: absolute;
-    left: 1.25rem;
-    top: 1.25rem;
-    
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    
-    background-color: var(--color-bg-surface);
-    color: var(--color-primary);
-    border-radius: 50%;
-    font-size: 1rem;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    content: 'LOG_ENTRY >';
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--color-rust);
+    font-weight: bold;
+    font-size: 0.8rem;
 }
 
-/* Mobile adjustments */
-@media (max-width: 768px) {
-    .article-intro {
-        padding: 1.25rem 1.25rem 1.25rem 1.25rem;
-        margin: var(--spacing-lg) 0;
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-    
-    .article-intro::before {
-        position: static; /* Flow naturally on mobile */
-        width: 2rem;
-        height: 2rem;
-        font-size: 0.9rem;
-    }
-}
-
-.article-intro p {
-    margin-bottom: 0.75em;
-}
-
-.article-intro p:last-child {
-    margin-bottom: 0;
-}
-
-.article-intro p {
-    margin-bottom: 1em;
-}
-
-.article-intro p:last-child {
-    margin-bottom: 0;
-}
-
-/* Remove article-content blockquote to let markdown.css handle generic blockquotes */
-/* .article-content blockquote was here */
-
+/* Markdown Elements */
 .article-content pre {
-    background-color: #1e293b; /* Dark bg for code */
-    color: #e2e8f0;
-    padding: var(--spacing-md);
-    border-radius: var(--radius-md);
+    background-color: var(--color-bg-surface-alt); /* Adaptive background */
+    color: var(--color-text-main);
+    padding: 2.5rem 1rem 1rem 1rem;
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-accent);
     overflow-x: auto;
     margin: var(--spacing-lg) 0;
+    position: relative;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.2);
+    /* Grid Texture */
+    background-image: 
+        linear-gradient(rgba(128, 128, 128, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(128, 128, 128, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
+}
+
+.article-content pre::before {
+    content: 'TERMINAL_OUTPUT //';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 0.25rem 1rem;
+    color: var(--color-accent);
+    font-size: 0.75rem;
+    font-family: var(--font-stack-mono);
+    font-weight: bold;
+    letter-spacing: 0.1em;
 }
 
 .article-content code {
-    font-family: monospace;
-    background-color: var(--color-bg-surface-alt);
+    font-family: var(--font-stack-mono);
+    background-color: rgba(0,0,0,0.1);
+    color: var(--color-rust);
     padding: 0.2em 0.4em;
-    border-radius: var(--radius-sm);
     font-size: 0.9em;
+    border: 1px solid rgba(0,0,0,0.1);
 }
+
 .article-content pre code {
     background-color: transparent;
     padding: 0;
+    color: inherit;
+    border: none;
 }
 
-/* Article Card Modern Redesign */
+/* Article Card Modern Redesign - Wasteland */
 .article-card {
     background-color: var(--color-bg-surface);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    /* More subtle shadow */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--color-border);
     display: flex;
     flex-direction: column;
-    border: 1px solid transparent;
     position: relative;
     height: auto;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Jagged corner */
+    clip-path: var(--clip-path-card);
 }
 
-/* Dark mode adjustment */
-@media (prefers-color-scheme: dark) {
-    .article-card {
-        border-color: var(--color-border);
-        box-shadow: none;
-        background-color: var(--color-bg-surface);
-    }
+.article-card::after {
+    /* Worn tape/sticker effect */
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 20px;
+    width: 40px;
+    height: 4px;
+    background: rgba(0,0,0,0.1);
 }
 
-/* Hover Effect */
+/* Hover Effect - Glitch Card */
 .article-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-    border-color: var(--color-primary);
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 var(--color-rust);
+    border-color: var(--color-rust);
+    z-index: 10;
+    /* Random Glitch Animation on Hover */
+    animation: card-glitch 0.4s cubic-bezier(.25, .46, .45, .94) both;
+}
+
+/* Define keyframes here to ensure they are available */
+@keyframes card-glitch {
+    0% { transform: translate(-2px, -2px); }
+    20% { transform: translate(-4px, 2px); filter: hue-rotate(90deg); }
+    40% { transform: translate(-2px, -2px); filter: none; }
+    60% { transform: translate(2px, -4px); filter: hue-rotate(-90deg); }
+    80% { transform: translate(-2px, 0px); }
+    100% { transform: translate(-2px, -2px); }
 }
 
 /* Cover Wrapper */
@@ -186,26 +221,18 @@
     overflow: hidden;
     position: relative;
     cursor: pointer;
+    border-bottom: 1px solid var(--color-border);
 }
 
 .article-card__cover img {
-    /* Base styles for mobile (relative flow) */
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    height: 100% !important;
     object-fit: cover;
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-    display: block;
-}
-
-/* Lazy loading placeholder */
-.article-card__cover img.lazy:not(.loaded) {
-    object-fit: scale-down;
-    padding: 2rem;
-    background-color: var(--color-bg-surface-alt);
+    transition: transform 0.2s steps(5); 
 }
 
 .article-card:hover .article-card__cover img {
-    transform: scale(1.08);
+    transform: scale(1.02);
 }
 
 /* Content Area */
@@ -215,6 +242,7 @@
     flex-direction: column;
     flex: 1;
     position: relative;
+    background-image: var(--noise-bg);
 }
 
 /* Meta Data */
@@ -223,9 +251,11 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 1rem;
-    font-size: 0.85rem;
+    font-family: var(--font-stack-mono);
+    font-size: 0.75rem;
     color: var(--color-text-muted);
     margin-bottom: 0.75rem;
+    text-transform: uppercase;
 }
 
 .article-card__meta span {
@@ -235,21 +265,22 @@
 }
 
 .article-card__meta i {
-    font-size: 0.9em;
-    opacity: 0.7;
+    color: var(--color-rust);
 }
 
 /* Title */
 .article-card__title {
+    font-family: var(--font-stack-display);
     font-size: 1.4rem;
     font-weight: 700;
     margin: 0 0 0.75rem 0;
-    line-height: 1.4;
-    letter-spacing: -0.01em;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
     
-    /* Limit title lines to prevent overwhelming the card */
     display: -webkit-box;
     -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
     overflow: hidden;
 }
 
@@ -257,56 +288,27 @@
     color: var(--color-text-main);
     text-decoration: none;
     transition: color 0.2s ease;
-    background-image: linear-gradient(var(--color-primary), var(--color-primary));
-    background-size: 0 2px;
-    background-position: 0 100%;
-    background-repeat: no-repeat;
-    transition: background-size 0.3s, color 0.3s;
 }
 
 .article-card__title a:hover {
-    color: var(--color-primary);
-    background-size: 100% 2px;
+    color: var(--color-rust);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
 }
 
 /* Excerpt */
 .article-card__excerpt {
-    font-size: 1rem;
+    font-size: 0.95rem;
     color: var(--color-text-secondary);
-    line-height: 1.625;
+    line-height: 1.5;
     margin-bottom: 1.5rem;
+    font-family: var(--font-stack-base);
     
-    /* Multi-line truncation */
     display: -webkit-box;
     -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
     overflow: hidden;
-    text-overflow: ellipsis;
-    
-    /* Layout safety */
-    word-wrap: break-word;
-    word-break: break-word;
-    opacity: 0.9;
-}
-
-/* 
-   Reset internal HTML elements to display as inline text 
-   This prevents block-level elements (like <p>) from breaking the layout or truncation
-*/
-.article-card__excerpt > * {
-    display: inline;
-    margin: 0;
-    padding: 0;
-}
-
-/* Hide non-text elements in excerpt */
-.article-card__excerpt img,
-.article-card__excerpt video,
-.article-card__excerpt audio,
-.article-card__excerpt table,
-.article-card__excerpt pre,
-.article-card__excerpt code,
-.article-card__excerpt blockquote {
-    display: none;
 }
 
 /* Footer */
@@ -329,20 +331,21 @@
 .article__tag {
     display: inline-flex;
     align-items: center;
-    padding: 0.25rem 0.75rem;
+    padding: 2px 8px;
     background-color: var(--color-bg-surface-alt);
-    border-radius: 99px;
-    font-size: 0.75rem;
-    font-weight: 500;
+    border: 1px solid var(--color-border);
+    font-family: var(--font-stack-mono);
+    font-size: 0.7rem;
     color: var(--color-text-secondary);
     text-decoration: none;
+    text-transform: uppercase;
     transition: all 0.2s ease;
 }
 
 .article__tag:hover {
-    background-color: var(--color-primary);
+    background-color: var(--color-rust);
     color: #fff;
-    transform: translateY(-1px);
+    border-color: var(--color-rust);
 }
 
 /* Stats */
@@ -350,48 +353,33 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    font-size: 0.85rem;
+    font-family: var(--font-stack-mono);
+    font-size: 0.75rem;
     color: var(--color-text-muted);
-}
-
-.stat-item {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
 }
 
 /* Desktop Layout (Horizontal) */
 @media (min-width: 768px) {
     .article-card {
         flex-direction: row;
-        /* Let content dictate height */
         height: auto;
         min-height: 220px;
-        /* Align items stretch makes both children equal height */
         align-items: stretch;
     }
 
     .article-card__cover {
-        width: 38%;
+        width: 35%;
         flex-shrink: 0;
-        /* 
-           Using flex on the cover itself to manage the image 
-           without absolute positioning.
-        */
         display: flex;
         align-items: center;
         justify-content: center;
         overflow: hidden;
-        /* Important: no specific height set here, it inherits from parent stretch */
+        border-bottom: none;
+        border-right: 1px solid var(--color-border);
+        clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%); /* Slightly slanted divider */
     }
     
     .article-card__cover img {
-        /* 
-           Restore normal flow behavior.
-           Since the parent (.article-card__cover) is stretched by flexbox to match the content height,
-           height: 100% here will make the image fill that calculated height.
-           object-fit: cover ensures it crops rather than distorts.
-        */
         position: static; 
         width: 100%;
         height: 100%;
@@ -399,11 +387,8 @@
     }
 
     .article-card__content {
-        width: 62%;
-        padding: 1.5rem 1.75rem;
-        /* Flex column to distribute content vertically */
-        display: flex;
-        flex-direction: column;
+        width: 65%;
+        padding: 1.5rem;
     }
     
     .article-card__title {
@@ -415,75 +400,26 @@
 @media (max-width: 768px) {
     .article-read {
         padding: var(--spacing-md);
-        border-radius: var(--radius-md);
+        border: none;
+        border-bottom: 2px solid var(--color-border);
+        box-shadow: none;
     }
 
-    .article-header {
-        margin-bottom: var(--spacing-lg);
-        padding-bottom: var(--spacing-md);
+    .article-read::before,
+    .article-read::after {
+        display: none;
     }
-    
+
     .article-title {
-        font-size: 1.5rem;
-        margin-bottom: var(--spacing-sm);
-    }
-
-    .article-meta {
-        flex-direction: row;
-        flex-wrap: nowrap;
-        gap: var(--spacing-md);
-        font-size: 0.9rem;
-        justify-content: center;
-    }
-    
-    .article-meta__item {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        white-space: nowrap;
-        flex-shrink: 0;
-    }
-    
-    /* 当屏幕宽度不足以容纳所有元素时，隐藏回复数量（第4个元素） */
-    @media (max-width: 420px) {
-        .article-meta__item:nth-child(4) {
-            display: none;
-        }
-    }
-
-    .article-content {
-        font-size: 1rem;
-        line-height: 1.6;
-    }
-    
-    .article-content h1,
-    .article-content h2,
-    .article-content h3 {
-        margin-top: var(--spacing-lg);
-        margin-bottom: var(--spacing-sm);
-    }
-    
-    .article-intro {
-        margin: var(--spacing-lg) 0;
-        padding: var(--spacing-md);
-    }
-
-    .article-content pre {
-        margin: var(--spacing-md) 0;
-        padding: var(--spacing-sm);
+        font-size: 1.75rem;
     }
 
     .article-card__content {
         padding: 1.25rem;
     }
     
-    .article-card__title {
-        font-size: 1.25rem;
-    }
-    
-    .article-card__excerpt {
-        font-size: 0.95rem;
-        margin-bottom: 1rem;
-        line-height: 1.5;
+    .article-card {
+         clip-path: none; 
+         border-bottom: 4px solid var(--color-border);
     }
 }
