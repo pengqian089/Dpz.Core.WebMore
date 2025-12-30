@@ -1,0 +1,29 @@
+@inherits LayoutComponentBase
+@layout MainLayout
+
+<div class="tools-layout">
+    <aside class="tools-sidebar">
+        <div class="tools-sidebar__header">
+            <h3 class="tools-sidebar__title">工具箱</h3>
+            <span class="tools-sidebar__subtitle">TOOLS</span>
+        </div>
+        <nav class="tools-nav">
+            <NavLink href="tools" Match="NavLinkMatch.All" class="tools-nav__item">
+                <span class="tools-nav__icon"><i class="fa fa-vial"></i></span>
+                <span class="tools-nav__text">对话框测试</span>
+            </NavLink>
+            <NavLink href="tools/bson-to-json" class="tools-nav__item">
+                <span class="tools-nav__icon"><i class="fa fa-file-code"></i></span>
+                <span class="tools-nav__text">BSON 转 JSON</span>
+            </NavLink>
+            <NavLink href="tools/json-viewer" class="tools-nav__item">
+                <span class="tools-nav__icon"><i class="fa fa-code"></i></span>
+                <span class="tools-nav__text">JSON 查看器</span>
+            </NavLink>
+        </nav>
+    </aside>
+    <div class="tools-content">
+        @Body
+    </div>
+</div>
+

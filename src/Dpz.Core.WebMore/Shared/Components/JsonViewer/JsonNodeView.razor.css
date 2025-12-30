@@ -20,8 +20,10 @@
         background-color: rgba(0, 0, 0, 0.05);
     }
 
-:global(.dark) .json-node__line:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+@media (prefers-color-scheme: dark) {
+    .json-node__line:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+    }
 }
 
 .json-node__toggle {
@@ -52,8 +54,10 @@
     margin-right: 4px;
 }
 
-:global(.dark) .json-node__key {
-    color: #9cdcfe; /* VS Code Light Blueish for keys in dark mode style */
+@media (prefers-color-scheme: dark) {
+    .json-node__key {
+        color: #9cdcfe; /* VS Code Light Blueish for keys in dark mode style */
+    }
 }
 
 /* Specific styling for VS Code like appearance in Light Mode */
@@ -61,12 +65,6 @@
     .json-node__key {
         color: #0451a5; /* VS Code Blue */
     }
-}
-
-/* Override with user variables if needed, but sticking to requested style */
-/* Using project variables */
-.json-node__key {
-    color: var(--color-primary);
 }
 
 /* Values */
@@ -77,29 +75,42 @@
 .json-node__value--string {
     color: #a31515; /* VS Code Red */
 }
-:global(.dark) .json-node__value--string {
-    color: #ce9178; /* VS Code Orange-Red */
+@media (prefers-color-scheme: dark) {
+    .json-node__value--string {
+        color: #ce9178; /* VS Code Orange-Red */
+    }
 }
 
 .json-node__value--number {
     color: #098658; /* VS Code Green */
 }
-:global(.dark) .json-node__value--number {
-    color: #b5cea8; /* VS Code Light Green */
+@media (prefers-color-scheme: dark) {
+    .json-node__value--number {
+        color: #b5cea8; /* VS Code Light Green */
+    }
 }
 
 .json-node__value--true,
 .json-node__value--false {
     color: #0000ff; /* Blue */
 }
-:global(.dark) .json-node__value--true,
-:global(.dark) .json-node__value--false {
-    color: #569cd6; /* Blue */
+@media (prefers-color-scheme: dark) {
+    .json-node__value--true,
+    .json-node__value--false {
+        color: #569cd6; /* Blue */
+    }
 }
 
 .json-node__value--null {
     color: #0000ff;
     opacity: 0.7;
+}
+
+@media (prefers-color-scheme: dark) {
+    .json-node__value--null {
+        color: #569cd6;
+        opacity: 0.7;
+    }
 }
 
 .json-node__bracket {
