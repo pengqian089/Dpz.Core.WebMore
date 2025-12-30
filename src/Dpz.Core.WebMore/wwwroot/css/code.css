@@ -32,11 +32,11 @@
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     /* Outer Frame Effect */
     clip-path: polygon(
-        0 0, 
-        100% 0, 
-        100% calc(100% - 20px), 
-        calc(100% - 20px) 100%, 
-        0 100%
+            0 0,
+            100% 0,
+            100% calc(100% - 20px),
+            calc(100% - 20px) 100%,
+            0 100%
     );
 }
 
@@ -287,9 +287,8 @@ mark {
     background-color: var(--color-bg-body);
     min-width: 0;
     /* subtle grid bg */
-    background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
     background-size: 20px 20px;
 }
 
@@ -425,11 +424,10 @@ mark {
     padding: var(--spacing-lg);
     position: relative;
     /* Corner decorations */
-    background-image: 
-        linear-gradient(45deg, var(--color-border) 25%, transparent 25%), 
-        linear-gradient(-45deg, var(--color-border) 25%, transparent 25%), 
-        linear-gradient(45deg, transparent 75%, var(--color-border) 75%), 
-        linear-gradient(-45deg, transparent 75%, var(--color-border) 75%);
+    background-image: linear-gradient(45deg, var(--color-border) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--color-border) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--color-border) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--color-border) 75%);
     background-position: 0 0, 0 100%, 100% 0, 100% 100%;
     background-size: 10px 10px;
     background-repeat: no-repeat;
@@ -507,9 +505,16 @@ mark {
 }
 
 @keyframes skeleton-pulse {
-    0% { opacity: 0.5; }
-    50% { opacity: 1; background-color: var(--color-border); }
-    100% { opacity: 0.5; }
+    0% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+        background-color: var(--color-border);
+    }
+    100% {
+        opacity: 0.5;
+    }
 }
 
 /* Mobile Responsive */
@@ -533,11 +538,11 @@ mark {
         border-right: none;
         border-bottom: 2px solid var(--color-border);
     }
-    
+
     .code-explorer__resizer {
         display: none;
     }
-    
+
     .code-explorer__breadcrumbs {
         position: static; /* 移除sticky定位，防止与内容重叠或被内容遮挡 */
         width: 100%;
@@ -550,7 +555,7 @@ mark {
         padding-top: var(--spacing-md); /* 增加顶部间距，与面包屑拉开距离 */
     }
 
-    .readme-main, 
+    .readme-main,
     .code-preview-container {
         max-width: 100%;
         min-width: 0; /* 关键：允许Flex容器内的元素收缩 */
@@ -563,9 +568,13 @@ mark {
         overflow-x: auto !important; /* 强制启用滚动 */
         white-space: pre; /* 确保不换行 */
     }
-    
+
     .code-explorer__content .row .desc,
     .code-explorer__content .row .time {
         display: none;
     }
+}
+
+.line-highlight.line-highlight {
+    margin-top: 16px;
 }

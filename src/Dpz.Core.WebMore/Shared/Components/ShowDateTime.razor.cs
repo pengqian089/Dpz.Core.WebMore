@@ -12,9 +12,24 @@ public partial class ShowDateTime : ComponentBase
     [Parameter]
     public string? Class { get; set; }
 
+    private DateTime _lastDateTime;
+    private string? _lastClass;
+
+    protected override bool ShouldRender()
+    {
+        // 只有当参数改变时才重新渲染
+        if (_lastDateTime != DateTime || _lastClass != Class)
+        {
+            _lastDateTime = DateTime;
+            _lastClass = Class;
+            return true;
+        }
+        return false;
+    }
+
     private string UpdateTimeTag()
     {
-        var now = DateTime.Now;
+        var now = System.DateTime.Now;
         var diff = (now - DateTime).TotalSeconds;
 
         return diff switch

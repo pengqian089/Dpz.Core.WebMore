@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using AngleSharp;
 using Dpz.Core.WebMore.Helper;
@@ -21,6 +22,25 @@ public partial class MarkdownPreview : ComponentBase
 
     private string _htmlContent = "";
 
+    private static readonly MarkdownPipeline Pipeline = new MarkdownPipelineBuilder()
+        .UseAutoLinks()
+        .UsePipeTables()
+        .UseTaskLists()
+        .UseEmphasisExtras()
+        .UseFooters()
+        .UseCitations()
+        .UseMathematics()
+        .UseAutoIdentifiers()
+        .Build();
+
+    private static readonly ConcurrentDictionary<string, string> Cache = new();
+
+    protected override bool ShouldRender()
+    {
+        // 只有当 Markdown 内容改变时才重新渲染
+        return Cache.ContainsKey(Markdown);
+    }
+
     protected override async Task OnParametersSetAsync()
     {
         if (string.IsNullOrWhiteSpace(Markdown))
@@ -28,17 +48,23 @@ public partial class MarkdownPreview : ComponentBase
             _htmlContent = "";
             return;
         }
-        var pipeline = new MarkdownPipelineBuilder()
-            .UseAutoLinks()
-            .UsePipeTables()
-            .UseTaskLists()
-            .UseEmphasisExtras()
-            .UseFooters()
-            .UseCitations()
-            .UseMathematics()
-            .UseAutoIdentifiers()
-            .Build();
-        var html = Markdig.Markdown.ToHtml(Markdown, pipeline);
+        if (Cache.TryGetValue(Markdown, out var html))
+        {
+            _htmlContent = html;
+        }
+        else
+        {
+            var parseHtml = await ParseMarkdownAsync();
+            Cache.TryAdd(Markdown, parseHtml);
+            _htmlContent = parseHtml;
+        }
+
+        await base.OnParametersSetAsync();
+    }
+
+    private async Task<string> ParseMarkdownAsync()
+    {
+        var html = Markdig.Markdown.ToHtml(Markdown, Pipeline);
 
         var context = BrowsingContext.New(Configuration.Default);
         var document = await context.OpenAsync(y => y.Content(html));
@@ -66,7 +92,6 @@ public partial class MarkdownPreview : ComponentBase
             y.SetAttribute("class", "lazy");
             y.SetAttribute("src", $"{Program.LibraryHost}/loaders/oval.svg");
         });
-        _htmlContent = document.Body?.InnerHtml ?? "";
-        await base.OnParametersSetAsync();
+        return document.Body?.InnerHtml ?? "";
     }
 }

@@ -6,7 +6,9 @@
      * */
     constructor(element= null) {
         this.element = element || document;
+        this.index = 0;
         this.init();
+        
     }
     
     init() {
@@ -19,7 +21,13 @@
                     prismTheme.href = 'https://dpangzi.com/library/prism/prism-light.css';
                 }
             }
+            const that = this;
             this.element.querySelectorAll('pre code').forEach((block, index) => {
+                // Prevent infinite loop: check if already highlighted
+                if (block.getAttribute('data-highlighted') === 'true') {
+                    return;
+                }
+
                 const pre = block.parentNode;
                 if (!pre.id) {
                     pre.id = `code-block-article-${index}`;
@@ -39,7 +47,10 @@
                 if (!pre.hasAttribute('data-line')) {
                     pre.setAttribute('data-line', '');
                 }
+                that.index++;
+                console.log(that.index);
                 Prism.highlightElement(block);
+                block.setAttribute('data-highlighted', 'true');
             });
 
         }
