@@ -281,7 +281,8 @@
         top: 0;
         right: 0;
         width: 0;
-        height: 100vh; /* Restore 100vh to ensure full visibility */
+        height: 100vh; 
+        height: 100dvh;
         background-color: var(--color-bg-surface);
         background-image: var(--noise-bg);
         
