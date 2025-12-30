@@ -1,0 +1,249 @@
+.json-viewer-page {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - var(--header-height) - 40px); /* Adjust based on layout */
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    box-sizing: border-box;
+    max-width: var(--container-width);
+    margin: 0 auto;
+    width: 100%;
+}
+
+.json-viewer-page__header {
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--spacing-sm);
+}
+
+.json-viewer-page__header h1 {
+    margin: 0;
+    font-family: var(--font-stack-display);
+    color: var(--color-primary);
+    text-transform: uppercase;
+    font-size: 1.8rem;
+}
+
+.json-viewer-page__subtitle {
+    margin: var(--spacing-xs) 0 0;
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+}
+
+.json-viewer-page__controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    background: var(--color-bg-surface);
+    padding: var(--spacing-md);
+    border: 1px solid var(--color-border);
+    clip-path: var(--clip-path-card);
+}
+
+.json-viewer-page__input-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.json-viewer-page__textarea {
+    width: 100%;
+    min-height: 120px;
+    font-family: var(--font-stack-mono);
+    font-size: 0.9rem;
+    padding: var(--spacing-sm);
+    background: var(--color-bg-body);
+    color: var(--color-text-main);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    resize: vertical;
+}
+
+.json-viewer-page__textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+}
+
+.json-viewer-page__actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.json-viewer-page__file-input {
+    display: none;
+}
+
+.json-viewer-page__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-family: var(--font-stack-display);
+    font-weight: 600;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    clip-path: var(--clip-path-btn);
+    transition: all var(--transition-normal);
+    font-size: 0.9rem;
+    min-width: 100px;
+}
+
+.json-viewer-page__btn:active {
+    transform: translateY(2px);
+}
+
+.json-viewer-page__btn--primary {
+    background: var(--color-primary);
+    color: #fff;
+}
+.json-viewer-page__btn--primary:hover {
+    background: var(--color-primary-hover);
+}
+
+.json-viewer-page__btn--secondary {
+    background: var(--color-bg-surface-alt);
+    color: var(--color-text-main);
+    border: 1px solid var(--color-border);
+}
+.json-viewer-page__btn--secondary:hover {
+    background: var(--color-border);
+}
+
+.json-viewer-page__btn--danger {
+    background: var(--color-bg-surface-alt);
+    color: var(--color-accent-alert);
+    border: 1px solid var(--color-accent-alert);
+}
+.json-viewer-page__btn--danger:hover {
+    background: var(--color-accent-alert);
+    color: #fff;
+}
+
+.json-viewer-page__btn--sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+    min-width: auto;
+}
+
+.json-viewer-page__toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px dashed var(--color-border);
+}
+
+.json-viewer-page__search {
+    display: flex;
+    gap: var(--spacing-xs);
+    flex-grow: 1;
+    max-width: 400px;
+}
+
+.json-viewer-page__search input {
+    flex-grow: 1;
+    padding: 0.4rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-body);
+    color: var(--color-text-main);
+    font-family: var(--font-stack-base);
+}
+
+.json-viewer-page__btn--icon {
+    background: var(--color-bg-surface-alt);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-main);
+    cursor: pointer;
+    width: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.json-viewer-page__btn--icon:hover {
+    background: var(--color-accent);
+    color: var(--color-text-main);
+}
+
+.json-viewer-page__error {
+    background-color: var(--color-msg-error-alpha);
+    color: var(--color-msg-error);
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-msg-error);
+    border-radius: var(--radius-sm);
+}
+
+.json-viewer-page__content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-surface);
+    overflow: hidden;
+}
+
+.json-viewer-page__stats {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--color-bg-surface-alt);
+    border-bottom: 1px solid var(--color-border);
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.json-viewer-page__search-result {
+    color: var(--color-accent);
+    font-weight: bold;
+}
+
+.json-viewer-page__tree {
+    flex-grow: 1;
+    overflow: auto;
+    padding: var(--spacing-sm);
+    background: var(--color-bg-surface); /* Should be lighter/different than controls? */
+}
+
+:global(.dark) .json-viewer-page__tree {
+    background: #1e1e1e; /* VS Code dark bg-like */
+    border: 1px solid var(--color-border);
+}
+
+@media (prefers-color-scheme: light) {
+    .json-viewer-page__tree {
+        background: #ffffff;
+        border: 1px solid var(--color-border);
+    }
+}
+
+/* Force override if using variable theming, ensuring readability */
+.json-viewer-page__tree {
+     background: var(--color-bg-body);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .json-viewer-page {
+        height: auto;
+        padding: var(--spacing-sm);
+    }
+    
+    .json-viewer-page__actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .json-viewer-page__btn {
+        width: 100%;
+    }
+    
+    .json-viewer-page__tree {
+        min-height: 400px;
+    }
+}
+

@@ -1,0 +1,72 @@
+@using Dpz.Core.WebMore.Models.JsonViewer
+
+@if (Node != null && Node.IsVisible)
+{
+    <div class="json-node @(Node.IsMatch ? "json-node--match" : "")">
+        <div class="json-node__line">
+            @if (Node.Children.Any())
+            {
+                <span class="json-node__toggle @(Node.IsExpanded ? "json-node__toggle--expanded" : "")" @onclick="ToggleExpand">
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                        <path fill="currentColor" d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z" />
+                    </svg>
+                </span>
+            }
+            else
+            {
+                <span class="json-node__spacer"></span>
+            }
+
+            @if (!string.IsNullOrEmpty(Node.Key))
+            {
+                <span class="json-node__key">"@Node.Key": </span>
+            }
+
+            @if (Node.Children.Any())
+            {
+                @if (Node.IsExpanded)
+                {
+                    <span class="json-node__bracket">
+                        @(Node.ValueKind == System.Text.Json.JsonValueKind.Array ? "[" : "{")
+                    </span>
+                }
+                else
+                {
+                     <span class="json-node__collapsed-preview" @onclick="ToggleExpand">
+                        @(Node.ValueKind == System.Text.Json.JsonValueKind.Array ? "[ ... ]" : "{ ... }")
+                        <span class="json-node__count">
+                            @(Node.Children.Count) @(Node.Children.Count == 1 ? "item" : "items")
+                        </span>
+                    </span>
+                }
+            }
+            else
+            {
+                <span class="json-node__value json-node__value--@Node.ValueKind.ToString().ToLower()">
+                    @GetDisplayValue(Node)
+                </span>
+                @if(Node.ValueKind == System.Text.Json.JsonValueKind.String) 
+                {
+                     <!-- String quotes are handled in CSS or via logic, doing logic for simplicity -->
+                }
+            }
+        </div>
+
+        @if (Node.Children.Any() && Node.IsExpanded)
+        {
+            <div class="json-node__children">
+                @foreach (var child in Node.Children)
+                {
+                    <JsonNodeView Node="child" />
+                }
+            </div>
+            <div class="json-node__line">
+                <span class="json-node__spacer"></span>
+                <span class="json-node__bracket">
+                     @(Node.ValueKind == System.Text.Json.JsonValueKind.Array ? "]" : "}")
+                </span>
+            </div>
+        }
+    </div>
+}
+
