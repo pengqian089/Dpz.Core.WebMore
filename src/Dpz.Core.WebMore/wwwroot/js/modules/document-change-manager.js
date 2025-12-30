@@ -8,6 +8,7 @@ export class DOMChangeManager {
         this.handlers = [];
         this.pendingUpdate = false;
         this.paused = false; // 添加暂停标志
+        this.pendingMutations = []; // 存储待处理的 mutations
     }
     
     /**
@@ -55,6 +56,9 @@ export class DOMChangeManager {
                 return;
             }
             
+            // 将新的 mutations 加入队列
+            this.pendingMutations.push(...mutations);
+            
             // 使用防抖机制，避免频繁触发
             // MutationObserver 本身会批量处理变化，但我们再加一层保护
             if (this.pendingUpdate) return;
@@ -66,7 +70,12 @@ export class DOMChangeManager {
             requestAnimationFrame(() => {
                 // 再次检查是否已暂停
                 if (!this.paused) {
-                    this.handleMutations(mutations);
+                    this.handleMutations(this.pendingMutations);
+                    // 处理完后清空队列
+                    this.pendingMutations = [];
+                } else {
+                    // 如果暂停了，也要清空队列，避免堆积
+                    this.pendingMutations = [];
                 }
                 this.pendingUpdate = false;
             });
