@@ -269,7 +269,7 @@ JavaScript 文件位于 `wwwroot/js/` 目录下，Blazor 组件可通过 `IJSRun
 如有问题或建议，欢迎通过以下方式联系：
 
 - 网站: https://www.dpangzi.com
-- Issues: [GitHub Issues](https://github.com/your-repo/issues)
+- Issues: [GitHub Issues](https://github.com/pengqian089/Dpz.Core.WebMore/issues)
 
 ---
 
