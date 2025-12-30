@@ -74,10 +74,8 @@ public partial class CodeView(
     {
         var path = string.Join("/", _currentPath);
 
-        if (
-            !string.IsNullOrEmpty(Path)
-            && !string.Equals(path, Path, StringComparison.InvariantCulture)
-        )
+        // 检查路径是否发生变化（包括空路径的情况）
+        if (!string.Equals(path, Path ?? "", StringComparison.InvariantCulture))
         {
             if (!string.IsNullOrEmpty(_tempSearch))
             {
@@ -86,6 +84,24 @@ public partial class CodeView(
                 _treeData = await codeService.GetTreeAsync(null);
                 _currentFolderNode = _treeData;
                 _expandedNodes.Clear();
+            }
+
+            // 如果 Path 为空或null，表示导航到根目录
+            if (string.IsNullOrEmpty(Path))
+            {
+                _selectedNode = null;
+                _currentFolderNode = _treeData;
+                _activePath = [];
+                _currentPath = [];
+
+                // 恢复根目录的 README 内容
+                if (!string.IsNullOrEmpty(_homeReadmeContent))
+                {
+                    _treeData.ReadmeContent = _homeReadmeContent;
+                }
+
+                StateHasChanged();
+                return;
             }
 
             var paths = Path.Split('/', StringSplitOptions.RemoveEmptyEntries);
@@ -282,7 +298,15 @@ public partial class CodeView(
         _currentFolderNode = obj;
         _selectedNode = null;
 
-        if (!string.IsNullOrEmpty(obj.ReadmeContent))
+        // 如果是根目录，使用保存的根目录 README 内容
+        if (obj.CurrentPaths.Count == 0)
+        {
+            if (!string.IsNullOrEmpty(_homeReadmeContent))
+            {
+                _treeData.ReadmeContent = _homeReadmeContent;
+            }
+        }
+        else if (!string.IsNullOrEmpty(obj.ReadmeContent))
         {
             _treeData.ReadmeContent = obj.ReadmeContent;
         }
