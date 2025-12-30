@@ -1,5 +1,8 @@
 ﻿using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using AngleSharp;
 using Dpz.Core.WebMore.Helper;
@@ -21,6 +24,7 @@ public partial class MarkdownPreview : ComponentBase
     public string? Class { get; set; } = "markdown-body";
 
     private string _htmlContent = "";
+    private string _lastRenderedMarkdown = "";
 
     private static readonly MarkdownPipeline Pipeline = new MarkdownPipelineBuilder()
         .UseAutoLinks()
@@ -33,12 +37,17 @@ public partial class MarkdownPreview : ComponentBase
         .UseAutoIdentifiers()
         .Build();
 
-    private static readonly ConcurrentDictionary<string, string> Cache = new();
+    private static readonly Dictionary<string, string> Cache = new();
+    
+    /// <summary>
+    /// 限制缓存大小，防止内存泄漏
+    /// </summary>
+    private const int MaxCacheSize = 1 << 10;
 
     protected override bool ShouldRender()
     {
         // 只有当 Markdown 内容改变时才重新渲染
-        return Cache.ContainsKey(Markdown);
+        return _lastRenderedMarkdown != Markdown;
     }
 
     protected override async Task OnParametersSetAsync()
@@ -46,20 +55,49 @@ public partial class MarkdownPreview : ComponentBase
         if (string.IsNullOrWhiteSpace(Markdown))
         {
             _htmlContent = "";
+            _lastRenderedMarkdown = "";
             return;
         }
-        if (Cache.TryGetValue(Markdown, out var html))
+
+        // 内容没有改变，跳过处理
+        if (_lastRenderedMarkdown == Markdown)
+        {
+            return;
+        }
+
+        // 使用内容的哈希值作为缓存 key
+        var cacheKey = GetCacheKey(Markdown);
+
+        if (Cache.TryGetValue(cacheKey, out var html))
         {
             _htmlContent = html;
         }
         else
         {
             var parseHtml = await ParseMarkdownAsync();
-            Cache.TryAdd(Markdown, parseHtml);
+
+            // 如果缓存已满，清除最早的条目（简单的 FIFO 策略）
+            if (Cache.Count >= MaxCacheSize)
+            {
+                var firstKey = Cache.Keys.FirstOrDefault();
+                if (firstKey != null)
+                {
+                    Cache.Remove(firstKey);
+                }
+            }
+
+            Cache[cacheKey] = parseHtml;
             _htmlContent = parseHtml;
         }
 
+        _lastRenderedMarkdown = Markdown;
         await base.OnParametersSetAsync();
+    }
+
+    private static string GetCacheKey(string markdown)
+    {
+        var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(markdown));
+        return Convert.ToHexString(hashBytes);
     }
 
     private async Task<string> ParseMarkdownAsync()
