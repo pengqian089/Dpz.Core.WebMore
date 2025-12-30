@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Dpz.Core.WebMore.Models;
 using Dpz.Core.WebMore.Service;
-using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace Dpz.Core.WebMore.Shared.Components.Dialog;
@@ -32,7 +32,36 @@ public partial class DialogContainer(IAppDialogService dialogService, IJSRuntime
                 "import",
                 "./js/modules/dialog-interop.js"
             );
+
+            // 初始化全局按键监听
+            if (_dialogModule != null)
+            {
+                var dotNetHelper = DotNetObjectReference.Create(this);
+                await _dialogModule.InvokeVoidAsync("initKeyboardListener", dotNetHelper);
+            }
         }
+    }
+
+    [JSInvokable]
+    public async Task HandleGlobalEsc()
+    {
+        // 查找最后一个（最上层）可被 Esc 关闭的对话框
+        var dialog = _dialogs.LastOrDefault();
+
+        if (dialog != null && dialog.EscToClose)
+        {
+            if (dialog.RequestCloseAction != null)
+            {
+                dialog.RequestCloseAction.Invoke();
+            }
+            else
+            {
+                // 如果没有注册 Action (比如还没渲染完成)，直接移除
+                RemoveDialog(dialog);
+                dialog.TaskSource.TrySetResult(null);
+            }
+        }
+        await Task.CompletedTask;
     }
 
     private async void ShowDialog(DialogModel model)

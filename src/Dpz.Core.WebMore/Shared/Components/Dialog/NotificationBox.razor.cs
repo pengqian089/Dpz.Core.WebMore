@@ -1,6 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Dpz.Core.WebMore.Service;
+using Dpz.Core.WebMore.Models;
 using Microsoft.AspNetCore.Components;
 
 namespace Dpz.Core.WebMore.Shared.Components.Dialog;

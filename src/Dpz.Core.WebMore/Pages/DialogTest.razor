@@ -1,6 +1,8 @@
 @page "/test/dialog"
-@using NotificationType = Dpz.Core.WebMore.Service.NotificationType
+@using Dpz.Core.WebMore.Models
+@using NotificationType = Dpz.Core.WebMore.Models.NotificationType
 @inject IAppDialogService DialogService
+@implements IDisposable
 
 <PageTitle>对话框测试 - 个人文章分享</PageTitle>
 
@@ -80,6 +82,15 @@
             <button class="btn btn-warning" @onclick="TestNestedDialogs">嵌套对话框</button>
             <button class="btn btn-danger" @onclick="TestRapidFire">快速连续触发</button>
             <button class="btn btn-primary" @onclick="TestSpecialCharacters">特殊字符</button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>高级交互测试</h3>
+        <div class="btn-group">
+            <button class="btn btn-primary" @onclick="TestMaskToClose">点击遮罩关闭</button>
+            <button class="btn btn-warning" @onclick="TestNoEsc">禁用 Esc 关闭</button>
+            <button class="btn btn-danger" @onclick="TestStrictDialog">严格模式(必须点击按钮)</button>
         </div>
     </div>
 </div>
@@ -193,6 +204,37 @@
 @code {
     private string _lastResult = "-";
     private string? _componentResult;
+
+    protected override void OnInitialized()
+    {
+        DialogService.OnDialogShow += HandleDialogShow;
+    }
+
+    public void Dispose()
+    {
+        DialogService.OnDialogShow -= HandleDialogShow;
+    }
+
+    private void HandleDialogShow(DialogModel model)
+    {
+        // 通过拦截事件来修改特定测试用例的对话框属性
+        // 这样就不需要修改 IAppDialogService 接口来支持传递这些参数
+        switch (model.Title)
+        {
+            case "点击遮罩关闭测试":
+                model.MaskToClose = true;
+                model.EscToClose = true;
+                break;
+            case "禁用 Esc 测试":
+                model.EscToClose = false;
+                model.MaskToClose = false;
+                break;
+            case "严格模式测试":
+                model.EscToClose = false;
+                model.MaskToClose = false;
+                break;
+        }
+    }
 
     // ========== 基础对话框测试 ==========
     private async Task TestAlert()
@@ -727,6 +769,34 @@ SQL: '; DROP TABLE users; --
 
         await DialogService.AlertAsync(message, "特殊字符测试");
         _lastResult = "特殊字符测试完成";
+    }
+
+    // ========== 高级交互测试 ==========
+    private async Task TestMaskToClose()
+    {
+        await DialogService.AlertAsync(
+            "请尝试点击遮罩层（灰色背景）来关闭此对话框。\nMaskToClose = true",
+            "点击遮罩关闭测试"
+        );
+        _lastResult = "对话框已关闭";
+    }
+
+    private async Task TestNoEsc()
+    {
+        await DialogService.AlertAsync(
+            "请尝试按 Esc 键（应该无效）。\n只能点击确定按钮关闭。\nEscToClose = false",
+            "禁用 Esc 测试"
+        );
+        _lastResult = "对话框已关闭";
+    }
+
+    private async Task TestStrictDialog()
+    {
+        var result = await DialogService.ConfirmAsync(
+            "此对话框禁用了 Esc 和遮罩层关闭。\n强制用户必须进行显式操作。\nEscToClose = false\nMaskToClose = false",
+            "严格模式测试"
+        );
+        _lastResult = $"严格模式对话框结果: {(result ? "确定" : "取消")}";
     }
 
     // 辅助类

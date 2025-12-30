@@ -45,3 +45,15 @@ export function enableBodyScroll() {
     }
 }
 
+/**
+ * 初始化全局按键监听
+ * @param {DotNetObjectReference} dotNetHelper 
+ */
+export function initKeyboardListener(dotNetHelper) {
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            dotNetHelper.invokeMethodAsync('HandleGlobalEsc');
+        }
+    });
+}
+
