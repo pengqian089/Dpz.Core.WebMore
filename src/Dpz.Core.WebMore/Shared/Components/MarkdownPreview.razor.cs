@@ -38,17 +38,11 @@ public partial class MarkdownPreview : ComponentBase
         .Build();
 
     private static readonly Dictionary<string, string> Cache = new();
-    
+
     /// <summary>
     /// 限制缓存大小，防止内存泄漏
     /// </summary>
     private const int MaxCacheSize = 1 << 10;
-
-    protected override bool ShouldRender()
-    {
-        // 只有当 Markdown 内容改变时才重新渲染
-        return _lastRenderedMarkdown != Markdown;
-    }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -90,8 +84,14 @@ public partial class MarkdownPreview : ComponentBase
             _htmlContent = parseHtml;
         }
 
-        _lastRenderedMarkdown = Markdown;
         await base.OnParametersSetAsync();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        // 在渲染完成后更新，确保下次能正确判断是否需要重新渲染
+        _lastRenderedMarkdown = Markdown;
+        base.OnAfterRender(firstRender);
     }
 
     private static string GetCacheKey(string markdown)
