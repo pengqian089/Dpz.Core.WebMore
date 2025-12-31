@@ -5,6 +5,271 @@
     padding: 0;
 }
 
+/* ==========================================================================
+   Selection Styles - Cyberpunk Wasteland (Enhanced Neon FX)
+   ========================================================================== */
+
+/* Chromium & Safari - Light Mode */
+::selection {
+    background-color: var(--color-accent);
+    color: var(--color-bg-body);
+    text-shadow: 
+        /* Inner glow */
+        0 0 1px var(--color-bg-body),
+        /* Core neon */
+        0 0 3px var(--color-accent),
+        0 0 6px var(--color-accent),
+        /* Outer spread */
+        0 0 12px var(--color-accent-secondary),
+        /* Chromatic aberration - Glitch effect */
+        2px 0 0 rgba(255, 0, 85, 0.4),
+        -2px 0 0 rgba(0, 217, 247, 0.4);
+    -webkit-background-clip: initial;
+    background-clip: initial;
+}
+
+/* Firefox - Light Mode */
+::-moz-selection {
+    background-color: var(--color-accent);
+    color: var(--color-bg-body);
+    text-shadow: 
+        0 0 1px var(--color-bg-body),
+        0 0 3px var(--color-accent),
+        0 0 6px var(--color-accent),
+        0 0 12px var(--color-accent-secondary),
+        2px 0 0 rgba(255, 0, 85, 0.4),
+        -2px 0 0 rgba(0, 217, 247, 0.4);
+}
+
+/* Selection on images & media */
+img::selection,
+video::selection,
+svg::selection {
+    background-color: var(--color-accent-secondary);
+}
+
+img::-moz-selection,
+video::-moz-selection,
+svg::-moz-selection {
+    background-color: var(--color-accent-secondary);
+}
+
+/* Selection in code blocks - Terminal/Matrix style */
+code::selection,
+pre::selection,
+.code-block::selection {
+    background-color: rgba(0, 255, 0, 0.25);
+    color: #00ff00;
+    text-shadow: 
+        0 0 2px #00ff00,
+        0 0 5px #00ff00,
+        0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+code::-moz-selection,
+pre::-moz-selection,
+.code-block::-moz-selection {
+    background-color: rgba(0, 255, 0, 0.25);
+    color: #00ff00;
+    text-shadow: 
+        0 0 2px #00ff00,
+        0 0 5px #00ff00,
+        0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+/* Selection in links - Alert/Warning style */
+a::selection {
+    background-color: var(--color-accent-alert);
+    color: #fff;
+    text-shadow: 
+        0 0 2px #fff,
+        0 0 4px var(--color-accent-alert),
+        0 0 8px var(--color-accent-alert),
+        0 0 15px var(--color-accent-alert),
+        /* Pulsing danger effect */
+        0 0 25px rgba(255, 42, 42, 0.6);
+}
+
+a::-moz-selection {
+    background-color: var(--color-accent-alert);
+    color: #fff;
+    text-shadow: 
+        0 0 2px #fff,
+        0 0 4px var(--color-accent-alert),
+        0 0 8px var(--color-accent-alert),
+        0 0 15px var(--color-accent-alert),
+        0 0 25px rgba(255, 42, 42, 0.6);
+}
+
+/* Headings selection - Extra dramatic */
+h1::selection, h2::selection, h3::selection,
+h4::selection, h5::selection, h6::selection {
+    background-color: transparent;
+    color: var(--color-accent);
+    text-shadow: 
+        0 0 5px var(--color-accent),
+        0 0 10px var(--color-accent),
+        0 0 20px var(--color-accent),
+        0 0 40px var(--color-accent-secondary),
+        /* Heavy chromatic aberration */
+        3px 0 0 rgba(255, 0, 85, 0.7),
+        -3px 0 0 rgba(0, 217, 247, 0.7),
+        0 3px 0 rgba(255, 183, 0, 0.5);
+}
+
+h1::-moz-selection, h2::-moz-selection, h3::-moz-selection,
+h4::-moz-selection, h5::-moz-selection, h6::-moz-selection {
+    background-color: transparent;
+    color: var(--color-accent);
+    text-shadow: 
+        0 0 5px var(--color-accent),
+        0 0 10px var(--color-accent),
+        0 0 20px var(--color-accent),
+        0 0 40px var(--color-accent-secondary),
+        3px 0 0 rgba(255, 0, 85, 0.7),
+        -3px 0 0 rgba(0, 217, 247, 0.7),
+        0 3px 0 rgba(255, 183, 0, 0.5);
+}
+
+/* ==========================================================================
+   Dark Mode - MAXIMUM NEON OVERDRIVE
+   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+    /* Main selection - Intense cyan neon */
+    ::selection {
+        background-color: rgba(0, 255, 234, 0.3);
+        color: #fff;
+        text-shadow: 
+            /* Core white */
+            0 0 2px #fff,
+            /* Primary neon cyan */
+            0 0 5px var(--color-accent),
+            0 0 10px var(--color-accent),
+            0 0 20px var(--color-accent),
+            0 0 35px var(--color-accent),
+            /* Secondary magenta bloom */
+            0 0 50px var(--color-accent-secondary),
+            /* RGB split / Chromatic aberration - Glitch */
+            3px 0 0 rgba(255, 0, 85, 0.8),
+            -3px 0 0 rgba(0, 255, 234, 0.8),
+            0 2px 0 rgba(255, 183, 0, 0.4);
+    }
+    
+    ::-moz-selection {
+        background-color: rgba(0, 255, 234, 0.3);
+        color: #fff;
+        text-shadow: 
+            0 0 2px #fff,
+            0 0 5px var(--color-accent),
+            0 0 10px var(--color-accent),
+            0 0 20px var(--color-accent),
+            0 0 35px var(--color-accent),
+            0 0 50px var(--color-accent-secondary),
+            3px 0 0 rgba(255, 0, 85, 0.8),
+            -3px 0 0 rgba(0, 255, 234, 0.8),
+            0 2px 0 rgba(255, 183, 0, 0.4);
+    }
+    
+    /* Links - Hot pink/magenta neon */
+    a::selection {
+        background-color: rgba(255, 0, 85, 0.35);
+        color: #fff;
+        text-shadow: 
+            0 0 2px #fff,
+            0 0 5px var(--color-accent-secondary),
+            0 0 10px var(--color-accent-secondary),
+            0 0 20px var(--color-accent-secondary),
+            0 0 40px var(--color-accent-secondary),
+            /* Inverted chromatic */
+            3px 0 0 rgba(0, 255, 234, 0.7),
+            -3px 0 0 rgba(255, 183, 0, 0.7);
+    }
+    
+    a::-moz-selection {
+        background-color: rgba(255, 0, 85, 0.35);
+        color: #fff;
+        text-shadow: 
+            0 0 2px #fff,
+            0 0 5px var(--color-accent-secondary),
+            0 0 10px var(--color-accent-secondary),
+            0 0 20px var(--color-accent-secondary),
+            0 0 40px var(--color-accent-secondary),
+            3px 0 0 rgba(0, 255, 234, 0.7),
+            -3px 0 0 rgba(255, 183, 0, 0.7);
+    }
+    
+    /* Code - Matrix green overdrive */
+    code::selection,
+    pre::selection,
+    .code-block::selection {
+        background-color: rgba(0, 255, 0, 0.15);
+        color: #00ff00;
+        text-shadow: 
+            0 0 2px #00ff00,
+            0 0 5px #00ff00,
+            0 0 10px #00ff00,
+            0 0 20px #00ff00,
+            0 0 35px rgba(0, 255, 0, 0.5),
+            /* Scanline effect simulation */
+            0 1px 0 rgba(0, 0, 0, 0.8);
+    }
+    
+    code::-moz-selection,
+    pre::-moz-selection,
+    .code-block::-moz-selection {
+        background-color: rgba(0, 255, 0, 0.15);
+        color: #00ff00;
+        text-shadow: 
+            0 0 2px #00ff00,
+            0 0 5px #00ff00,
+            0 0 10px #00ff00,
+            0 0 20px #00ff00,
+            0 0 35px rgba(0, 255, 0, 0.5),
+            0 1px 0 rgba(0, 0, 0, 0.8);
+    }
+    
+    /* Headings - Ultimate neon explosion */
+    h1::selection, h2::selection, h3::selection,
+    h4::selection, h5::selection, h6::selection {
+        background-color: transparent;
+        color: #fff;
+        text-shadow: 
+            /* White hot core */
+            0 0 3px #fff,
+            0 0 6px #fff,
+            /* Primary cyan neon */
+            0 0 10px var(--color-accent),
+            0 0 20px var(--color-accent),
+            0 0 40px var(--color-accent),
+            /* Secondary magenta bloom */
+            0 0 60px var(--color-accent-secondary),
+            0 0 80px var(--color-accent-secondary),
+            /* Maximum chromatic aberration */
+            4px 0 0 rgba(255, 0, 85, 0.9),
+            -4px 0 0 rgba(0, 255, 234, 0.9),
+            0 4px 0 rgba(255, 183, 0, 0.6),
+            0 -2px 0 rgba(138, 43, 226, 0.5);
+    }
+    
+    h1::-moz-selection, h2::-moz-selection, h3::-moz-selection,
+    h4::-moz-selection, h5::-moz-selection, h6::-moz-selection {
+        background-color: transparent;
+        color: #fff;
+        text-shadow: 
+            0 0 3px #fff,
+            0 0 6px #fff,
+            0 0 10px var(--color-accent),
+            0 0 20px var(--color-accent),
+            0 0 40px var(--color-accent),
+            0 0 60px var(--color-accent-secondary),
+            0 0 80px var(--color-accent-secondary),
+            4px 0 0 rgba(255, 0, 85, 0.9),
+            -4px 0 0 rgba(0, 255, 234, 0.9),
+            0 4px 0 rgba(255, 183, 0, 0.6),
+            0 -2px 0 rgba(138, 43, 226, 0.5);
+    }
+}
+
 body {
     font-family: var(--font-stack-base);
     background-color: var(--color-bg-body);
