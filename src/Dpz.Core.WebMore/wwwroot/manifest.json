@@ -1,0 +1,30 @@
+{
+  "name": "Dpz.Core.More - 保持热爱，共赴山海 - 叫我阿胖",
+  "short_name": "Dpz.Core.More",
+  "description": "个人文章分享、代码笔记、技术博客",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#e6e2dd",
+  "theme_color": "#ffb700",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ]
+}

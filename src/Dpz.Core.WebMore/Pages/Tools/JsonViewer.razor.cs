@@ -17,21 +17,32 @@ public partial class JsonViewer : ComponentBase
     private string _searchText = "";
     private string _searchResult = "";
     private int _totalNodes;
+    private bool _isProcessing;
 
-    private void ParseJson()
+    private const int FileMaxLimit = 1024 * 1024 * 20;
+
+    private async Task ParseJsonAsync()
     {
         _errorMessage = "";
         _rootNode = null;
         _totalNodes = 0;
         _searchResult = "";
+        _isProcessing = true;
+        // 立即更新 UI，显示加载状态
+        StateHasChanged();
 
         if (string.IsNullOrWhiteSpace(_jsonInput))
         {
+            _isProcessing = false;
+            StateHasChanged();
             return;
         }
 
         try
         {
+            // 让出控制权，确保 UI 有机会更新显示加载动画
+            await Task.Yield();
+
             var options = new JsonDocumentOptions
             {
                 AllowTrailingCommas = true,
@@ -39,7 +50,12 @@ public partial class JsonViewer : ComponentBase
             };
 
             using var document = JsonDocument.Parse(_jsonInput, options);
+
+            // 对于大文件，分批处理以避免长时间阻塞
+            await Task.Yield();
             _rootNode = BuildTree(document.RootElement, null, "root");
+
+            await Task.Yield();
             CountNodes(_rootNode);
         }
         catch (JsonException ex)
@@ -50,29 +66,46 @@ public partial class JsonViewer : ComponentBase
         {
             _errorMessage = $"Error: {ex.Message}";
         }
+        finally
+        {
+            _isProcessing = false;
+            StateHasChanged(); // 更新 UI，隐藏加载状态
+        }
     }
 
     private async Task LoadFile(InputFileChangeEventArgs e)
     {
         _errorMessage = "";
+        _isProcessing = true;
+        // 立即更新 UI，显示加载状态
+        StateHasChanged();
+
         try
         {
             var file = e.File;
-            // 5MB limit
-            if (file.Size > 1024 * 1024 * 5)
+            if (file.Size > FileMaxLimit)
             {
-                _errorMessage = "File is too large (max 5MB).";
+                _errorMessage = "文件超过最大限制（20MB）";
+                _isProcessing = false;
+                StateHasChanged();
                 return;
             }
 
-            await using var stream = file.OpenReadStream(1024 * 1024 * 5);
+            // 让出控制权，确保 UI 有机会更新
+            await Task.Yield();
+
+            await using var stream = file.OpenReadStream(FileMaxLimit);
             using var reader = new StreamReader(stream);
             _jsonInput = await reader.ReadToEndAsync();
-            ParseJson();
+
+            // 调用异步版本的 ParseJson
+            await ParseJsonAsync();
         }
         catch (Exception ex)
         {
             _errorMessage = $"Error loading file: {ex.Message}";
+            _isProcessing = false;
+            StateHasChanged();
         }
     }
 

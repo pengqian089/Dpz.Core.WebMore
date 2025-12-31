@@ -16,7 +16,7 @@
         <div class="json-viewer-page__input-group">
             <div class="json-viewer-page__label-bar">
                 <span class="json-viewer-page__label">JSON INPUT</span>
-                <span class="json-viewer-page__hint">MAX 20MB</span>
+                <span class="json-viewer-page__hint">MAX 5MB</span>
             </div>
             <textarea @bind="_jsonInput" class="json-viewer-page__textarea" placeholder="Paste JSON here..." disabled="@_isProcessing"></textarea>
             <div class="json-viewer-page__actions">
@@ -25,7 +25,7 @@
                     <i class="fa-solid fa-folder-open"></i>
                     <span>LOAD FILE</span>
                 </label>
-                <button @onclick="ParseJson" class="json-viewer-page__btn json-viewer-page__btn--primary" disabled="@_isProcessing">
+                <button @onclick="ParseJsonAsync" class="json-viewer-page__btn json-viewer-page__btn--primary" disabled="@_isProcessing">
                     @if (_isProcessing)
                     {
                         <i class="fa-solid fa-spinner fa-spin"></i>
@@ -86,13 +86,6 @@
                     <i class="fa-solid fa-code-branch"></i>
                     <span>NODES: <strong>@_totalNodes</strong></span>
                 </div>
-                @if (_totalNodes > 500)
-                {
-                    <div class="json-viewer-page__stat-item json-viewer-page__stat-item--warning">
-                        <i class="fa-solid fa-bolt"></i>
-                        <span>LARGE FILE: Auto-collapsed to depth @_maxDepthToExpand</span>
-                    </div>
-                }
                 @if (!string.IsNullOrEmpty(_searchResult))
                 {
                     <div class="json-viewer-page__stat-item json-viewer-page__stat-item--highlight">
