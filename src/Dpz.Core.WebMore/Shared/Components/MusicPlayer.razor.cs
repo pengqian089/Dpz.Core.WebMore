@@ -500,6 +500,13 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
         Console.WriteLine($"Audio Error: {message}");
     }
 
+    [JSInvokable]
+    public void OpenPanel()
+    {
+        TogglePanel(true);
+        StateHasChanged();
+    }
+
     /// <summary>
     /// 格式化时间显示 (分:秒)
     /// </summary>

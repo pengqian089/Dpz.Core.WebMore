@@ -273,32 +273,106 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
     position: relative;
+    min-height: 260px;
 }
 
+/* Reactor Container */
+.music-player__reactor {
+    position: relative;
+    width: 240px;
+    height: 240px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Core Cover */
 .music-player__cover {
-    width: 200px;
-    height: 200px;
-    /* Hexagon Cover */
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    box-shadow: none;
-    filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
-    transition: transform 0.3s ease;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    border: 4px solid var(--music-player-bg); /* Simulated border via padding if needed, but clip-path handles shape */
+    position: relative;
+    z-index: 10;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    border: 2px solid var(--music-neon-primary);
+    transition: all 0.5s ease;
 }
 
-/* Rotating Animation - Slow spin for tech feel */
-@keyframes music-spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+/* Reactor Rings */
+.music-player__reactor-ring-1,
+.music-player__reactor-ring-2,
+.music-player__reactor-ring-3 {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.5s ease;
 }
 
-.music-player__cover--rotating {
-    animation: music-spin 20s linear infinite;
+/* Outer Ring - Dashed Hazard */
+.music-player__reactor-ring-1 {
+    width: 100%;
+    height: 100%;
+    border: 2px dashed var(--music-player-theme);
+    opacity: 0.3;
+    z-index: 1;
+}
+
+/* Middle Ring - Tech Scale */
+.music-player__reactor-ring-2 {
+    width: 85%;
+    height: 85%;
+    border: 1px solid var(--music-neon-secondary);
+    border-left-color: transparent;
+    border-right-color: transparent;
+    opacity: 0.5;
+    z-index: 2;
+    box-shadow: 0 0 5px var(--music-neon-secondary);
+}
+
+/* Inner Ring - Core Containment */
+.music-player__reactor-ring-3 {
+    width: 72%;
+    height: 72%;
+    border: 4px dotted var(--music-neon-primary);
+    opacity: 0.4;
+    z-index: 3;
+}
+
+/* Playing State Animations */
+.music-player__reactor--playing .music-player__cover {
+    animation: reactor-spin 20s linear infinite;
+    box-shadow: 0 0 30px var(--music-neon-primary);
+    border-color: var(--music-neon-secondary);
+}
+
+.music-player__reactor--playing .music-player__reactor-ring-1 {
+    animation: reactor-spin 30s linear infinite reverse;
+    opacity: 0.6;
+    border-color: var(--music-neon-primary);
+}
+
+.music-player__reactor--playing .music-player__reactor-ring-2 {
+    animation: reactor-spin 10s linear infinite;
+    opacity: 0.8;
+    box-shadow: 0 0 15px var(--music-neon-secondary);
+}
+
+.music-player__reactor--playing .music-player__reactor-ring-3 {
+    animation: reactor-pulse 2s ease-in-out infinite alternate;
+    opacity: 0.8;
+}
+
+@keyframes reactor-pulse {
+    from { transform: scale(0.95) rotate(0deg); opacity: 0.4; }
+    to { transform: scale(1.05) rotate(180deg); opacity: 0.8; }
 }
 
 /* Controls */
