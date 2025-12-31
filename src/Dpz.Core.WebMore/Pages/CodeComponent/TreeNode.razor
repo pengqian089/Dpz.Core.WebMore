@@ -18,21 +18,23 @@
             </div>
             
             <!-- Label -->
-            <div class="code-tree__label" title="@string.Join("/", Path)">
-                @{
-                    var (first,keyword,end) = MatchKeyword(Name);
-                }
-                @if (keyword == null || end == null)
-                {
-                    @Name
-                }
-                else
-                {
-                    <span>@first</span>
-                    <mark>@keyword</mark>
-                    <span>@end</span>
-                }
-            </div>
+            <Tooltip Text="@string.Join("/", Path)">
+                <div class="code-tree__label">
+                    @{
+                        var (first,keyword,end) = MatchKeyword(Name);
+                    }
+                    @if (keyword == null || end == null)
+                    {
+                        @Name
+                    }
+                    else
+                    {
+                        <span>@first</span>
+                        <mark>@keyword</mark>
+                        <span>@end</span>
+                    }
+                </div>
+            </Tooltip>
         </div>
         
         @if (_childrenNode != null && _expand)

@@ -18,15 +18,16 @@ else
         </div>
 
         <div class="steam-game-grid">
-            @foreach (var item in _steamLibraries.OrderBy(x => x.Name, StringComparer.Create(new CultureInfo("zh-Hans"), false)))
+            @foreach (var item in _steamLibraries.OrderBy(x => x.Name, StringComparer.Create(new CultureInfo("zh-Hans"),
+                    false)))
             {
                 var time = TimeSpan.FromMinutes(item.PlayTime);
                 <div class="steam-game-card">
-                    <a href="/steam/@item.Id"
-                       class="steam-game-card__link">
-                        <div class="steam-game-card__image-wrapper" style="@(string.IsNullOrEmpty(item.ImageLogo) ? "" : $"--card-img: url('{item.ImageLogo}');")">
+                    <a href="/steam/@item.Id" class="steam-game-card__link">
+                        <div class="steam-game-card__image-wrapper"
+                            style="@(string.IsNullOrEmpty(item.ImageLogo) ? "" : $"--card-img: url('{item.ImageLogo}');")">
                             <img src="@item.ImageLogo" alt="@item.Name" class="steam-game-card__image lazy"
-                                 data-src="@item.ImageLogo"/>
+                                data-src="@item.ImageLogo" />
                         </div>
                         <div class="steam-game-card__content">
                             <h2 class="steam-game-card__title" data-text="@item.Name">@item.Name</h2>
@@ -48,15 +49,18 @@ else
                                             <span>@percent%</span>
                                         </div>
                                         <div class="steam-summary__progress-track">
-                                            <div class="steam-summary__progress-bar" style="width: @(_animate ? percent : "0")%"></div>
+                                            <div class="steam-summary__progress-bar" style="width: @(_animate? percent : "0")%">
+                                            </div>
                                         </div>
                                         <div class="steam-summary__icons">
-                                            @foreach (var achievement in item.Achievements.Where(x => x.UnlockTime.HasValue).OrderByDescending(x => x.UnlockTime).Take(10))
+                                            @foreach (var achievement in item.Achievements.Where(x =>
+                                                                            x.UnlockTime.HasValue).OrderByDescending(x => x.UnlockTime).Take(10))
                                             {
-                                                <div class="steam-summary__icon" title="@achievement.DisplayName">
-                                                    <img src="@achievement.Icon" alt="@achievement.DisplayName"
-                                                         loading="lazy"/>
-                                                </div>
+                                                <Tooltip Text="@achievement.DisplayName">
+                                                    <div class="steam-summary__icon">
+                                                        <img src="@achievement.Icon" alt="@achievement.DisplayName" loading="lazy" />
+                                                    </div>
+                                                </Tooltip>
                                             }
                                         </div>
                                     </div>

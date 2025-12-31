@@ -1,5 +1,6 @@
 ﻿<!-- Mini Player -->
-<div class="music-player__mini" id="mp-mini" @onclick="OnMiniClick" @ondblclick="OnMiniDblClick" title="双击或者长按打开播放器/点击暂停或播放音乐">
+<div class="music-player__mini" id="mp-mini" @onclick="OnMiniClick" @ondblclick="OnMiniDblClick"
+    title="双击或者长按打开播放器/点击暂停或播放音乐">
     <div class="music-player__mini-cover @(_isPlaying ? "music-player__cover--rotating" : "")"
         style="background-image: url('@(_currentTrack?.CoverUrl ?? "/images/music.png")')"></div>
     <svg class="music-player__progress-ring" viewBox="0 0 80 80">
@@ -86,43 +87,57 @@
                 </div>
 
                 <div class="music-player__btn-group">
-                    <button class="music-player__btn" title="上一首" @onclick="Prev">
-                        <i class="fa fa-step-backward"></i>
-                    </button>
-                    <button class="music-player__btn music-player__btn--main" title="播放/暂停" @onclick="TogglePlay">
-                        <i class="fa @(_isPlaying ? "fa-pause" : "fa-play")"></i>
-                    </button>
-                    <button class="music-player__btn" title="下一首" @onclick="Next">
-                        <i class="fa fa-step-forward"></i>
-                    </button>
+                    <Tooltip Text="上一首">
+                        <button class="music-player__btn" @onclick="Prev">
+                            <i class="fa fa-step-backward"></i>
+                        </button>
+                    </Tooltip>
+                    <Tooltip Text="播放/暂停">
+                        <button class="music-player__btn music-player__btn--main" @onclick="TogglePlay">
+                            <i class="fa @(_isPlaying ? "fa-pause" : "fa-play")"></i>
+                        </button>
+                    </Tooltip>
+                    <Tooltip Text="下一首">
+                        <button class="music-player__btn" @onclick="Next">
+                            <i class="fa fa-step-forward"></i>
+                        </button>
+                    </Tooltip>
                 </div>
 
                 <div class="music-player__extra-controls">
-                    <button class="music-player__text-btn" title="播放模式" @onclick="CycleMode">
+                    <button class="music-player__text-btn" @onclick="CycleMode">
                         @if (_playMode == PlayMode.Order)
                         {
-                            <i class="fa fa-sort-amount-asc"></i>
+                            <Tooltip Text="顺序播放">
+                                <i class="fa fa-sort-amount-asc"></i>
+                            </Tooltip>
                         }
                         else if (_playMode == PlayMode.Random)
                         {
-
-                            <i class="fa fa-random"></i>
+                            <Tooltip Text="随机播放">
+                                <i class="fa fa-random"></i>
+                            </Tooltip>
                         }
                         else
                         {
-
-                            <i class="fa fa-retweet"></i>
+                            <Tooltip Text="单曲循环">
+                                <i class="fa fa-retweet"></i>
+                            </Tooltip>
                         }
                     </button>
-                    <button
-                        class="music-player__text-btn @(_showLyrics || _lyricsOnBackground ? "music-player__text-btn--active" : "")"
-                        title="歌词" @onclick="ToggleLrc">
-                        <i class="fa-regular fa-file-lines"></i>
-                    </button>
-                    <button class="music-player__text-btn @(_showList ? "music-player__text-btn--active" : "")"
-                        title="播放列表" @onclick="ToggleList">
-                        <i class="fa fa-list-ul"></i>
-                    </button>
+                    <Tooltip Text="歌词">
+                        <button
+                            class="music-player__text-btn @(_showLyrics || _lyricsOnBackground ? "music-player__text-btn--active" : "")"
+                            @onclick="ToggleLrc">
+                            <i class="fa-regular fa-file-lines"></i>
+                        </button>
+                    </Tooltip>
+                    <Tooltip Text="播放列表">
+                        <button class="music-player__text-btn @(_showList ? "music-player__text-btn--active" : "")"
+                            @onclick="ToggleList">
+                            <i class="fa fa-list-ul"></i>
+                        </button>
+                    </Tooltip>
                 </div>
             </div>
         </section>
