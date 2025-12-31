@@ -1,0 +1,102 @@
+﻿@page "/tools/json-viewer"
+@layout ToolsLayout
+@using Dpz.Core.WebMore.Shared.Components.JsonViewer
+
+<PageTitle>JSON Viewer - 个人文章分享</PageTitle>
+<div class="json-viewer-page">
+    <div class="json-viewer-page__header">
+        <div class="json-viewer-page__title-group">
+            <h1 class="json-viewer-page__title">JSON VIEWER</h1>
+            <div class="json-viewer-page__title-accent"></div>
+        </div>
+        <p class="json-viewer-page__subtitle">/// VIEW • FORMAT • SEARCH JSON DATA</p>
+    </div>
+
+    <div class="json-viewer-page__controls">
+        <div class="json-viewer-page__input-group">
+            <div class="json-viewer-page__label-bar">
+                <span class="json-viewer-page__label">JSON INPUT</span>
+                <span class="json-viewer-page__hint">MAX 5MB</span>
+            </div>
+            <textarea @bind="_jsonInput" class="json-viewer-page__textarea" placeholder="Paste JSON here..." disabled="@_isProcessing"></textarea>
+            <div class="json-viewer-page__actions">
+                <InputFile OnChange="LoadFile" class="json-viewer-page__file-input" id="jsonFile" accept=".json,.txt" disabled="@_isProcessing" />
+                <label for="jsonFile" class="json-viewer-page__btn json-viewer-page__btn--secondary">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <span>LOAD FILE</span>
+                </label>
+                <button @onclick="ParseJsonAsync" class="json-viewer-page__btn json-viewer-page__btn--primary" disabled="@_isProcessing">
+                    @if (_isProcessing)
+                    {
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                        <span>PROCESSING...</span>
+                    }
+                    else
+                    {
+                        <i class="fa-solid fa-play"></i>
+                        <span>PARSE JSON</span>
+                    }
+                </button>
+                <button @onclick="Clear" class="json-viewer-page__btn json-viewer-page__btn--danger" disabled="@_isProcessing">
+                    <i class="fa-solid fa-trash"></i>
+                    <span>CLEAR</span>
+                </button>
+            </div>
+        </div>
+
+        @if (_rootNode != null)
+        {
+            <div class="json-viewer-page__toolbar">
+                <div class="json-viewer-page__search">
+                    <input type="text" @bind="_searchText" @bind:event="oninput" @onkeyup="OnSearchKeyUp" placeholder="Search keys or values..." class="json-viewer-page__search-input" />
+                    <button @onclick="Search" class="json-viewer-page__search-btn">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </button>
+                </div>
+                <div class="json-viewer-page__tree-actions">
+                    <button @onclick="ExpandAll" class="json-viewer-page__btn json-viewer-page__btn--sm">
+                        <i class="fa-solid fa-angles-down"></i> EXPAND ALL
+                    </button>
+                    <button @onclick="CollapseAll" class="json-viewer-page__btn json-viewer-page__btn--sm">
+                        <i class="fa-solid fa-angles-up"></i> COLLAPSE ALL
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (!string.IsNullOrEmpty(_errorMessage))
+    {
+        <div class="json-viewer-page__error">
+            <div class="json-viewer-page__error-icon">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div class="json-viewer-page__error-content">
+                <strong>ERROR</strong>
+                <span>@_errorMessage</span>
+            </div>
+        </div>
+    }
+
+    @if (_rootNode != null)
+    {
+        <div class="json-viewer-page__content">
+            <div class="json-viewer-page__stats">
+                <div class="json-viewer-page__stat-item">
+                    <i class="fa-solid fa-code-branch"></i>
+                    <span>NODES: <strong>@_totalNodes</strong></span>
+                </div>
+                @if (!string.IsNullOrEmpty(_searchResult))
+                {
+                    <div class="json-viewer-page__stat-item json-viewer-page__stat-item--highlight">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <span>@_searchResult</span>
+                    </div>
+                }
+            </div>
+            <div class="json-viewer-page__tree">
+                <JsonNodeView Node="_rootNode" />
+            </div>
+        </div>
+    }
+</div>

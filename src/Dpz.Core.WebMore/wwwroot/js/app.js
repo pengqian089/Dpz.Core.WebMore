@@ -181,3 +181,33 @@ window.notifyBlazorStarted = function() {
         window.appInstance.onBlazorStarted();
     }
 };
+
+// 文件下载工具函数
+window.downloadFile = function(fileName, base64Content, contentType) {
+    try {
+        // 将 base64 转换为 Blob
+        const binaryString = window.atob(base64Content);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        const blob = new Blob([bytes], { type: contentType });
+        
+        // 创建下载链接
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        
+        // 触发下载
+        document.body.appendChild(link);
+        link.click();
+        
+        // 清理
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('Download failed:', error);
+        throw error;
+    }
+};

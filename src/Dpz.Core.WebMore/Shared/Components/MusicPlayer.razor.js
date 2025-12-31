@@ -3,6 +3,7 @@ export class AudioPlayer {
         this.dotNetHelper = dotNetHelper;
         this.audio = new Audio();
         this.setupEvents();
+        this.initTouchEvents('mp-mini');
     }
 
     setupEvents() {
@@ -89,6 +90,41 @@ export class AudioPlayer {
              const offset = lines[index].offsetTop;
              container.style.transform = `translateY(-${offset}px)`;
          }
+    }
+
+    initTouchEvents(elementId) {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+
+        let timer;
+        let isLongPress = false;
+
+        const start = (e) => {
+            isLongPress = false;
+            timer = setTimeout(() => {
+                isLongPress = true;
+                this.dotNetHelper.invokeMethodAsync('OpenPanel');
+                if (navigator.vibrate) navigator.vibrate(50);
+            }, 600);
+        };
+
+        const end = (e) => {
+            clearTimeout(timer);
+            if (isLongPress) {
+                if (e.cancelable) {
+                    e.preventDefault();
+                }
+            }
+        };
+
+        const move = () => {
+            clearTimeout(timer);
+        };
+
+        element.addEventListener('touchstart', start, { passive: true });
+        element.addEventListener('touchend', end);
+        element.addEventListener('touchmove', move, { passive: true });
+        element.addEventListener('touchcancel', move);
     }
 }
 

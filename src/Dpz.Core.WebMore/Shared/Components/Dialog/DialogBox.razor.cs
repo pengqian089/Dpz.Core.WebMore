@@ -1,11 +1,13 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Dpz.Core.WebMore.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 
 namespace Dpz.Core.WebMore.Shared.Components.Dialog;
 
-public partial class DialogBox
+public partial class DialogBox(IJSRuntime jsRuntime) : IAsyncDisposable
 {
     [Parameter]
     public DialogModel Model { get; set; } = new();
@@ -18,6 +20,7 @@ public partial class DialogBox
     private ElementReference _inputRef;
     private ElementReference _confirmBtnRef;
     private ElementReference _dialogRef;
+    private IJSObjectReference? _dialogModule;
 
     protected override async Task OnInitializedAsync()
     {
@@ -35,6 +38,11 @@ public partial class DialogBox
     {
         if (firstRender)
         {
+            _dialogModule = await jsRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./js/modules/dialog-interop.js"
+            );
+
             if (Model.Type == DialogType.Prompt)
             {
                 await _inputRef.FocusAsync();
@@ -42,6 +50,12 @@ public partial class DialogBox
             else if (Model.Type != DialogType.Component)
             {
                 await _confirmBtnRef.FocusAsync();
+            }
+
+            // 对话框打开时 DOM 管理器已暂停，手动触发 LazyLoad 更新以加载图片
+            if (_dialogModule != null)
+            {
+                await _dialogModule.InvokeVoidAsync("updateLazyLoad");
             }
         }
     }
@@ -89,5 +103,18 @@ public partial class DialogBox
         await OnClose.InvokeAsync(Model);
     }
 
-    public void Dispose() { }
+    public async ValueTask DisposeAsync()
+    {
+        if (_dialogModule != null)
+        {
+            try
+            {
+                await _dialogModule.DisposeAsync();
+            }
+            catch
+            {
+                // Ignore disposal errors
+            }
+        }
+    }
 }

@@ -1,0 +1,102 @@
+@inherits LayoutComponentBase
+@layout MainLayout
+
+<div class="tools-layout">
+    <aside class="tools-sidebar">
+        <!-- 工具箱头部 -->
+        <div class="tools-sidebar__header">
+            <h3 class="tools-sidebar__title">工具箱</h3>
+            <span class="tools-sidebar__subtitle">TOOLKIT</span>
+        </div>
+
+        <!-- 搜索筛选区 -->
+        <div class="tools-search">
+            <div class="tools-search__wrapper">
+                <i class="fa fa-search tools-search__icon"></i>
+                <input 
+                    type="text" 
+                    class="tools-search__input" 
+                    placeholder="搜索工具..."
+                    @bind="_searchKeyword"
+                    @bind:event="oninput"
+                    @bind:after="OnSearchChanged" />
+                @if (!string.IsNullOrWhiteSpace(_searchKeyword))
+                {
+                    <button class="tools-search__clear" @onclick="ClearSearch" aria-label="清除搜索">
+                        <i class="fa fa-times"></i>
+                    </button>
+                }
+            </div>
+        </div>
+
+        <!-- 分类过滤器 -->
+        <div class="tools-categories">
+            <button 
+                class="tools-category @(_selectedCategory == "全部" ? "tools-category--active" : "")"
+                @onclick="@(() => SelectCategory("全部"))">
+                <i class="fa fa-th"></i>
+                <span>全部</span>
+                <span class="tools-category__badge">@_allTools.Count</span>
+            </button>
+            @foreach (var category in _categories)
+            {
+                var count = _allTools.Count(t => t.Category == category);
+                <button 
+                    class="tools-category @(_selectedCategory == category ? "tools-category--active" : "")"
+                    @onclick="@(() => SelectCategory(category))">
+                    <i class="@GetCategoryIcon(category)"></i>
+                    <span>@category</span>
+                    <span class="tools-category__badge">@count</span>
+                </button>
+            }
+        </div>
+
+        <!-- 工具列表 -->
+        <nav class="tools-nav">
+            @if (_filteredTools.Any())
+            {
+                @foreach (var tool in _filteredTools)
+                {
+                    <NavLink href="@tool.Url" Match="@(tool.ExactMatch ? NavLinkMatch.All : NavLinkMatch.Prefix)" class="tools-nav__item">
+                        <span class="tools-nav__icon">
+                            <i class="@tool.Icon"></i>
+                        </span>
+                        <div class="tools-nav__content">
+                            <span class="tools-nav__text">@tool.Name</span>
+                            @if (!string.IsNullOrWhiteSpace(tool.Description))
+                            {
+                                <span class="tools-nav__desc">@tool.Description</span>
+                            }
+                            @if (tool.IsNew)
+                            {
+                                <span class="tools-nav__badge tools-nav__badge--new">NEW</span>
+                            }
+                        </div>
+                    </NavLink>
+                }
+            }
+            else
+            {
+                <div class="tools-nav__empty">
+                    <i class="fa fa-inbox"></i>
+                    <p>未找到匹配的工具</p>
+                </div>
+            }
+        </nav>
+
+        <!-- 侧边栏底部装饰 -->
+        <div class="tools-sidebar__footer">
+            <div class="tools-sidebar__stat">
+                <span class="tools-sidebar__stat-label">已加载工具</span>
+                <span class="tools-sidebar__stat-value">@_filteredTools.Count / @_allTools.Count</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 内容区域 -->
+    <div class="tools-content">
+        <div class="tools-content__inner">
+            @Body
+        </div>
+    </div>
+</div>

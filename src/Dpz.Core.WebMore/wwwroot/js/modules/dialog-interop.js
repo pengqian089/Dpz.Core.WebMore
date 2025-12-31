@@ -57,3 +57,12 @@ export function initKeyboardListener(dotNetHelper) {
     });
 }
 
+/**
+ * 手动更新 LazyLoad（对话框打开后调用，因为 DOM 管理器已暂停）
+ */
+export function updateLazyLoad() {
+    if (window.appInstance && window.appInstance.lazyLoadInstance) {
+        window.appInstance.lazyLoadInstance.update();
+    }
+}
+

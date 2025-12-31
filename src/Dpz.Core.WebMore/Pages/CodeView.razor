@@ -54,8 +54,8 @@
                     {
                         steps.Add(item);
                         var currentStepPath = string.Join("/", steps);
-                        <span>/</span>
-                        <a href="javascript:void(0)" @onclick="@(() => NavigateToPath(currentStepPath))">@item</a>
+                        <span @key="@($"sep-{currentStepPath}")">/</span>
+                        <a @key="@($"link-{currentStepPath}")" href="javascript:void(0)" @onclick="@(() => NavigateToPath(currentStepPath))">@item</a>
                     }
                 </div>
 
@@ -73,7 +73,7 @@
                             foreach (var item in folderNode.Directories)
                             {
                                 var fullPath = string.Join("/", item.CurrentPath);
-                                <div class="row" @onclick="@(() => NavigateToPath(fullPath))" style="cursor: pointer;">
+                                <div @key="fullPath" class="row" @onclick="@(() => NavigateToPath(fullPath))" style="cursor: pointer;">
                                     <div class="icon">
                                         <ShowIcon IsFolder="@true" Filename="@item.Name"/>
                                     </div>
@@ -109,7 +109,7 @@
                             foreach (var item in folderNode.Files)
                             {
                                 var fullPath = string.Join("/", item.CurrentPath);
-                                <div class="row" @onclick="@(() => NavigateToPath(fullPath))" style="cursor: pointer;">
+                                <div @key="fullPath" class="row" @onclick="@(() => NavigateToPath(fullPath))" style="cursor: pointer;">
                                     <div class="icon">
                                         <ShowIcon IsFolder="@false" Filename="@item.Name"/>
                                     </div>
