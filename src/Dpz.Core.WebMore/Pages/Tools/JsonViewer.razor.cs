@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 
-namespace Dpz.Core.WebMore.Pages;
+namespace Dpz.Core.WebMore.Pages.Tools;
 
 public partial class JsonViewer: ComponentBase
 {

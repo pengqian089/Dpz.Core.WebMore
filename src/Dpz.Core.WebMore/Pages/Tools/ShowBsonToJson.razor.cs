@@ -10,7 +10,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 
-namespace Dpz.Core.WebMore.Pages;
+namespace Dpz.Core.WebMore.Pages.Tools;
 
 public partial class ShowBsonToJson(IAppDialogService dialogService) : ComponentBase
 {
