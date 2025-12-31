@@ -65,7 +65,6 @@ public partial class ToolsLayout(NavigationManager navigationManager) : IDisposa
                 Url = "tools/regex-test",
                 Category = "文本处理",
                 ExactMatch = false,
-                IsNew = true,
             },
         ];
 

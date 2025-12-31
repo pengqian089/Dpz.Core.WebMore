@@ -11,27 +11,22 @@ public partial class RegexTest : ComponentBase
 {
     private string _pattern = string.Empty;
     private string _testText = string.Empty;
-    private bool _ignoreCase = false;
-    private bool _multiline = false;
-    private bool _singleline = false;
-    private bool _explicitCapture = false;
+    private bool _ignoreCase;
+    private bool _multiline;
+    private bool _singleline;
+    private bool _explicitCapture;
     private string _errorMessage = string.Empty;
     private string _highlightedText = string.Empty;
     private RegexMatchResult? _matchResult;
     private HashSet<int> _expandedMatches = [];
-    private bool _expandAll = false;
-    private bool _showExamples = false;
+    private bool _expandAll;
+    private bool _showExamples;
     private bool _showReference = true;
     private List<RegexExample> _examples = [];
 
     protected override void OnInitialized()
     {
         InitializeExamples();
-    }
-
-    protected override void OnParametersSet()
-    {
-        PerformMatch();
     }
 
     private void InitializeExamples()
@@ -43,18 +38,21 @@ public partial class RegexTest : ComponentBase
                 Name = "邮箱地址",
                 Pattern = @"^[\w\.-]+@[\w\.-]+\.\w+$",
                 TestText = "example@email.com\ntest.user@domain.co.uk\ninvalid@email",
+                Multiline = true,
             },
             new RegexExample
             {
                 Name = "手机号码",
                 Pattern = @"^1[3-9]\d{9}$",
                 TestText = "13812345678\n15987654321\n12345678901",
+                Multiline = true,
             },
             new RegexExample
             {
                 Name = "IP地址",
                 Pattern = @"^((25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(25[0-5]|2[0-4]\d|[01]?\d\d?)$",
                 TestText = "192.168.1.1\n255.255.255.0\n999.999.999.999",
+                Multiline = true,
             },
             new RegexExample
             {
@@ -62,42 +60,50 @@ public partial class RegexTest : ComponentBase
                 Pattern = @"^https?://[\w\.-]+\.\w+(/[\w\.-]*)*/?$",
                 TestText =
                     "https://www.example.com\nhttp://test.com/path/to/page\nftp://invalid.url",
+                Multiline = true,
             },
             new RegexExample
             {
                 Name = "身份证号",
                 Pattern = @"^\d{17}[\dXx]$",
                 TestText = "110101199001011234\n12345678901234567X\n123456789012345",
+                Multiline = true,
+                IgnoreCase = true,
             },
             new RegexExample
             {
                 Name = "日期(YYYY-MM-DD)",
                 Pattern = @"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$",
                 TestText = "2024-01-15\n2024-12-31\n2024-13-45",
+                Multiline = true,
             },
             new RegexExample
             {
                 Name = "时间(HH:MM:SS)",
                 Pattern = @"^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$",
                 TestText = "12:30:45\n23:59:59\n25:61:61",
+                Multiline = true,
             },
             new RegexExample
             {
                 Name = "邮政编码",
                 Pattern = @"^\d{6}$",
                 TestText = "100000\n518000\n12345",
+                Multiline = true,
             },
             new RegexExample
             {
                 Name = "HTML标签",
                 Pattern = @"<(\w+)[^>]*>.*?</\1>",
                 TestText = "<div>内容</div>\n<p class=\"text\">段落</p>\n<span>不匹配",
+                Singleline = true,
             },
             new RegexExample
             {
                 Name = "十六进制颜色",
                 Pattern = @"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$",
                 TestText = "#FF0000\n#f0f\n#GGGGGG",
+                Multiline = true,
             },
         ];
     }
@@ -106,6 +112,9 @@ public partial class RegexTest : ComponentBase
     {
         _pattern = example.Pattern;
         _testText = example.TestText;
+        _multiline = example.Multiline;
+        _singleline = example.Singleline;
+        _ignoreCase = example.IgnoreCase;
         PerformMatch();
     }
 
@@ -277,13 +286,9 @@ public partial class RegexTest : ComponentBase
 
     private void ToggleMatch(int index)
     {
-        if (_expandedMatches.Contains(index))
+        if (!_expandedMatches.Add(index))
         {
             _expandedMatches.Remove(index);
-        }
-        else
-        {
-            _expandedMatches.Add(index);
         }
     }
 
@@ -332,5 +337,8 @@ public partial class RegexTest : ComponentBase
         public required string Name { get; init; }
         public required string Pattern { get; init; }
         public required string TestText { get; init; }
+        public bool Multiline { get; init; }
+        public bool Singleline { get; init; }
+        public bool IgnoreCase { get; init; }
     }
 }

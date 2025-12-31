@@ -34,11 +34,11 @@ try {
     Write-Host "Executing: $execute" -ForegroundColor gray
     Invoke-Expression $execute
     
-    Write-Host "✓ Build completed successfully!" -ForegroundColor green
+    Write-Host "Build completed successfully!" -ForegroundColor green
     Write-Host "  Output: wwwroot/css/$outputFile" -ForegroundColor green
 }
 catch {
-    Write-Host "✗ Build failed: $_" -ForegroundColor red
+    Write-Host "Build failed: $_" -ForegroundColor red
     exit 1
 }
 finally {

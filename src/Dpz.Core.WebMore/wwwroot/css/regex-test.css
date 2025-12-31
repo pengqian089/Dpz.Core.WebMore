@@ -937,9 +937,11 @@
     }
 
     .regex-test__quick-examples-header {
-        flex-direction: column;
-        align-items: flex-start;
         gap: var(--spacing-sm);
+    }
+
+    .regex-test__quick-examples-title {
+        flex: 1;
     }
 
     .regex-test__quick-examples-grid {
