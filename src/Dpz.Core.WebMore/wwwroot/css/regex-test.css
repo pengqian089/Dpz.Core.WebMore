@@ -1,0 +1,1079 @@
+/* =========================================
+   正则表达式测试器 - Regex Test Tool
+   Cyberpunk Wasteland Style
+   ========================================= */
+
+/* -----------------------------------------
+   主容器 - Main Container
+   ----------------------------------------- */
+.regex-test {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    width: 100%;
+}
+
+/* -----------------------------------------
+   头部区域 - Header
+   ----------------------------------------- */
+.regex-test__header {
+    border-left: 4px solid var(--color-rust);
+    padding-left: var(--spacing-md);
+    background: var(--color-bg-surface);
+    background-image: var(--noise-bg);
+    padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) var(--spacing-lg);
+    border: 2px solid var(--color-border);
+    position: relative;
+    clip-path: polygon(
+        0 0,
+        100% 0,
+        100% calc(100% - 15px),
+        calc(100% - 15px) 100%,
+        0 100%
+    );
+}
+
+.regex-test__header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 15px;
+    height: 15px;
+    background: var(--color-rust);
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+.regex-test__title {
+    margin: 0 0 var(--spacing-xs) 0;
+    font-family: var(--font-stack-display);
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.regex-test__subtitle {
+    margin: 0;
+    font-family: var(--font-stack-mono);
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    letter-spacing: 0.02em;
+}
+
+/* -----------------------------------------
+   快速示例 - Quick Examples
+   ----------------------------------------- */
+.regex-test__quick-examples {
+    background: var(--color-bg-surface);
+    background-image: var(--noise-bg);
+    border: 2px solid var(--color-border);
+    padding: var(--spacing-lg);
+    box-shadow: var(--color-shadow);
+}
+
+.regex-test__quick-examples-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--color-border);
+    margin-bottom: var(--spacing-md);
+}
+
+.regex-test__quick-examples-title {
+    font-family: var(--font-stack-display);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.regex-test__quick-examples-title i {
+    color: var(--color-rust);
+    font-size: 1.1rem;
+}
+
+.regex-test__quick-examples-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--spacing-sm);
+}
+
+.regex-test__example-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-md);
+    background: var(--color-bg-body);
+    border: 2px solid var(--color-border);
+    border-left: 3px solid var(--color-border);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-align: left;
+}
+
+.regex-test__example-btn:hover {
+    background: var(--color-bg-surface-alt);
+    border-left-color: var(--color-rust);
+    transform: translateX(2px);
+}
+
+.regex-test__example-btn:active {
+    transform: translateX(2px) translateY(2px);
+}
+
+.regex-test__example-name {
+    font-family: var(--font-stack-display);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--color-rust);
+    text-transform: uppercase;
+}
+
+.regex-test__example-pattern {
+    font-family: var(--font-stack-mono);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    word-break: break-all;
+}
+
+/* -----------------------------------------
+   控制区域 - Controls
+   ----------------------------------------- */
+.regex-test__controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    background: var(--color-bg-surface);
+    background-image: var(--noise-bg);
+    border: 2px solid var(--color-border);
+    padding: var(--spacing-lg);
+    box-shadow: var(--color-shadow);
+}
+
+.regex-test__pattern-group,
+.regex-test__text-group,
+.regex-test__options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.regex-test__label {
+    font-family: var(--font-stack-display);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.regex-test__label i {
+    color: var(--color-rust);
+    font-size: 1rem;
+}
+
+/* 输入框包装器 */
+.regex-test__input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.regex-test__input {
+    width: 100%;
+    padding: var(--spacing-md);
+    font-family: var(--font-stack-mono);
+    font-size: 1rem;
+    background: var(--color-bg-body);
+    color: var(--color-text-main);
+    border: 2px solid var(--color-border);
+    outline: none;
+    transition: all var(--transition-fast);
+}
+
+.regex-test__input:focus {
+    border-color: var(--color-rust);
+    box-shadow: 0 0 0 3px rgba(194, 94, 0, 0.1);
+}
+
+.regex-test__clear-btn {
+    position: absolute;
+    right: var(--spacing-sm);
+    background: var(--color-rust);
+    color: white;
+    border: none;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-size: 0.85rem;
+}
+
+.regex-test__clear-btn:hover {
+    background: var(--color-primary-hover);
+    transform: rotate(90deg);
+}
+
+.regex-test__textarea {
+    width: 100%;
+    min-height: 180px;
+    padding: var(--spacing-md);
+    font-family: var(--font-stack-mono);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    background: var(--color-bg-body);
+    color: var(--color-text-main);
+    border: 2px solid var(--color-border);
+    outline: none;
+    resize: vertical;
+    transition: all var(--transition-fast);
+}
+
+.regex-test__textarea:focus {
+    border-color: var(--color-rust);
+    box-shadow: 0 0 0 3px rgba(194, 94, 0, 0.1);
+}
+
+/* -----------------------------------------
+   选项网格 - Options Grid
+   ----------------------------------------- */
+.regex-test__options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.regex-test__checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-body);
+    transition: all var(--transition-fast);
+}
+
+.regex-test__checkbox:hover {
+    background: var(--color-bg-surface-alt);
+    border-color: var(--color-rust);
+}
+
+.regex-test__checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--color-rust);
+}
+
+.regex-test__checkbox-label {
+    font-family: var(--font-stack-mono);
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.regex-test__checkbox-label i {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+}
+
+/* -----------------------------------------
+   错误提示 - Error Message
+   ----------------------------------------- */
+.regex-test__error {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: var(--color-msg-error-alpha);
+    border: 2px solid var(--color-msg-error);
+    border-left: 4px solid var(--color-msg-error);
+    color: var(--color-msg-error);
+    font-family: var(--font-stack-mono);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.regex-test__error i {
+    font-size: 1.2rem;
+}
+
+/* -----------------------------------------
+   结果区域 - Results
+   ----------------------------------------- */
+.regex-test__results {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+/* 统计信息 */
+.regex-test__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.regex-test__stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-md);
+    background: var(--color-bg-surface);
+    background-image: var(--noise-bg);
+    border: 2px solid var(--color-border);
+    position: relative;
+}
+
+.regex-test__stat-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--color-border);
+}
+
+.regex-test__stat-item--matches::before {
+    background: var(--color-msg-success);
+}
+
+.regex-test__stat-item--groups::before {
+    background: var(--color-msg-info);
+}
+
+.regex-test__stat-item i {
+    font-size: 1.5rem;
+    color: var(--color-rust);
+}
+
+.regex-test__stat-label {
+    font-family: var(--font-stack-mono);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.regex-test__stat-value {
+    font-family: var(--font-stack-display);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-rust);
+}
+
+/* -----------------------------------------
+   预览区域 - Preview
+   ----------------------------------------- */
+.regex-test__preview {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    background: var(--color-bg-surface);
+    background-image: var(--noise-bg);
+    border: 2px solid var(--color-border);
+    padding: var(--spacing-lg);
+    box-shadow: var(--color-shadow);
+}
+
+.regex-test__preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--color-border);
+}
+
+.regex-test__preview-header h3 {
+    margin: 0;
+    font-family: var(--font-stack-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.regex-test__preview-header h3 i {
+    color: var(--color-rust);
+}
+
+/* 图例 */
+.regex-test__legend {
+    display: flex;
+    gap: var(--spacing-lg);
+}
+
+.regex-test__legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-family: var(--font-stack-mono);
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+}
+
+.regex-test__legend-color {
+    width: 20px;
+    height: 14px;
+    border: 1px solid var(--color-border);
+}
+
+.regex-test__legend-color--match {
+    background: var(--color-msg-success);
+}
+
+.regex-test__legend-color--nomatch {
+    background: var(--color-bg-body);
+}
+
+/* 预览内容 */
+.regex-test__preview-content {
+    padding: var(--spacing-md);
+    background: var(--color-bg-body);
+    border: 1px solid var(--color-border);
+    font-family: var(--font-stack-mono);
+    font-size: 0.95rem;
+    line-height: 1.8;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-height: 400px;
+    overflow-y: auto;
+    /* 自定义滚动条 */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+}
+
+.regex-test__preview-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.regex-test__preview-content::-webkit-scrollbar-track {
+    background: var(--color-bg-surface-alt);
+}
+
+.regex-test__preview-content::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+}
+
+.regex-test__preview-content::-webkit-scrollbar-thumb:hover {
+    background: var(--color-rust);
+}
+
+/* 文本高亮 */
+.regex-test__text-match {
+    background: var(--color-msg-success);
+    color: white;
+    padding: 2px 4px;
+    font-weight: 600;
+    border-bottom: 2px solid var(--color-primary);
+}
+
+.regex-test__text-nomatch {
+    color: var(--color-text-secondary);
+}
+
+/* -----------------------------------------
+   匹配详情 - Match Details
+   ----------------------------------------- */
+.regex-test__matches {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    background: var(--color-bg-surface);
+    background-image: var(--noise-bg);
+    border: 2px solid var(--color-border);
+    padding: var(--spacing-lg);
+    box-shadow: var(--color-shadow);
+}
+
+.regex-test__matches-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--color-border);
+}
+
+.regex-test__matches-header h3 {
+    margin: 0;
+    font-family: var(--font-stack-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.regex-test__matches-header h3 i {
+    color: var(--color-rust);
+}
+
+.regex-test__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-family: var(--font-stack-display);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    background: var(--color-rust);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    letter-spacing: 0.05em;
+    clip-path: var(--clip-path-btn);
+}
+
+.regex-test__btn:hover {
+    background: var(--color-primary-hover);
+}
+
+.regex-test__btn:active {
+    transform: translateY(2px);
+}
+
+.regex-test__btn--sm {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.75rem;
+}
+
+.regex-test__matches-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    max-height: 500px;
+    overflow-y: auto;
+    /* 自定义滚动条 */
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+}
+
+.regex-test__matches-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.regex-test__matches-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.regex-test__matches-list::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+}
+
+.regex-test__matches-list::-webkit-scrollbar-thumb:hover {
+    background: var(--color-rust);
+}
+
+/* 匹配项 */
+.regex-test__match-item {
+    background: var(--color-bg-body);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-border);
+    transition: all var(--transition-fast);
+}
+
+.regex-test__match-item--expanded {
+    border-left-color: var(--color-rust);
+}
+
+.regex-test__match-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.regex-test__match-header:hover {
+    background: var(--color-bg-surface-alt);
+}
+
+.regex-test__match-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex: 1;
+    min-width: 0;
+}
+
+.regex-test__match-title i {
+    color: var(--color-rust);
+    font-size: 0.85rem;
+    transition: transform var(--transition-fast);
+}
+
+.regex-test__match-index {
+    font-family: var(--font-stack-display);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--color-rust);
+    text-transform: uppercase;
+}
+
+.regex-test__match-preview {
+    font-family: var(--font-stack-mono);
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.regex-test__match-position {
+    font-family: var(--font-stack-mono);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    background: var(--color-bg-surface);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border: 1px solid var(--color-border);
+}
+
+/* 匹配详情 */
+.regex-test__match-details {
+    padding: var(--spacing-md);
+    border-top: 1px dashed var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.regex-test__match-row {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.regex-test__match-label {
+    font-family: var(--font-stack-mono);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    min-width: 60px;
+}
+
+.regex-test__match-value {
+    font-family: var(--font-stack-mono);
+    font-size: 0.85rem;
+    color: var(--color-text-main);
+    word-break: break-all;
+}
+
+/* 捕获组 */
+.regex-test__groups {
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-md);
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-msg-info);
+}
+
+.regex-test__groups-title {
+    font-family: var(--font-stack-display);
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    margin-bottom: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.regex-test__groups-title i {
+    color: var(--color-msg-info);
+}
+
+.regex-test__group-item {
+    display: flex;
+    gap: var(--spacing-md);
+    padding: var(--spacing-xs) 0;
+    border-bottom: 1px dashed var(--color-border);
+}
+
+.regex-test__group-item:last-child {
+    border-bottom: none;
+}
+
+.regex-test__group-name {
+    font-family: var(--font-stack-mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-msg-info);
+    min-width: 80px;
+}
+
+.regex-test__group-value {
+    font-family: var(--font-stack-mono);
+    font-size: 0.8rem;
+    color: var(--color-text-main);
+    word-break: break-all;
+}
+
+/* -----------------------------------------
+   空状态 - Empty State
+   ----------------------------------------- */
+.regex-test__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl);
+    background: var(--color-bg-surface);
+    background-image: var(--noise-bg);
+    border: 2px dashed var(--color-border);
+    color: var(--color-text-muted);
+    gap: var(--spacing-md);
+}
+
+.regex-test__empty i {
+    font-size: 3rem;
+    opacity: 0.5;
+}
+
+.regex-test__empty p {
+    margin: 0;
+    font-family: var(--font-stack-mono);
+    font-size: 1rem;
+}
+
+/* -----------------------------------------
+   深色模式适配 - Dark Mode
+   ----------------------------------------- */
+@media (prefers-color-scheme: dark) {
+    .regex-test__text-match {
+        background: var(--color-msg-success);
+        color: white;
+        box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+    }
+
+    .regex-test__checkbox:hover {
+        background: var(--color-bg-surface);
+    }
+
+    .regex-test__match-header:hover {
+        background: var(--color-bg-surface);
+    }
+}
+
+/* -----------------------------------------
+   参考手册 - Reference
+   ----------------------------------------- */
+.regex-test__reference {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    background: var(--color-bg-surface);
+    background-image: var(--noise-bg);
+    border: 2px solid var(--color-border);
+    padding: var(--spacing-lg);
+    box-shadow: var(--color-shadow);
+}
+
+.regex-test__reference-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 2px solid var(--color-border);
+}
+
+.regex-test__reference-header h3 {
+    margin: 0;
+    font-family: var(--font-stack-display);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--color-text-main);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.regex-test__reference-header h3 i {
+    color: var(--color-rust);
+}
+
+.regex-test__reference-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.regex-test__reference-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.regex-test__reference-title {
+    margin: 0;
+    font-family: var(--font-stack-display);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm);
+    background: var(--color-bg-surface-alt);
+    border-left: 3px solid var(--color-rust);
+}
+
+.regex-test__reference-title i {
+    color: var(--color-rust);
+    font-size: 0.9rem;
+}
+
+.regex-test__reference-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-stack-mono);
+    font-size: 0.85rem;
+    background: var(--color-bg-body);
+    border: 1px solid var(--color-border);
+}
+
+.regex-test__reference-table thead {
+    background: var(--color-bg-surface-alt);
+}
+
+.regex-test__reference-table thead th {
+    padding: var(--spacing-sm) var(--spacing-md);
+    text-align: left;
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    border-bottom: 2px solid var(--color-border);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.75rem;
+}
+
+.regex-test__reference-table tbody tr {
+    border-bottom: 1px solid var(--color-border);
+    transition: background var(--transition-fast);
+}
+
+.regex-test__reference-table tbody tr:hover {
+    background: var(--color-bg-surface-alt);
+}
+
+.regex-test__reference-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.regex-test__reference-table tbody td {
+    padding: var(--spacing-sm) var(--spacing-md);
+    color: var(--color-text-main);
+}
+
+.regex-test__reference-table tbody td:first-child {
+    font-weight: 700;
+    color: var(--color-rust);
+    width: 120px;
+}
+
+.regex-test__reference-table code {
+    background: var(--color-bg-surface);
+    color: var(--color-accent);
+    padding: 2px 6px;
+    border: 1px solid var(--color-border);
+    font-family: var(--font-stack-mono);
+    font-size: 0.9em;
+}
+
+/* -----------------------------------------
+   响应式设计 - Responsive
+   ----------------------------------------- */
+@media (max-width: 768px) {
+    .regex-test {
+        gap: var(--spacing-md);
+    }
+
+    .regex-test__header {
+        padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-sm) var(--spacing-md);
+    }
+
+    .regex-test__title {
+        font-size: 1.4rem;
+    }
+
+    .regex-test__subtitle {
+        font-size: 0.75rem;
+    }
+
+    .regex-test__quick-examples {
+        padding: var(--spacing-md);
+    }
+
+    .regex-test__quick-examples-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+
+    .regex-test__quick-examples-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+
+    .regex-test__example-btn {
+        padding: var(--spacing-sm);
+    }
+
+    .regex-test__example-name {
+        font-size: 0.85rem;
+    }
+
+    .regex-test__example-pattern {
+        font-size: 0.7rem;
+    }
+
+    .regex-test__controls {
+        padding: var(--spacing-md);
+        gap: var(--spacing-md);
+    }
+
+    .regex-test__options-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-sm);
+    }
+
+    .regex-test__textarea {
+        min-height: 150px;
+        font-size: 0.85rem;
+    }
+
+    .regex-test__stats {
+        grid-template-columns: 1fr;
+    }
+
+    .regex-test__stat-value {
+        font-size: 1.5rem;
+    }
+
+    .regex-test__preview,
+    .regex-test__matches {
+        padding: var(--spacing-md);
+    }
+
+    .regex-test__preview-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+
+    .regex-test__preview-content {
+        font-size: 0.85rem;
+        max-height: 300px;
+    }
+
+    .regex-test__match-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-xs);
+    }
+
+    .regex-test__match-title {
+        width: 100%;
+    }
+
+    .regex-test__match-preview {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .regex-test__title {
+        font-size: 1.2rem;
+    }
+
+    .regex-test__input,
+    .regex-test__textarea {
+        font-size: 0.8rem;
+        padding: var(--spacing-sm);
+    }
+
+    .regex-test__preview-header h3,
+    .regex-test__matches-header h3 {
+        font-size: 1rem;
+    }
+
+    .regex-test__legend {
+        flex-direction: column;
+        gap: var(--spacing-xs);
+    }
+
+    .regex-test__match-details {
+        padding: var(--spacing-sm);
+    }
+
+    .regex-test__match-row {
+        flex-direction: column;
+        gap: var(--spacing-xs);
+    }
+
+    .regex-test__match-label {
+        min-width: auto;
+    }
+
+    .regex-test__reference {
+        padding: var(--spacing-md);
+    }
+
+    .regex-test__reference-content {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+
+    .regex-test__reference-table {
+        font-size: 0.75rem;
+    }
+
+    .regex-test__reference-table thead th {
+        padding: var(--spacing-xs) var(--spacing-sm);
+        font-size: 0.7rem;
+    }
+
+    .regex-test__reference-table tbody td {
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+
+    .regex-test__reference-table tbody td:first-child {
+        width: auto;
+    }
+
+    .regex-test__quick-examples-grid {
+        grid-template-columns: 1fr;
+    }
+}
+

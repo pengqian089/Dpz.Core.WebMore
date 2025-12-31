@@ -51,14 +51,13 @@ public partial class ShowBsonToJson(IAppDialogService dialogService) : Component
             if (data.Count == 0)
             {
                 await dialogService.AlertAsync("未解析到任何 BSON 文档，请确认文件格式正确。");
+                return;
             }
-            else
-            {
-                var json = data.ToJson(new JsonWriterSettings { Indent = true });
-                _bsonValue = json;
-                // 内容更新后再次刷新 key
-                _renderKey = Guid.NewGuid();
-            }
+
+            var json = data.ToJson(new JsonWriterSettings { Indent = true });
+            _bsonValue = json;
+            // 内容更新后再次刷新 key
+            _renderKey = Guid.NewGuid();
         }
         catch (Exception ex)
         {
@@ -69,6 +68,20 @@ public partial class ShowBsonToJson(IAppDialogService dialogService) : Component
 
         StateHasChanged();
     }
+
+
+    private async Task DownloadAsync()
+    {
+        if (_bsonValue == "{}")
+        {
+            await dialogService.AlertAsync("请选择要处理的 BSON 文件。");
+            return;
+        }
+    }
+    
+    
+    
+    
 
     private List<BsonDocument> ParseBson(MemoryStream memoryStream)
     {

@@ -57,6 +57,16 @@ public partial class ToolsLayout(NavigationManager navigationManager) : IDisposa
                 ExactMatch = false,
                 IsNew = false,
             },
+            new ToolItem
+            {
+                Name = "正则表达式测试",
+                Description = "测试和调试正则表达式，支持匹配高亮",
+                Icon = "fa fa-asterisk",
+                Url = "tools/regex-test",
+                Category = "文本处理",
+                ExactMatch = false,
+                IsNew = true,
+            },
         ];
 
         // 提取所有分类

@@ -1,0 +1,294 @@
+﻿@page "/tools/regex-test"
+@layout ToolsLayout
+
+<div class="regex-test">
+    <div class="regex-test__header">
+        <h1 class="regex-test__title">正则表达式测试器</h1>
+        <p class="regex-test__subtitle">测试和调试正则表达式，支持匹配高亮显示</p>
+    </div>
+
+    <div class="regex-test__quick-examples">
+        <div class="regex-test__quick-examples-header">
+            <div class="regex-test__quick-examples-title">
+                <i class="fa fa-star"></i> 常用示例
+            </div>
+            <button class="regex-test__btn regex-test__btn--sm" @onclick="ToggleExamples">
+                <i class="fa @(_showExamples ? "fa-chevron-up" : "fa-chevron-down")"></i>
+                @(_showExamples ? "收起" : "展开")
+            </button>
+        </div>
+        @if (_showExamples)
+        {
+            <div class="regex-test__quick-examples-grid">
+                @foreach (var example in _examples)
+                {
+                    <button class="regex-test__example-btn" @onclick="() => LoadExample(example)">
+                        <span class="regex-test__example-name">@example.Name</span>
+                        <span class="regex-test__example-pattern">@example.Pattern</span>
+                    </button>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="regex-test__controls">
+        <div class="regex-test__pattern-group">
+            <label class="regex-test__label">
+                <i class="fa fa-code"></i> 正则表达式
+            </label>
+            <div class="regex-test__input-wrapper">
+                <input type="text" 
+                       class="regex-test__input" 
+                       @bind="_pattern" 
+                       @bind:event="oninput"
+                       placeholder="输入正则表达式，例如：\d{3}-\d{4}" />
+                @if (!string.IsNullOrEmpty(_pattern))
+                {
+                    <button class="regex-test__clear-btn" @onclick="ClearPattern" title="清除">
+                        <i class="fa fa-times"></i>
+                    </button>
+                }
+            </div>
+        </div>
+
+        <div class="regex-test__options">
+            <label class="regex-test__label">
+                <i class="fa fa-sliders-h"></i> 匹配选项
+            </label>
+            <div class="regex-test__options-grid">
+                <label class="regex-test__checkbox">
+                    <input type="checkbox" @bind="_ignoreCase" @bind:after="PerformMatch" />
+                    <span class="regex-test__checkbox-label">
+                        <i class="fa fa-font"></i> 忽略大小写
+                    </span>
+                </label>
+                <label class="regex-test__checkbox">
+                    <input type="checkbox" @bind="_multiline" @bind:after="PerformMatch" />
+                    <span class="regex-test__checkbox-label">
+                        <i class="fa fa-align-left"></i> 多行模式
+                    </span>
+                </label>
+                <label class="regex-test__checkbox">
+                    <input type="checkbox" @bind="_singleline" @bind:after="PerformMatch" />
+                    <span class="regex-test__checkbox-label">
+                        <i class="fa fa-minus"></i> 单行模式
+                    </span>
+                </label>
+                <label class="regex-test__checkbox">
+                    <input type="checkbox" @bind="_explicitCapture" @bind:after="PerformMatch" />
+                    <span class="regex-test__checkbox-label">
+                        <i class="fa fa-bullseye"></i> 显式捕获
+                    </span>
+                </label>
+            </div>
+        </div>
+
+        <div class="regex-test__text-group">
+            <label class="regex-test__label">
+                <i class="fa fa-file-text"></i> 测试文本
+            </label>
+            <textarea class="regex-test__textarea" 
+                      @bind="_testText" 
+                      @bind:event="oninput"
+                      placeholder="在这里输入要测试的文本内容..."></textarea>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(_errorMessage))
+    {
+        <div class="regex-test__error">
+            <i class="fa fa-exclamation-triangle"></i>
+            <span>@_errorMessage</span>
+        </div>
+    }
+
+    @if (_matchResult != null && !_matchResult.HasError)
+    {
+        <div class="regex-test__results">
+            <div class="regex-test__stats">
+                <div class="regex-test__stat-item regex-test__stat-item--matches">
+                    <i class="fa fa-check-circle"></i>
+                    <span class="regex-test__stat-label">匹配数量</span>
+                    <span class="regex-test__stat-value">@_matchResult.MatchCount</span>
+                </div>
+                <div class="regex-test__stat-item regex-test__stat-item--groups">
+                    <i class="fa fa-layer-group"></i>
+                    <span class="regex-test__stat-label">捕获组</span>
+                    <span class="regex-test__stat-value">@_matchResult.GroupCount</span>
+                </div>
+            </div>
+
+            <div class="regex-test__preview">
+                <div class="regex-test__preview-header">
+                    <h3>
+                        <i class="fa fa-eye"></i> 匹配预览
+                    </h3>
+                    <div class="regex-test__legend">
+                        <span class="regex-test__legend-item">
+                            <span class="regex-test__legend-color regex-test__legend-color--match"></span>
+                            匹配
+                        </span>
+                        <span class="regex-test__legend-item">
+                            <span class="regex-test__legend-color regex-test__legend-color--nomatch"></span>
+                            不匹配
+                        </span>
+                    </div>
+                </div>
+                <div class="regex-test__preview-content">
+                    @((MarkupString)_highlightedText)
+                </div>
+            </div>
+
+            @if (_matchResult.Matches.Any())
+            {
+                <div class="regex-test__matches">
+                    <div class="regex-test__matches-header">
+                        <h3>
+                            <i class="fa fa-list"></i> 匹配详情
+                        </h3>
+                        <button class="regex-test__btn regex-test__btn--sm" @onclick="ToggleAllGroups">
+                            <i class="fa @(_expandAll ? "fa-compress" : "fa-expand")"></i>
+                            @(_expandAll ? "全部收起" : "全部展开")
+                        </button>
+                    </div>
+                    <div class="regex-test__matches-list">
+                        @foreach (var (match, index) in _matchResult.Matches.Select((m, i) => (m, i)))
+                        {
+                            <div class="regex-test__match-item @(_expandedMatches.Contains(index) ? "regex-test__match-item--expanded" : "")">
+                                <div class="regex-test__match-header" @onclick="() => ToggleMatch(index)">
+                                    <div class="regex-test__match-title">
+                                        <i class="fa @(_expandedMatches.Contains(index) ? "fa-chevron-down" : "fa-chevron-right")"></i>
+                                        <span class="regex-test__match-index">匹配 #@(index + 1)</span>
+                                        <span class="regex-test__match-preview">@match.Value</span>
+                                    </div>
+                                    <span class="regex-test__match-position">[@match.Index - @(match.Index + match.Length - 1)]</span>
+                                </div>
+                                @if (_expandedMatches.Contains(index))
+                                {
+                                    <div class="regex-test__match-details">
+                                        <div class="regex-test__match-row">
+                                            <span class="regex-test__match-label">值:</span>
+                                            <span class="regex-test__match-value">@match.Value</span>
+                                        </div>
+                                        <div class="regex-test__match-row">
+                                            <span class="regex-test__match-label">位置:</span>
+                                            <span class="regex-test__match-value">@match.Index</span>
+                                        </div>
+                                        <div class="regex-test__match-row">
+                                            <span class="regex-test__match-label">长度:</span>
+                                            <span class="regex-test__match-value">@match.Length</span>
+                                        </div>
+                                        @if (match.Groups.Count > 1)
+                                        {
+                                            <div class="regex-test__groups">
+                                                <div class="regex-test__groups-title">
+                                                    <i class="fa fa-layer-group"></i> 捕获组
+                                                </div>
+                                                @foreach (var group in match.Groups.Skip(1))
+                                                {
+                                                    <div class="regex-test__group-item">
+                                                        <span class="regex-test__group-name">@group.Name</span>
+                                                        <span class="regex-test__group-value">@group.Value</span>
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else if (_matchResult != null && _matchResult.MatchCount == 0 && !string.IsNullOrEmpty(_testText) && !string.IsNullOrEmpty(_pattern))
+    {
+        <div class="regex-test__empty">
+            <i class="fa fa-search"></i>
+            <p>没有找到匹配项</p>
+        </div>
+    }
+
+    <div class="regex-test__reference">
+        <div class="regex-test__reference-header">
+            <h3><i class="fa fa-book"></i> 正则表达式参考</h3>
+            <button class="regex-test__btn regex-test__btn--sm" @onclick="ToggleReference">
+                <i class="fa @(_showReference ? "fa-chevron-up" : "fa-chevron-down")"></i>
+                @(_showReference ? "收起" : "展开")
+            </button>
+        </div>
+
+        @if (_showReference)
+        {
+            <div class="regex-test__reference-content">
+                <div class="regex-test__reference-section">
+                    <h4 class="regex-test__reference-title">
+                        <i class="fa fa-code"></i> 常用元字符
+                    </h4>
+                    <table class="regex-test__reference-table">
+                        <thead>
+                            <tr>
+                                <th>代码</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>.</code></td><td>匹配除换行符以外的任意字符</td></tr>
+                            <tr><td><code>\w</code></td><td>匹配字母或数字或下划线</td></tr>
+                            <tr><td><code>\s</code></td><td>匹配任意的空白符</td></tr>
+                            <tr><td><code>\d</code></td><td>匹配数字</td></tr>
+                            <tr><td><code>\b</code></td><td>匹配单词的开始或结束</td></tr>
+                            <tr><td><code>^</code></td><td>匹配字符串的开始</td></tr>
+                            <tr><td><code>$</code></td><td>匹配字符串的结束</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="regex-test__reference-section">
+                    <h4 class="regex-test__reference-title">
+                        <i class="fa fa-repeat"></i> 常用限定符
+                    </h4>
+                    <table class="regex-test__reference-table">
+                        <thead>
+                            <tr>
+                                <th>代码/语法</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>*</code></td><td>重复零次或更多次</td></tr>
+                            <tr><td><code>+</code></td><td>重复一次或更多次</td></tr>
+                            <tr><td><code>?</code></td><td>重复零次或一次</td></tr>
+                            <tr><td><code>{n}</code></td><td>重复n次</td></tr>
+                            <tr><td><code>{n,}</code></td><td>重复n次或更多次</td></tr>
+                            <tr><td><code>{n,m}</code></td><td>重复n到m次</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="regex-test__reference-section">
+                    <h4 class="regex-test__reference-title">
+                        <i class="fa fa-ban"></i> 常用反义词
+                    </h4>
+                    <table class="regex-test__reference-table">
+                        <thead>
+                            <tr>
+                                <th>代码/语法</th>
+                                <th>说明</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>\W</code></td><td>匹配任意不是字母，数字，下划线，汉字的字符</td></tr>
+                            <tr><td><code>\S</code></td><td>匹配任意不是空白符的字符</td></tr>
+                            <tr><td><code>\D</code></td><td>匹配任意非数字的字符</td></tr>
+                            <tr><td><code>\B</code></td><td>匹配不是单词开头或结束的位置</td></tr>
+                            <tr><td><code>[^x]</code></td><td>匹配除了x以外的任意字符</td></tr>
+                            <tr><td><code>[^aeiou]</code></td><td>匹配除了aeiou这几个字母以外的任意字符</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+    </div>
+</div>
