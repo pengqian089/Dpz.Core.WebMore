@@ -1,15 +1,15 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.IO;
+using System.Text.Json;
+using System.Threading.Tasks;
 using Dpz.Core.WebMore.Models.JsonViewer;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
-using System;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace Dpz.Core.WebMore.Pages;
 
-public partial class JsonViewer
+public partial class JsonViewer: ComponentBase
 {
     private string _jsonInput = "";
     private JsonNodeViewModel? _rootNode;
@@ -35,7 +35,7 @@ public partial class JsonViewer
             var options = new JsonDocumentOptions
             {
                 AllowTrailingCommas = true,
-                CommentHandling = JsonCommentHandling.Skip
+                CommentHandling = JsonCommentHandling.Skip,
             };
 
             using var document = JsonDocument.Parse(_jsonInput, options);
@@ -60,8 +60,8 @@ public partial class JsonViewer
             var file = e.File;
             if (file.Size > 1024 * 1024 * 5) // 5MB limit
             {
-                 _errorMessage = "File is too large (max 5MB).";
-                 return;
+                _errorMessage = "File is too large (max 5MB).";
+                return;
             }
 
             using var stream = file.OpenReadStream(1024 * 1024 * 5);
@@ -93,7 +93,7 @@ public partial class JsonViewer
             ValueKind = element.ValueKind,
             Parent = parent,
             Depth = parent == null ? 0 : parent.Depth + 1,
-            Path = parent == null ? key : $"{parent.Path}.{key}"
+            Path = parent == null ? key : $"{parent.Path}.{key}",
         };
 
         switch (element.ValueKind)
@@ -131,7 +131,7 @@ public partial class JsonViewer
 
         return node;
     }
-    
+
     private void CountNodes(JsonNodeViewModel node)
     {
         _totalNodes++;
@@ -175,11 +175,11 @@ public partial class JsonViewer
 
         var matches = 0;
         var hasVisible = PerformSearch(_rootNode, _searchText.Trim(), ref matches);
-        
+
         // If root is not visible (no matches anywhere), we should probably indicate that
         if (!hasVisible)
         {
-             _searchResult = "No matches found.";
+            _searchResult = "No matches found.";
         }
         else
         {
@@ -200,17 +200,21 @@ public partial class JsonViewer
     private bool PerformSearch(JsonNodeViewModel node, string term, ref int matchCount)
     {
         var selfMatch = false;
-        
+
         // Check Key
-        if (!string.IsNullOrEmpty(node.Key) 
-            && node.Key.Contains(term, StringComparison.OrdinalIgnoreCase))
+        if (
+            !string.IsNullOrEmpty(node.Key)
+            && node.Key.Contains(term, StringComparison.OrdinalIgnoreCase)
+        )
         {
             selfMatch = true;
         }
-        
+
         // Check Value
-        if (node.Value != null 
-            && node.Value.ToString()!.Contains(term, StringComparison.OrdinalIgnoreCase))
+        if (
+            node.Value != null
+            && node.Value.ToString()!.Contains(term, StringComparison.OrdinalIgnoreCase)
+        )
         {
             selfMatch = true;
         }
@@ -218,7 +222,7 @@ public partial class JsonViewer
         node.IsMatch = selfMatch;
         if (selfMatch)
         {
-             matchCount++;
+            matchCount++;
         }
 
         var childHasMatch = false;
@@ -233,7 +237,7 @@ public partial class JsonViewer
 
         var isVisible = selfMatch || childHasMatch;
         node.IsVisible = isVisible;
-        
+
         if (isVisible)
         {
             node.IsExpanded = childHasMatch;
