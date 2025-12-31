@@ -1,18 +1,10 @@
 ﻿<!-- Mini Player -->
-<div class="music-player__mini" id="mp-mini" title="Double click to open / Click to play/pause" 
-     @onclick="OnMiniClick" @ondblclick="OnMiniDblClick">
-    <div class="music-player__mini-cover @(_isPlaying ? "music-player__cover--rotating" : "")" 
-         style="background-image: url('@(_currentTrack?.CoverUrl ?? "/images/music.png")')"></div>
+<div class="music-player__mini" id="mp-mini" @onclick="OnMiniClick" @ondblclick="OnMiniDblClick" title="双击或者长按打开播放器/点击暂停或播放音乐">
+    <div class="music-player__mini-cover @(_isPlaying ? "music-player__cover--rotating" : "")"
+        style="background-image: url('@(_currentTrack?.CoverUrl ?? "/images/music.png")')"></div>
     <svg class="music-player__progress-ring" viewBox="0 0 80 80">
-        <circle
-            stroke="var(--music-player-theme)"
-            stroke-width="3"
-            fill="transparent"
-            r="34"
-            cx="40"
-            cy="40"
-            style="stroke-dasharray: 213.6; stroke-dashoffset: @_progressOffset;"
-        />
+        <circle stroke="var(--music-player-theme)" stroke-width="3" fill="transparent" r="34" cx="40" cy="40"
+            style="stroke-dasharray: 213.6; stroke-dashoffset: @_progressOffset;" />
     </svg>
     <div class="music-player__mini-overlay">
         <div class="music-player__mini-status">
@@ -26,7 +18,7 @@
     <div class="music-player__bg-lyrics-inner" id="mp-bg-lyrics-inner">
         @if (_lyrics.Count == 0)
         {
-             <div class="music-player__lyric-line">纯音乐 / 暂无歌词</div>
+            <div class="music-player__lyric-line">纯音乐 / 暂无歌词</div>
         }
         else
         {
@@ -55,26 +47,28 @@
         <section class="music-player__main">
             <div class="music-player__cover-wrap">
                 <div class="music-player__reactor @(_isPlaying ? "music-player__reactor--playing" : "")"
-                     style="display: @((_showLyrics && !_lyricsOnBackground) ? "none" : "flex")">
+                    style="display: @((_showLyrics && !_lyricsOnBackground) ? "none" : "flex")">
                     <div class="music-player__reactor-ring-1"></div>
                     <div class="music-player__reactor-ring-2"></div>
                     <div class="music-player__reactor-ring-3"></div>
-                    <div class="music-player__cover" 
-                         style="background-image: url('@(_currentTrack?.CoverUrl ?? "/images/music.png")')"></div>
+                    <div class="music-player__cover"
+                        style="background-image: url('@(_currentTrack?.CoverUrl ?? "/images/music.png")')"></div>
                 </div>
-                     
+
                 <!-- Lyrics Container -->
-                <div class="music-player__lyrics" style="display: @((_showLyrics && !_lyricsOnBackground) ? "block" : "none");">
+                <div class="music-player__lyrics"
+                    style="display: @((_showLyrics && !_lyricsOnBackground) ? "block" : "none");">
                     <div class="music-player__lyrics-inner">
-                         @if (_lyrics.Count == 0)
+                        @if (_lyrics.Count == 0)
                         {
-                             <div class="music-player__lyric-line">纯音乐 / 暂无歌词</div>
+                            <div class="music-player__lyric-line">纯音乐 / 暂无歌词</div>
                         }
                         else
                         {
                             @for (int i = 0; i < _lyrics.Count; i++)
                             {
-                                <div id="lyric-line-@i" class="music-player__lyric-line @(i == _currentLyricIndex ? "music-player__lyric-line--current" : "")">
+                                <div id="lyric-line-@i"
+                                    class="music-player__lyric-line @(i == _currentLyricIndex ? "music-player__lyric-line--current" : "")">
                                     @_lyrics[i].Text
                                 </div>
                             }
@@ -86,9 +80,8 @@
             <div class="music-player__controls">
                 <div class="music-player__progress">
                     <span class="music-player__time">@FormatTime(_currentTime)</span>
-                    <input type="range" class="music-player__seek" min="0" max="100" 
-                           value="@((_currentTime / (_duration > 0 ? _duration : 1)) * 100)"
-                           @onchange="OnSeekChange">
+                    <input type="range" class="music-player__seek" min="0" max="100"
+                        value="@((_currentTime / (_duration > 0 ? _duration : 1)) * 100)" @onchange="OnSeekChange">
                     <span class="music-player__time">@FormatTime(_duration)</span>
                 </div>
 
@@ -106,14 +99,28 @@
 
                 <div class="music-player__extra-controls">
                     <button class="music-player__text-btn" title="播放模式" @onclick="CycleMode">
-                         @if (_playMode == PlayMode.Order) { <i class="fa fa-sort-amount-asc"></i> }
-                         else if (_playMode == PlayMode.Random) { <i class="fa fa-random"></i> }
-                         else { <i class="fa fa-retweet"></i> }
+                        @if (_playMode == PlayMode.Order)
+                        {
+                            <i class="fa fa-sort-amount-asc"></i>
+                        }
+                        else if (_playMode == PlayMode.Random)
+                        {
+
+                            <i class="fa fa-random"></i>
+                        }
+                        else
+                        {
+
+                            <i class="fa fa-retweet"></i>
+                        }
                     </button>
-                    <button class="music-player__text-btn @(_showLyrics || _lyricsOnBackground ? "music-player__text-btn--active" : "")" title="歌词" @onclick="ToggleLrc">
+                    <button
+                        class="music-player__text-btn @(_showLyrics || _lyricsOnBackground ? "music-player__text-btn--active" : "")"
+                        title="歌词" @onclick="ToggleLrc">
                         <i class="fa-regular fa-file-lines"></i>
                     </button>
-                    <button class="music-player__text-btn @(_showList ? "music-player__text-btn--active" : "")" title="播放列表" @onclick="ToggleList">
+                    <button class="music-player__text-btn @(_showList ? "music-player__text-btn--active" : "")"
+                        title="播放列表" @onclick="ToggleList">
                         <i class="fa fa-list-ul"></i>
                     </button>
                 </div>
@@ -121,18 +128,20 @@
         </section>
 
         <section class="music-player__list @(_showList ? "music-player__list--visible" : "")" id="mp-list">
-             <!-- Mobile Close Button -->
-             <div class="music-player__list-close-mobile" style="@(_showList ? "display:flex" : "display:none")" @onclick="ToggleList">
+            <!-- Mobile Close Button -->
+            <div class="music-player__list-close-mobile" style="@(_showList ? "display:flex" : "display:none")"
+                @onclick="ToggleList">
                 <i class="fa-solid fa-angles-down"></i>
             </div>
-            
+
             <div id="mp-list-items">
                 @for (var i = 0; i < _musics.Count; i++)
                 {
                     var index = i;
                     var item = _musics[i];
-                    <div id="track-item-@index" class="music-player__item @(index == _currentIndex ? "music-player__item--active" : "")" 
-                         @onclick="() => LoadTrack(index)">
+                    <div id="track-item-@index"
+                        class="music-player__item @(index == _currentIndex ? "music-player__item--active" : "")"
+                        @onclick="() => LoadTrack(index)">
                         <div class="music-player__item-index">@(index + 1)</div>
                         <div class="music-player__item-meta">
                             <span class="music-player__item-title">@item.Title</span>

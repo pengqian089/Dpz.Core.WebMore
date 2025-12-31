@@ -1,6 +1,3 @@
-@using Dpz.Core.WebMore.Models
-@implements IDisposable
-
 <div class="dialog-overlay @(_isVisible ? "dialog-overlay--visible" : "")" @onclick="HandleOverlayClick">
     <div class="dialog @(Model.Type == DialogType.Component ? "dialog--component" : "")" 
          style="@(!string.IsNullOrEmpty(Model.Width) ? $"width: {Model.Width}; max-width: none;" : "")"
