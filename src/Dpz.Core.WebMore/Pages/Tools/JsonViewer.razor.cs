@@ -9,14 +9,14 @@ using Microsoft.AspNetCore.Components.Web;
 
 namespace Dpz.Core.WebMore.Pages.Tools;
 
-public partial class JsonViewer: ComponentBase
+public partial class JsonViewer : ComponentBase
 {
     private string _jsonInput = "";
     private JsonNodeViewModel? _rootNode;
     private string _errorMessage = "";
     private string _searchText = "";
     private string _searchResult = "";
-    private int _totalNodes = 0;
+    private int _totalNodes;
 
     private void ParseJson()
     {
@@ -58,13 +58,14 @@ public partial class JsonViewer: ComponentBase
         try
         {
             var file = e.File;
-            if (file.Size > 1024 * 1024 * 5) // 5MB limit
+            // 5MB limit
+            if (file.Size > 1024 * 1024 * 5)
             {
                 _errorMessage = "File is too large (max 5MB).";
                 return;
             }
 
-            using var stream = file.OpenReadStream(1024 * 1024 * 5);
+            await using var stream = file.OpenReadStream(1024 * 1024 * 5);
             using var reader = new StreamReader(stream);
             _jsonInput = await reader.ReadToEndAsync();
             ParseJson();
