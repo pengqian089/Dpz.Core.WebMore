@@ -132,16 +132,38 @@
                     </div>
                 </div>
 
-                <!-- Intro Skeleton -->
-                <div class="widget card">
-                    <div class="card__header">
-                        <div class="skeleton skeleton--title skeleton--w-40" style="margin: 0;"></div>
+                <!-- Intro Skeleton - 档案卡骨架 -->
+                <div class="widget card intro-card">
+                    <div class="intro-card__header">
+                        <div class="skeleton" style="height: 4px; width: 100%;"></div>
+                        <div class="intro-card__title-wrapper">
+                            <div class="skeleton skeleton--circle" style="width: 28px; height: 28px;"></div>
+                            <div class="skeleton skeleton--title" style="width: 120px; margin: 0;"></div>
+                            <div class="skeleton skeleton--text" style="width: 50px; margin: 0;"></div>
+                        </div>
                     </div>
-                    <div class="card__body">
-                        <div class="skeleton skeleton--text skeleton--w-100"></div>
-                        <div class="skeleton skeleton--text skeleton--w-100"></div>
-                        <div class="skeleton skeleton--text skeleton--w-80"></div>
-                        <div class="skeleton skeleton--text skeleton--w-60"></div>
+                    <div class="intro-card__body">
+                        <div class="intro-card__meta">
+                            <div class="intro-card__meta-item">
+                                <div class="skeleton skeleton--text" style="width: 20px; height: 10px;"></div>
+                                <div class="skeleton skeleton--text" style="width: 40px;"></div>
+                            </div>
+                            <div class="intro-card__meta-item">
+                                <div class="skeleton skeleton--text" style="width: 35px; height: 10px;"></div>
+                                <div class="skeleton skeleton--text" style="width: 35px;"></div>
+                            </div>
+                            <div class="intro-card__meta-item">
+                                <div class="skeleton skeleton--text" style="width: 40px; height: 10px;"></div>
+                                <div class="skeleton skeleton--text" style="width: 20px;"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton skeleton--text" style="width: 80px; margin-bottom: var(--spacing-md);"></div>
+                        <div class="intro-card__content">
+                            @for (int j = 0; j < 5; j++)
+                            {
+                                <div class="skeleton skeleton--text skeleton--w-100"></div>
+                            }
+                        </div>
                     </div>
                 </div>
 
@@ -296,21 +318,79 @@ else
                 </div>
     
                 
-                <!-- Introduction -->
-                <div class="widget card">
-                    <div class="card__header">
-                        <h4 class="card__title">
-                            <i class="fa-solid fa-address-card"></i>
-                            关于我
-                        </h4>
+                <!-- Introduction - 赛博朋克档案卡 -->
+                <div class="widget card intro-card">
+                    <div class="intro-card__header">
+                        <div class="intro-card__header-line"></div>
+                        <div class="intro-card__title-wrapper">
+                            <span class="intro-card__icon">
+                                <i class="fa-solid fa-fingerprint"></i>
+                            </span>
+                            <h4 class="intro-card__title">PROFILE_DATA</h4>
+                            <span class="intro-card__status">
+                                <span class="intro-card__status-dot"></span>
+                                ACTIVE
+                            </span>
+                        </div>
                     </div>
-                    <div class="card__body widget__intro">
-                        <p>彭氏胖纸者，名迁，江陵人，诞于夏。少聪慧，敏于学。</p>
-                        <p>古人有言，曰：趋于地，就于时。迁者诞于炎炎之夏，故活泼而好动。</p>
-                        <p>江陵者襟江带河，集日月精华，文人骚客多出于此，迁虽芸芸之其一，实粹粹然也。</p>
-                        <p>迁之性，稳而健，平而滑。若得于古，不可为刺客而说客也夫刺客，静若处子，动若蛇蝎。偏安于角落，偶然爆发。而说客者，平滑婉转，若流水，或缓或急，然不可断绝也。</p>
-                        <p>迁者，柔弱如水，暴怒如江。遏飞舟击巉石曲回肠终归海。</p>
+                    
+                    <div class="intro-card__body">
+                        <!-- 档案信息条 -->
+                        <div class="intro-card__meta">
+                            <div class="intro-card__meta-item">
+                                <span class="intro-card__meta-label">ID</span>
+                                <span class="intro-card__meta-value">彭迁</span>
+                            </div>
+                            <div class="intro-card__meta-item">
+                                <span class="intro-card__meta-label">ORIGIN</span>
+                                <span class="intro-card__meta-value">沙市</span>
+                            </div>
+                            <div class="intro-card__meta-item">
+                                <span class="intro-card__meta-label">SEASON</span>
+                                <span class="intro-card__meta-value">夏</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 分隔线 -->
+                        <div class="intro-card__divider">
+                            <span class="intro-card__divider-text">// BIOGRAPHY</span>
+                        </div>
+                        
+                        <!-- 正文内容 -->
+                        <div class="intro-card__content">
+                            <p class="intro-card__paragraph">
+                                <span class="intro-card__line-num">01</span>
+                                彭氏胖纸者，名迁，江陵人，诞于夏。少聪慧，敏于学。
+                            </p>
+                            <p class="intro-card__paragraph">
+                                <span class="intro-card__line-num">02</span>
+                                古人有言，曰：趋于地，就于时。迁者诞于炎炎之夏，故活泼而好动。
+                            </p>
+                            <p class="intro-card__paragraph">
+                                <span class="intro-card__line-num">03</span>
+                                江陵者襟江带河，集日月精华，文人骚客多出于此，迁虽芸芸之其一，实粹粹然也。
+                            </p>
+                            <p class="intro-card__paragraph intro-card__paragraph--highlight">
+                                <span class="intro-card__line-num">04</span>
+                                迁之性，稳而健，平而滑。若得于古，不可为刺客而说客也。
+                            </p>
+                            <p class="intro-card__paragraph">
+                                <span class="intro-card__line-num">05</span>
+                                迁者，柔弱如水，暴怒如江。遏飞舟击巉石曲回肠终归海。
+                            </p>
+                        </div>
+                        
+                        <!-- 底部装饰 -->
+                        <div class="intro-card__footer">
+                            <span class="intro-card__footer-code">&lt;/PROFILE&gt;</span>
+                            <div class="intro-card__footer-bars">
+                                <span></span><span></span><span></span><span></span><span></span>
+                            </div>
+                        </div>
                     </div>
+                    
+                    <!-- 扫描线效果 -->
+                    <div class="intro-card__scanline"></div>
                 </div>
     
                 <!-- Tags Cloud -->

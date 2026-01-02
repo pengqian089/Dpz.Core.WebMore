@@ -1325,3 +1325,356 @@
         opacity: 0.6;
     }
 }
+
+/* ==========================================================================
+   自我介绍卡片 - 赛博朋克档案风格
+   ========================================================================== */
+
+.intro-card {
+    position: relative;
+    overflow: hidden;
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+}
+
+/* 头部区域 */
+.intro-card__header {
+    position: relative;
+    padding: 0;
+}
+
+.intro-card__header-line {
+    height: 4px;
+    background: linear-gradient(
+        90deg,
+        var(--color-accent) 0%,
+        var(--color-accent) 30%,
+        var(--color-accent-secondary) 30%,
+        var(--color-accent-secondary) 60%,
+        var(--color-rust) 60%,
+        var(--color-rust) 100%
+    );
+}
+
+.intro-card__title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: var(--spacing-md);
+    background: var(--color-bg-surface-alt);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.intro-card__icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-accent);
+    color: #0d0c0b;
+    font-size: 0.8rem;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+.intro-card__title {
+    flex: 1;
+    font-family: var(--font-stack-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-main);
+    margin: 0;
+}
+
+.intro-card__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-stack-mono);
+    font-size: 0.65rem;
+    color: var(--color-msg-success);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.intro-card__status-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--color-msg-success);
+    border-radius: 50%;
+    animation: intro-status-blink 2s ease-in-out infinite;
+}
+
+@keyframes intro-status-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* 主体区域 */
+.intro-card__body {
+    padding: var(--spacing-md);
+}
+
+/* 档案信息条 */
+.intro-card__meta {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px dashed var(--color-border);
+}
+
+.intro-card__meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.intro-card__meta-label {
+    font-family: var(--font-stack-mono);
+    font-size: 0.6rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.intro-card__meta-value {
+    font-family: var(--font-stack-display);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-accent);
+}
+
+/* 分隔线 */
+.intro-card__divider {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.intro-card__divider-text {
+    font-family: var(--font-stack-mono);
+    font-size: 0.7rem;
+    color: var(--color-rust);
+    letter-spacing: 0.05em;
+}
+
+.intro-card__divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    margin-left: var(--spacing-sm);
+    background: linear-gradient(90deg, var(--color-border), transparent);
+}
+
+/* 正文内容 */
+.intro-card__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.intro-card__paragraph {
+    display: flex;
+    gap: var(--spacing-sm);
+    font-size: 0.875rem;
+    line-height: 1.8;
+    color: var(--color-text-secondary);
+    margin: 0;
+    padding: var(--spacing-xs) 0;
+    border-left: 2px solid transparent;
+    padding-left: var(--spacing-sm);
+    transition: all 0.2s ease;
+}
+
+.intro-card__paragraph:hover {
+    background: rgba(255, 183, 0, 0.05);
+    border-left-color: var(--color-accent);
+}
+
+.intro-card__line-num {
+    font-family: var(--font-stack-mono);
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    min-width: 20px;
+    opacity: 0.6;
+    user-select: none;
+}
+
+.intro-card__paragraph--highlight {
+    background: rgba(255, 183, 0, 0.08);
+    border-left-color: var(--color-accent);
+}
+
+.intro-card__paragraph--highlight .intro-card__line-num {
+    color: var(--color-accent);
+    opacity: 1;
+}
+
+/* 底部装饰 */
+.intro-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-sm);
+    border-top: 1px dashed var(--color-border);
+}
+
+.intro-card__footer-code {
+    font-family: var(--font-stack-mono);
+    font-size: 0.65rem;
+    color: var(--color-text-muted);
+    opacity: 0.5;
+}
+
+.intro-card__footer-bars {
+    display: flex;
+    gap: 3px;
+    align-items: flex-end;
+}
+
+.intro-card__footer-bars span {
+    width: 4px;
+    background: var(--color-accent);
+    opacity: 0.3;
+    animation: intro-bar-dance 1.5s ease-in-out infinite;
+}
+
+.intro-card__footer-bars span:nth-child(1) { height: 8px; animation-delay: 0s; }
+.intro-card__footer-bars span:nth-child(2) { height: 12px; animation-delay: 0.1s; }
+.intro-card__footer-bars span:nth-child(3) { height: 6px; animation-delay: 0.2s; }
+.intro-card__footer-bars span:nth-child(4) { height: 14px; animation-delay: 0.3s; }
+.intro-card__footer-bars span:nth-child(5) { height: 10px; animation-delay: 0.4s; }
+
+@keyframes intro-bar-dance {
+    0%, 100% { opacity: 0.3; transform: scaleY(1); }
+    50% { opacity: 0.8; transform: scaleY(1.5); }
+}
+
+/* 扫描线效果 */
+.intro-card__scanline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.intro-card:hover .intro-card__scanline {
+    opacity: 1;
+}
+
+.intro-card__scanline::before {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(255, 183, 0, 0.03),
+        transparent
+    );
+    animation: intro-scan 3s linear infinite;
+}
+
+@keyframes intro-scan {
+    0% { top: -50%; }
+    100% { top: 150%; }
+}
+
+/* 深色模式适配 */
+@media (prefers-color-scheme: dark) {
+    .intro-card__header-line {
+        background: linear-gradient(
+            90deg,
+            var(--color-accent) 0%,
+            var(--color-accent) 30%,
+            var(--color-accent-secondary) 30%,
+            var(--color-accent-secondary) 60%,
+            #ff6b35 60%,
+            #ff6b35 100%
+        );
+        box-shadow: 0 0 10px rgba(0, 255, 234, 0.3);
+    }
+    
+    .intro-card__icon {
+        background: var(--color-accent);
+        box-shadow: 0 0 10px rgba(0, 255, 234, 0.4);
+    }
+    
+    .intro-card__meta-value {
+        text-shadow: 0 0 10px rgba(0, 255, 234, 0.3);
+    }
+    
+    .intro-card__status-dot {
+        box-shadow: 0 0 8px var(--color-msg-success);
+    }
+    
+    .intro-card__paragraph:hover {
+        background: rgba(0, 255, 234, 0.05);
+        border-left-color: var(--color-accent);
+    }
+    
+    .intro-card__paragraph--highlight {
+        background: rgba(0, 255, 234, 0.08);
+        border-left-color: var(--color-accent);
+    }
+    
+    .intro-card__footer-bars span {
+        background: var(--color-accent);
+        box-shadow: 0 0 5px var(--color-accent);
+    }
+    
+    .intro-card__scanline::before {
+        background: linear-gradient(
+            to bottom,
+            transparent,
+            rgba(0, 255, 234, 0.05),
+            transparent
+        );
+    }
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .intro-card__meta {
+        flex-wrap: wrap;
+        gap: var(--spacing-sm);
+    }
+    
+    .intro-card__meta-item {
+        min-width: calc(33% - var(--spacing-sm));
+    }
+    
+    .intro-card__paragraph {
+        font-size: 0.8rem;
+    }
+    
+    .intro-card__line-num {
+        font-size: 0.6rem;
+        min-width: 16px;
+    }
+}
+
+/* 减速动画 - 无障碍 */
+@media (prefers-reduced-motion: reduce) {
+    .intro-card__status-dot,
+    .intro-card__footer-bars span,
+    .intro-card__scanline::before {
+        animation: none;
+    }
+    
+    .intro-card__footer-bars span {
+        opacity: 0.5;
+    }
+}
