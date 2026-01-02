@@ -3,55 +3,106 @@
 
 @if (_loading)
 {
-    <!-- Skeleton Layout -->
-    <div class="home-view">
-        <!-- Hero Skeleton -->
-        <section class="hero skeleton skeleton--block" style="height: 500px; display: block; border-radius: 0;">
-            <div class="container hero__content">
-                <div class="skeleton skeleton--title skeleton--w-40" style="height: 3rem; background: rgba(255,255,255,0.1); margin-bottom: 1rem;"></div>
-                <div class="skeleton skeleton--text skeleton--w-20" style="height: 1.5rem; background: rgba(255,255,255,0.1);"></div>
+    <!-- Skeleton Layout - 赛博朋克加载态 -->
+    <div class="home-view home-view--loading">
+        <!-- Hero Skeleton - 全屏沉浸式 -->
+        <section class="hero hero--skeleton">
+            <div class="hero__grid"></div>
+            <div class="hero__overlay"></div>
+            
+            <!-- 加载动画装饰 -->
+            <div class="hero__loading-fx">
+                <div class="hero__loading-ring"></div>
+                <div class="hero__loading-ring hero__loading-ring--delay"></div>
+            </div>
+            
+            <div class="hero__content">
+                <!-- 状态标签骨架 -->
+                <div class="skeleton-hero__tag">
+                    <span class="skeleton-hero__tag-dot"></span>
+                    <span class="skeleton-hero__tag-text">INITIALIZING...</span>
+                </div>
+                
+                <!-- 标题骨架 - 带闪烁效果 -->
+                <div class="skeleton-hero__title">
+                    <div class="skeleton skeleton--glow" style="width: 70%; max-width: 550px; height: 4.5rem; margin: 0 auto;"></div>
+                </div>
+                
+                <!-- 副标题骨架 -->
+                <div class="skeleton-hero__subtitle">
+                    <span class="skeleton-hero__line"></span>
+                    <div class="skeleton skeleton--glow" style="width: 50%; max-width: 400px; height: 1.25rem;"></div>
+                    <span class="skeleton-hero__line"></span>
+                </div>
+                
+                <!-- 按钮骨架 -->
+                <div class="skeleton-hero__actions">
+                    <div class="skeleton skeleton--button skeleton--glow" style="width: 160px; height: 52px;"></div>
+                    <div class="skeleton skeleton--button" style="width: 160px; height: 52px; opacity: 0.5;"></div>
+                </div>
+            </div>
+            
+            <!-- 滚动提示骨架 -->
+            <div class="hero__scroll" style="opacity: 0.3;">
+                <div class="hero__scroll-icon"></div>
+                <span>Loading</span>
             </div>
         </section>
 
         <div class="container page-layout">
             <div class="page-content">
                 <!-- Video Section Skeleton -->
-                <div class="home-video-section" style="margin-bottom: 2rem;">
-                    <div class="skeleton skeleton--block" style="height: 300px; border-radius: var(--radius-lg);"></div>
+                <div class="skeleton-video">
+                    <div class="skeleton-video__player">
+                        <div class="skeleton skeleton--block" style="height: 100%;"></div>
+                        <div class="skeleton-video__play-icon">
+                            <i class="fa fa-play"></i>
+                        </div>
+                    </div>
+                    <div class="skeleton-video__info">
+                        <div class="skeleton skeleton--text skeleton--w-60"></div>
+                        <div class="skeleton skeleton--text skeleton--w-30" style="opacity: 0.5;"></div>
+                    </div>
                 </div>
 
                 <!-- Section Header Skeleton -->
-                <div class="section-header" style="border: none;">
-                    <div class="skeleton skeleton--title skeleton--w-20" style="margin: 0;"></div>
+                <div class="section-header skeleton-section-header">
+                    <div class="section-title">
+                        <div class="skeleton skeleton--circle" style="width: 32px; height: 32px;"></div>
+                        <div class="skeleton skeleton--title skeleton--w-25" style="margin: 0;"></div>
+                    </div>
+                    <div class="skeleton skeleton--button" style="width: 100px; height: 32px;"></div>
                 </div>
 
                 <!-- Articles Skeleton -->
                 <div class="article-grid">
                     @for (var i = 0; i < 3; i++)
                     {
-                        <article class="article-card" style="pointer-events: none;">
-                            <div class="article-card__cover skeleton skeleton--block"></div>
+                        var delay = i * 100;
+                        <article class="article-card skeleton-article" style="pointer-events: none; animation-delay: @(delay)ms;">
+                            <div class="article-card__cover">
+                                <div class="skeleton skeleton--block" style="height: 100%;"></div>
+                                <div class="skeleton-article__cover-overlay"></div>
+                            </div>
                             <div class="article-card__content">
-                                <div class="article-card__meta">
-                                    <div class="skeleton skeleton--text skeleton--w-20"></div>
-                                    <div class="skeleton skeleton--text skeleton--w-10"></div>
+                                <div class="article-card__meta" style="display: flex; gap: 1rem; margin-bottom: 0.75rem;">
+                                    <div class="skeleton skeleton--text" style="width: 80px;"></div>
+                                    <div class="skeleton skeleton--text" style="width: 60px; opacity: 0.5;"></div>
                                 </div>
-                                <div class="article-card__title">
-                                    <div class="skeleton skeleton--title skeleton--w-80"></div>
+                                <div class="article-card__title" style="margin-bottom: 0.75rem;">
+                                    <div class="skeleton skeleton--title skeleton--w-90"></div>
                                 </div>
                                 <div class="article-card__excerpt">
-                                    <div class="skeleton skeleton--text skeleton--block"></div>
-                                    <div class="skeleton skeleton--text skeleton--block"></div>
-                                    <div class="skeleton skeleton--text skeleton--w-60"></div>
+                                    <div class="skeleton skeleton--text skeleton--w-100"></div>
+                                    <div class="skeleton skeleton--text skeleton--w-100"></div>
+                                    <div class="skeleton skeleton--text skeleton--w-70"></div>
                                 </div>
-                                <div class="article-card__footer">
-                                    <div class="article-card__tags" style="display: flex; gap: 0.5rem;">
-                                        <div class="skeleton skeleton--button skeleton--w-20"></div>
-                                        <div class="skeleton skeleton--button skeleton--w-20"></div>
+                                <div class="article-card__footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <div class="skeleton skeleton--button" style="width: 60px; height: 24px;"></div>
+                                        <div class="skeleton skeleton--button" style="width: 50px; height: 24px; opacity: 0.6;"></div>
                                     </div>
-                                    <div class="article-card__stats">
-                                        <div class="skeleton skeleton--text skeleton--w-10"></div>
-                                    </div>
+                                    <div class="skeleton skeleton--text" style="width: 40px;"></div>
                                 </div>
                             </div>
                         </article>
@@ -62,41 +113,50 @@
             <!-- Sidebar Skeleton -->
             <aside class="page-sidebar">
                 <!-- Profile Skeleton -->
-                <div class="widget card">
+                <div class="widget card skeleton-profile">
                     <div class="card__body text-center">
-                        <div class="skeleton skeleton--circle" style="width: 80px; height: 80px; margin: 0 auto 1rem auto;"></div>
-                        <div class="skeleton skeleton--title skeleton--w-40" style="margin: 0 auto 0.5rem auto;"></div>
-                        <div class="skeleton skeleton--text skeleton--w-20" style="margin: 0 auto 1rem auto;"></div>
-                        <div class="social-links mt-1" style="justify-content: center; gap: 1rem; display: flex;">
-                             <div class="skeleton skeleton--circle" style="width: 32px; height: 32px;"></div>
-                             <div class="skeleton skeleton--circle" style="width: 32px; height: 32px;"></div>
-                             <div class="skeleton skeleton--circle" style="width: 32px; height: 32px;"></div>
-                             <div class="skeleton skeleton--circle" style="width: 32px; height: 32px;"></div>
+                        <!-- 核能头像骨架 -->
+                        <div class="skeleton-avatar-reactor">
+                            <div class="skeleton-avatar-reactor__ring"></div>
+                            <div class="skeleton-avatar-reactor__ring skeleton-avatar-reactor__ring--inner"></div>
+                            <div class="skeleton skeleton--circle" style="width: 80px; height: 80px;"></div>
+                        </div>
+                        <div class="skeleton skeleton--title" style="width: 100px; margin: 1rem auto 0.5rem;"></div>
+                        <div class="skeleton skeleton--text" style="width: 60px; margin: 0 auto 1rem; opacity: 0.5;"></div>
+                        <div class="social-links" style="justify-content: center;">
+                            @for (int j = 0; j < 4; j++)
+                            {
+                                <div class="skeleton skeleton--button" style="width: 40px; height: 40px;"></div>
+                            }
                         </div>
                     </div>
                 </div>
 
                 <!-- Intro Skeleton -->
                 <div class="widget card">
-                     <div class="card__header" style="border-bottom: 1px solid var(--color-border);">
-                         <div class="skeleton skeleton--title skeleton--w-30" style="margin: 0;"></div>
-                     </div>
-                     <div class="card__body">
-                         <div class="skeleton skeleton--text"></div>
-                         <div class="skeleton skeleton--text"></div>
-                         <div class="skeleton skeleton--text"></div>
-                         <div class="skeleton skeleton--text skeleton--w-60"></div>
-                     </div>
+                    <div class="card__header">
+                        <div class="skeleton skeleton--title skeleton--w-40" style="margin: 0;"></div>
+                    </div>
+                    <div class="card__body">
+                        <div class="skeleton skeleton--text skeleton--w-100"></div>
+                        <div class="skeleton skeleton--text skeleton--w-100"></div>
+                        <div class="skeleton skeleton--text skeleton--w-80"></div>
+                        <div class="skeleton skeleton--text skeleton--w-60"></div>
+                    </div>
                 </div>
 
                 <!-- Tag Cloud Skeleton -->
-                 <div class="widget">
-                      <div class="tag-cloud">
-                          @for(int k=0; k<10; k++) {
-                              <div class="skeleton skeleton--button skeleton--w-20" style="width: 60px; height: 24px; border-radius: 99px;"></div>
-                          }
-                      </div>
-                 </div>
+                <div class="widget skeleton-tags">
+                    <div class="tag-cloud">
+                        @{
+                            var tagWidths = new[] { 55, 70, 45, 80, 60, 50, 75, 65, 55, 70 };
+                        }
+                        @for (int k = 0; k < tagWidths.Length; k++)
+                        {
+                            <div class="skeleton skeleton--button" style="width: @(tagWidths[k])px; height: 28px;"></div>
+                        }
+                    </div>
+                </div>
             </aside>
         </div>
     </div>
@@ -105,41 +165,64 @@ else
 {
     <!-- Real Content -->
     <div class="home-view">
-        <!-- Hero Section -->
+        <!-- Hero Section - 全屏沉浸式 -->
         <section class="hero" id="hero-slider">
             @if (_banners.Count > 0)
             {
-                var currentBanner = _banners[_currentBannerIndex];
-                var description = string.IsNullOrEmpty(currentBanner.Description) ? "自由 · 开放 · 合作 · 共享" : currentBanner.Description;
-                
                 @for (var i = 0; i < _banners.Count; i++)
                 {
                     var pic = _banners[i];
                     var isActive = i == _currentBannerIndex ? "active" : "";
                     <div class="hero__bg @isActive" style="background-image: url('@pic.AccessUrl')"></div>
                 }
-                
-                <div class="hero__overlay"></div>
-                <div class="container hero__content">
-                    <h1 class="hero__title" id="hero-title">@description</h1>
-                    <p class="hero__subtitle" id="hero-subtitle">保持热爱，奔赴山海</p>
-                    <div class="hero__actions">
-                        <a href="#latest-articles" class="btn btn--primary">开始阅读</a>
-                    </div>
-                </div>
             }
             else
             {
-                 <div class="hero__bg active" style="background-color: #333;"></div>
-                 <div class="hero__overlay"></div>
-                 <div class="container hero__content">
-                    <h1 class="hero__title" id="hero-title">自由 · 开放 · 合作 · 共享</h1>
-                    <p class="hero__subtitle" id="hero-subtitle">保持热爱，奔赴山海</p>
-                    <div class="hero__actions">
-                        <a href="#latest-articles" class="btn btn--primary">开始阅读</a>
-                    </div>
-                </div>
+                <div class="hero__bg active" style="background: linear-gradient(135deg, #1a1816 0%, #2b2626 50%, #1a1816 100%);"></div>
             }
+            
+            <!-- 网格装饰层 -->
+            <div class="hero__grid"></div>
+            
+            <!-- 渐变遮罩层 -->
+            <div class="hero__overlay"></div>
+            
+            <!-- 内容区域 -->
+            <div class="hero__content">
+                <!-- 装饰性标签 -->
+                <div class="hero__tag">
+                    <span class="hero__tag-icon"></span>
+                    <span>SYSTEM ONLINE</span>
+                </div>
+                
+                <!-- 主标题 - 态度语 -->
+                <h1 class="hero__title" id="hero-title" data-text="保持热爱，奔赴山海">
+                    保持热爱，奔赴山海
+                </h1>
+                
+                <!-- 副标题 -->
+                <p class="hero__subtitle" id="hero-subtitle">
+                    KEEP THE PASSION, HEAD FOR THE MOUNTAINS AND SEAS
+                </p>
+                
+                <!-- 行动按钮 -->
+                <div class="hero__actions">
+                    <a href="#latest-articles" class="btn btn--primary">
+                        <i class="fa fa-rocket"></i>
+                        开始探索
+                    </a>
+                    <a href="/article/list" class="btn btn--secondary">
+                        <i class="fa fa-book"></i>
+                        浏览文章
+                    </a>
+                </div>
+            </div>
+            
+            <!-- 滚动提示 -->
+            <div class="hero__scroll">
+                <div class="hero__scroll-icon"></div>
+                <span>Scroll</span>
+            </div>
         </section>
     
         <!-- Main Content Area -->
@@ -164,7 +247,10 @@ else
                 }
     
                 <div class="section-header">
-                    <h2 class="section-title">最新文章</h2>
+                    <h2 class="section-title">
+                        <span class="section-title__icon"><i class="fa fa-fire"></i></span>
+                        <span class="section-title__text">最新文章</span>
+                    </h2>
                     <a href="/article/list" class="section-more">查看更多 <i class="fa fa-arrow-right"></i></a>
                 </div>
                 
