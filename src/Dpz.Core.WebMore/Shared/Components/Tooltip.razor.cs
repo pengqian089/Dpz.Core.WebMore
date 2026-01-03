@@ -21,8 +21,21 @@ public partial class Tooltip(IJSRuntime jsRuntime) : ComponentBase, IAsyncDispos
     [Parameter]
     public string? Class { get; set; }
 
+    /// <summary>
+    /// 是否阻止右键菜单/触摸长按菜单，默认为 true
+    /// </summary>
+    [Parameter]
+    public bool PreventContextMenu { get; set; } = true;
+
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object> AdditionalAttributes { get; set; } = [];
+
+    private bool _preventContextMenu => PreventContextMenu;
+
+    private void OnContextMenu()
+    {
+        // 事件处理由 @oncontextmenu:preventDefault 控制
+    }
 
     private ElementReference _triggerElement;
     private ElementReference _contentElement;

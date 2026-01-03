@@ -2,6 +2,13 @@
 .tooltip {
     position: relative;
     display: inline-block;
+    /* 禁止文本选中 */
+    user-select: none;
+    -webkit-user-select: none;
+    /* 禁止触摸屏长按弹出菜单 (iOS Safari) */
+    -webkit-touch-callout: none;
+    /* 禁止触摸高亮 */
+    -webkit-tap-highlight-color: transparent;
 }
 
 .tooltip__content {
