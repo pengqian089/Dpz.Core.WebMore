@@ -192,32 +192,65 @@ export class AlbumsBlazor {
         }
     }
     
-    downloadImage(url) {
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = '';
-        link.target = '_blank';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+    async downloadImage(url) {
+        try {
+            // 使用 fetch 获取图片 blob，然后触发下载
+            const response = await fetch(url);
+            const blob = await response.blob();
+            
+            // 从 URL 中提取文件名
+            const urlParts = url.split('/');
+            let filename = urlParts[urlParts.length - 1].split('?')[0].split('!')[0];
+            if (!filename || filename.length < 3) {
+                filename = `image_${Date.now()}.jpg`;
+            }
+            
+            // 创建 blob URL 并下载
+            const blobUrl = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = filename;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // 清理 blob URL
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+        } catch (e) {
+            console.error('下载失败:', e);
+            // 降级方案：在新窗口打开图片
+            window.open(url, '_blank');
+        }
     }
     
     async shareImage(url) {
+        // 优先使用 Web Share API（移动端支持较好）
         if (navigator.share) {
             try {
                 await navigator.share({
                     title: '分享图片',
+                    text: '来看看这张图片',
                     url: url
                 });
+                return null; // 分享成功，不需要 Toast
             } catch (e) {
-                console.error(e);
+                // 用户取消分享或不支持，降级到复制链接
+                if (e.name === 'AbortError') {
+                    return null; // 用户取消，不显示 Toast
+                }
+                console.warn('Web Share API 失败:', e);
             }
-        } else {
-             navigator.clipboard.writeText(url).then(() => {
-                alert('图片链接已复制到剪贴板');
-            }).catch(() => {
-                prompt('复制链接:', url);
-            });
+        }
+        
+        // 降级方案：复制链接到剪贴板
+        try {
+            await navigator.clipboard.writeText(url);
+            return '链接已复制到剪贴板';
+        } catch (e) {
+            // 最终降级：使用 prompt
+            prompt('复制图片链接:', url);
+            return null;
         }
     }
 }

@@ -1,3 +1,5 @@
+import { CodeArea } from "./code-area.js";
+
 /**
  * Dialog Interop Module
  * 对话框交互模块，负责管理对话框打开/关闭时的行为
@@ -63,6 +65,7 @@ export function initKeyboardListener(dotNetHelper) {
 export function updateLazyLoad() {
     if (window.appInstance && window.appInstance.lazyLoadInstance) {
         window.appInstance.lazyLoadInstance.update();
+        new CodeArea();
     }
 }
 

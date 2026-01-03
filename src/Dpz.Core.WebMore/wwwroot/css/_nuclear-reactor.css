@@ -1,0 +1,649 @@
+/* ==========================================================================
+   Nuclear Reactor Avatar & Logo - Cyberpunk Style
+   核能原子炉风格头像和Logo组件
+   ========================================================================== */
+
+/* ---------------------------------------------------------
+   CSS Variables for Nuclear Effects
+   --------------------------------------------------------- */
+:root {
+    /* Nuclear Glow Colors - Light Mode */
+    --nuclear-core: #00ffea;
+    --nuclear-glow-inner: rgba(0, 255, 234, 0.8);
+    --nuclear-glow-mid: rgba(0, 255, 234, 0.4);
+    --nuclear-glow-outer: rgba(0, 255, 234, 0.1);
+    --nuclear-ring: #ffb700;
+    --nuclear-ring-secondary: #00d9f7;
+    --nuclear-particle: #ff0055;
+    --nuclear-orbit-1: rgba(255, 183, 0, 0.6);
+    --nuclear-orbit-2: rgba(0, 217, 247, 0.6);
+    --nuclear-orbit-3: rgba(255, 0, 85, 0.5);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        /* Nuclear Glow Colors - Dark Mode (More intense) */
+        --nuclear-core: #00ffea;
+        --nuclear-glow-inner: rgba(0, 255, 234, 1);
+        --nuclear-glow-mid: rgba(0, 255, 234, 0.6);
+        --nuclear-glow-outer: rgba(0, 255, 234, 0.2);
+        --nuclear-ring: #ffb700;
+        --nuclear-ring-secondary: #00ffea;
+        --nuclear-particle: #ff0055;
+        --nuclear-orbit-1: rgba(255, 183, 0, 0.8);
+        --nuclear-orbit-2: rgba(0, 255, 234, 0.8);
+        --nuclear-orbit-3: rgba(255, 0, 85, 0.7);
+    }
+}
+
+/* ---------------------------------------------------------
+   Keyframe Animations
+   --------------------------------------------------------- */
+
+/* Orbit rotation animations */
+@keyframes nuclear-orbit {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes nuclear-orbit-reverse {
+    0% { transform: rotate(360deg); }
+    100% { transform: rotate(0deg); }
+}
+
+/* Core pulse animation */
+@keyframes nuclear-pulse {
+    0%, 100% {
+        box-shadow:
+            0 0 5px var(--nuclear-glow-inner),
+            0 0 10px var(--nuclear-glow-mid),
+            0 0 20px var(--nuclear-glow-outer);
+        filter: brightness(1);
+    }
+    50% {
+        box-shadow:
+            0 0 8px var(--nuclear-glow-inner),
+            0 0 16px var(--nuclear-glow-mid),
+            0 0 32px var(--nuclear-glow-outer),
+            0 0 48px var(--nuclear-glow-outer);
+        filter: brightness(1.1);
+    }
+}
+
+/* Particle glow pulse */
+@keyframes particle-pulse {
+    0%, 100% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}
+
+/* Energy flow animation */
+@keyframes energy-flow {
+    0% {
+        stroke-dashoffset: 100%;
+    }
+    100% {
+        stroke-dashoffset: 0%;
+    }
+}
+
+/* Ring glow flicker */
+@keyframes ring-flicker {
+    0%, 100% { opacity: 1; }
+    92% { opacity: 1; }
+    93% { opacity: 0.7; }
+    94% { opacity: 1; }
+    96% { opacity: 0.8; }
+    97% { opacity: 1; }
+}
+
+/* Scanline effect */
+@keyframes nuclear-scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+}
+
+/* ---------------------------------------------------------
+   Nuclear Reactor Container Base
+   --------------------------------------------------------- */
+.nuclear-reactor {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* Aspect ratio maintained by child sizing */
+}
+
+/* ---------------------------------------------------------
+   Site Logo - Nuclear Reactor Style
+   --------------------------------------------------------- */
+.site-logo {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--color-text-main);
+    text-decoration: none;
+}
+
+.site-logo:hover {
+    border-bottom: none;
+}
+
+/* Logo Reactor Container */
+.site-logo__reactor {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Logo Image - Core */
+.site-logo__img {
+    position: relative;
+    z-index: 3;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--nuclear-core);
+    background-color: var(--color-bg-surface-alt);
+    object-fit: cover;
+    animation: nuclear-pulse 2s ease-in-out infinite;
+    transition: all 0.3s ease;
+}
+
+/* Override hexagon - use circle for reactor core */
+.site-logo__img {
+    clip-path: none;
+}
+
+/* Orbit Rings */
+.site-logo__reactor::before,
+.site-logo__reactor::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    border-radius: 50%;
+    border-style: solid;
+    border-color: transparent;
+    pointer-events: none;
+    animation: ring-flicker 4s ease-in-out infinite;
+}
+
+/* Outer orbit ring */
+.site-logo__reactor::before {
+    width: 40px;
+    height: 40px;
+    margin-top: -20px;
+    margin-left: -20px;
+    border-width: 1px;
+    border-top-color: var(--nuclear-orbit-1);
+    border-right-color: var(--nuclear-orbit-2);
+    animation: nuclear-orbit 3s linear infinite, ring-flicker 4s ease-in-out infinite;
+}
+
+/* Inner orbit ring */
+.site-logo__reactor::after {
+    width: 48px;
+    height: 48px;
+    margin-top: -24px;
+    margin-left: -24px;
+    border-width: 1px;
+    border-bottom-color: var(--nuclear-orbit-3);
+    border-left-color: var(--nuclear-orbit-1);
+    animation: nuclear-orbit-reverse 4s linear infinite, ring-flicker 4s ease-in-out infinite;
+}
+
+/* Hover state - intensify */
+.site-logo:hover .site-logo__img {
+    border-color: var(--nuclear-ring);
+    box-shadow:
+        0 0 10px var(--nuclear-glow-inner),
+        0 0 20px var(--nuclear-glow-mid),
+        0 0 40px var(--nuclear-glow-outer);
+    filter: brightness(1.2) saturate(1.2);
+}
+
+.site-logo:hover .site-logo__reactor::before {
+    animation-duration: 1.5s;
+    border-top-color: var(--nuclear-ring);
+    border-right-color: var(--nuclear-core);
+}
+
+.site-logo:hover .site-logo__reactor::after {
+    animation-duration: 2s;
+    border-bottom-color: var(--nuclear-particle);
+    border-left-color: var(--nuclear-ring);
+}
+
+/* Logo Text with Glow */
+.site-logo__text {
+    font-family: var(--font-stack-display);
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-text-main);
+    text-shadow: 2px 2px 0 var(--color-rust);
+    transition: all 0.3s ease;
+}
+
+.site-logo:hover .site-logo__text {
+    color: var(--nuclear-ring);
+    text-shadow:
+        0 0 5px var(--nuclear-glow-mid),
+        2px 2px 0 var(--color-rust);
+}
+
+/* ---------------------------------------------------------
+   Homepage Avatar - Nuclear Reactor Style (Large)
+   --------------------------------------------------------- */
+.avatar--lg {
+    /* Reset old styles */
+    clip-path: none;
+    filter: none;
+    border: none;
+    background: transparent;
+    
+    /* New nuclear styles */
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+    display: block;
+}
+
+/* Avatar Reactor Wrapper */
+.avatar-reactor {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto var(--spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Avatar Core Image */
+.avatar-reactor__core {
+    position: relative;
+    z-index: 3;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid var(--nuclear-core);
+    object-fit: cover;
+    background-color: var(--color-bg-surface-alt);
+    animation: nuclear-pulse 2.5s ease-in-out infinite;
+    transition: all 0.3s ease;
+}
+
+/* Orbit Ring 1 - Inner */
+.avatar-reactor__orbit {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    pointer-events: none;
+}
+
+.avatar-reactor__orbit--inner {
+    width: 90px;
+    height: 90px;
+    margin-top: -45px;
+    margin-left: -45px;
+    border-top-color: var(--nuclear-orbit-1);
+    border-right-color: transparent;
+    border-bottom-color: var(--nuclear-orbit-2);
+    border-left-color: transparent;
+    animation: nuclear-orbit 3s linear infinite;
+}
+
+/* Orbit Ring 2 - Middle */
+.avatar-reactor__orbit--middle {
+    width: 105px;
+    height: 105px;
+    margin-top: -52.5px;
+    margin-left: -52.5px;
+    border-top-color: transparent;
+    border-right-color: var(--nuclear-orbit-3);
+    border-bottom-color: transparent;
+    border-left-color: var(--nuclear-orbit-1);
+    animation: nuclear-orbit-reverse 4s linear infinite;
+}
+
+/* Orbit Ring 3 - Outer */
+.avatar-reactor__orbit--outer {
+    width: 118px;
+    height: 118px;
+    margin-top: -59px;
+    margin-left: -59px;
+    border-width: 1px;
+    border-top-color: var(--nuclear-orbit-2);
+    border-right-color: var(--nuclear-orbit-1);
+    border-bottom-color: var(--nuclear-orbit-3);
+    border-left-color: var(--nuclear-orbit-2);
+    animation: nuclear-orbit 5s linear infinite;
+    opacity: 0.7;
+}
+
+/* Electron Particles */
+.avatar-reactor__particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--nuclear-particle);
+    box-shadow:
+        0 0 4px var(--nuclear-particle),
+        0 0 8px var(--nuclear-particle);
+    animation: particle-pulse 1.5s ease-in-out infinite;
+}
+
+.avatar-reactor__particle--1 {
+    top: 5px;
+    left: 50%;
+    margin-left: -3px;
+    background: var(--nuclear-ring);
+    box-shadow:
+        0 0 4px var(--nuclear-ring),
+        0 0 8px var(--nuclear-ring);
+    animation-delay: 0s;
+}
+
+.avatar-reactor__particle--2 {
+    bottom: 5px;
+    right: 15px;
+    background: var(--nuclear-core);
+    box-shadow:
+        0 0 4px var(--nuclear-core),
+        0 0 8px var(--nuclear-core);
+    animation-delay: 0.5s;
+}
+
+.avatar-reactor__particle--3 {
+    bottom: 15px;
+    left: 5px;
+    animation-delay: 1s;
+}
+
+/* Energy Ring - SVG-like effect with pseudo elements */
+.avatar-reactor__energy {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100px;
+    height: 100px;
+    margin-top: -50px;
+    margin-left: -50px;
+    border-radius: 50%;
+    border: 1px dashed var(--nuclear-core);
+    opacity: 0.5;
+    animation: nuclear-orbit-reverse 8s linear infinite;
+}
+
+/* Scanline Effect Overlay */
+.avatar-reactor__scanline {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 80px;
+    height: 2px;
+    margin-left: -40px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        var(--nuclear-glow-mid),
+        var(--nuclear-glow-inner),
+        var(--nuclear-glow-mid),
+        transparent
+    );
+    z-index: 4;
+    opacity: 0;
+    animation: nuclear-scanline 3s ease-in-out infinite;
+    pointer-events: none;
+}
+
+/* Hover State - Activate reactor */
+.avatar-reactor:hover .avatar-reactor__core {
+    border-color: var(--nuclear-ring);
+    box-shadow:
+        0 0 15px var(--nuclear-glow-inner),
+        0 0 30px var(--nuclear-glow-mid),
+        0 0 60px var(--nuclear-glow-outer),
+        inset 0 0 20px var(--nuclear-glow-outer);
+    filter: brightness(1.2) saturate(1.3);
+}
+
+.avatar-reactor:hover .avatar-reactor__orbit--inner {
+    animation-duration: 1.5s;
+    border-width: 3px;
+}
+
+.avatar-reactor:hover .avatar-reactor__orbit--middle {
+    animation-duration: 2s;
+    border-width: 2px;
+}
+
+.avatar-reactor:hover .avatar-reactor__orbit--outer {
+    animation-duration: 2.5s;
+    opacity: 1;
+}
+
+.avatar-reactor:hover .avatar-reactor__particle {
+    animation-duration: 0.75s;
+}
+
+.avatar-reactor:hover .avatar-reactor__scanline {
+    opacity: 0.8;
+    animation-duration: 1.5s;
+}
+
+.avatar-reactor:hover .avatar-reactor__energy {
+    opacity: 0.8;
+    animation-duration: 4s;
+    border-style: solid;
+}
+
+/* ---------------------------------------------------------
+   Dark Mode Enhancements
+   --------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+    .site-logo__img {
+        box-shadow:
+            0 0 8px var(--nuclear-glow-inner),
+            0 0 16px var(--nuclear-glow-mid),
+            0 0 24px var(--nuclear-glow-outer);
+    }
+    
+    .site-logo__reactor::before,
+    .site-logo__reactor::after {
+        filter: drop-shadow(0 0 2px var(--nuclear-glow-mid));
+    }
+    
+    .avatar-reactor__core {
+        box-shadow:
+            0 0 10px var(--nuclear-glow-inner),
+            0 0 20px var(--nuclear-glow-mid),
+            0 0 30px var(--nuclear-glow-outer);
+    }
+    
+    .avatar-reactor__orbit {
+        filter: drop-shadow(0 0 3px var(--nuclear-glow-mid));
+    }
+    
+    .avatar-reactor__particle {
+        filter: blur(0.5px);
+    }
+}
+
+/* ---------------------------------------------------------
+   Reduced Motion - Accessibility
+   --------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    .site-logo__img,
+    .avatar-reactor__core {
+        animation: none;
+    }
+    
+    .site-logo__reactor::before,
+    .site-logo__reactor::after,
+    .avatar-reactor__orbit,
+    .avatar-reactor__energy {
+        animation: none;
+    }
+    
+    .avatar-reactor__particle {
+        animation: none;
+        opacity: 0.8;
+    }
+    
+    .avatar-reactor__scanline {
+        display: none;
+    }
+}
+
+/* ---------------------------------------------------------
+   Mobile Responsive
+   --------------------------------------------------------- */
+@media (max-width: 768px) {
+    /* Smaller logo reactor */
+    .site-logo__reactor {
+        width: 38px;
+        height: 38px;
+    }
+    
+    .site-logo__img {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .site-logo__reactor::before {
+        width: 34px;
+        height: 34px;
+        margin-top: -17px;
+        margin-left: -17px;
+    }
+    
+    .site-logo__reactor::after {
+        width: 42px;
+        height: 42px;
+        margin-top: -21px;
+        margin-left: -21px;
+    }
+    
+    /* Smaller avatar reactor */
+    .avatar-reactor {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .avatar-reactor__core {
+        width: 64px;
+        height: 64px;
+        border-width: 2px;
+    }
+    
+    .avatar-reactor__orbit--inner {
+        width: 74px;
+        height: 74px;
+        margin-top: -37px;
+        margin-left: -37px;
+    }
+    
+    .avatar-reactor__orbit--middle {
+        width: 86px;
+        height: 86px;
+        margin-top: -43px;
+        margin-left: -43px;
+    }
+    
+    .avatar-reactor__orbit--outer {
+        width: 98px;
+        height: 98px;
+        margin-top: -49px;
+        margin-left: -49px;
+    }
+    
+    .avatar-reactor__energy {
+        width: 80px;
+        height: 80px;
+        margin-top: -40px;
+        margin-left: -40px;
+    }
+    
+    .avatar-reactor__scanline {
+        width: 64px;
+        margin-left: -32px;
+    }
+    
+    .avatar-reactor__particle {
+        width: 5px;
+        height: 5px;
+    }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+    .site-logo__text {
+        font-size: 0.9rem;
+    }
+    
+    .avatar-reactor {
+        width: 90px;
+        height: 90px;
+    }
+    
+    .avatar-reactor__core {
+        width: 56px;
+        height: 56px;
+    }
+    
+    .avatar-reactor__orbit--inner {
+        width: 66px;
+        height: 66px;
+        margin-top: -33px;
+        margin-left: -33px;
+    }
+    
+    .avatar-reactor__orbit--middle {
+        width: 76px;
+        height: 76px;
+        margin-top: -38px;
+        margin-left: -38px;
+    }
+    
+    .avatar-reactor__orbit--outer {
+        width: 88px;
+        height: 88px;
+        margin-top: -44px;
+        margin-left: -44px;
+    }
+}
+
+/* ---------------------------------------------------------
+   Firefox Specific Fixes
+   --------------------------------------------------------- */
+@-moz-document url-prefix() {
+    .site-logo__img,
+    .avatar-reactor__core {
+        /* Firefox rendering optimization */
+        image-rendering: -moz-crisp-edges;
+    }
+    
+    .avatar-reactor__orbit,
+    .site-logo__reactor::before,
+    .site-logo__reactor::after {
+        /* Better anti-aliasing in Firefox */
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
+    }
+}

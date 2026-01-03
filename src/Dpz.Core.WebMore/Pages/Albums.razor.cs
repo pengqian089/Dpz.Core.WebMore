@@ -8,9 +8,11 @@ using Microsoft.JSInterop;
 
 namespace Dpz.Core.WebMore.Pages;
 
-public partial class Albums(IPictureRecordService pictureRecordService, IJSRuntime jsRuntime)
-    : ComponentBase,
-        IAsyncDisposable
+public partial class Albums(
+    IPictureRecordService pictureRecordService,
+    IJSRuntime jsRuntime,
+    IAppDialogService dialogService
+) : ComponentBase, IAsyncDisposable
 {
     private readonly List<PictureRecordModel> _pictures = [];
     private int _pageIndex = 1;
@@ -111,7 +113,7 @@ public partial class Albums(IPictureRecordService pictureRecordService, IJSRunti
 
     private async Task DownloadImage(string? url)
     {
-        if (_jsAlbums != null && string.IsNullOrWhiteSpace(url))
+        if (_jsAlbums != null && !string.IsNullOrWhiteSpace(url))
         {
             await _jsAlbums.InvokeVoidAsync("downloadImage", url);
         }
@@ -119,9 +121,13 @@ public partial class Albums(IPictureRecordService pictureRecordService, IJSRunti
 
     private async Task ShareImage(string? url)
     {
-        if (_jsAlbums != null && string.IsNullOrWhiteSpace(url))
+        if (_jsAlbums != null && !string.IsNullOrWhiteSpace(url))
         {
-            await _jsAlbums.InvokeVoidAsync("shareImage", url);
+            var result = await _jsAlbums.InvokeAsync<string?>("shareImage", url);
+            if (!string.IsNullOrEmpty(result))
+            {
+                dialogService.Toast(result, ToastType.Success);
+            }
         }
     }
 

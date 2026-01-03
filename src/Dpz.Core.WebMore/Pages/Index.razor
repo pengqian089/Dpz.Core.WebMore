@@ -3,55 +3,106 @@
 
 @if (_loading)
 {
-    <!-- Skeleton Layout -->
-    <div class="home-view">
-        <!-- Hero Skeleton -->
-        <section class="hero skeleton skeleton--block" style="height: 500px; display: block; border-radius: 0;">
-            <div class="container hero__content">
-                <div class="skeleton skeleton--title skeleton--w-40" style="height: 3rem; background: rgba(255,255,255,0.1); margin-bottom: 1rem;"></div>
-                <div class="skeleton skeleton--text skeleton--w-20" style="height: 1.5rem; background: rgba(255,255,255,0.1);"></div>
+    <!-- Skeleton Layout - 赛博朋克加载态 -->
+    <div class="home-view home-view--loading">
+        <!-- Hero Skeleton - 全屏沉浸式 -->
+        <section class="hero hero--skeleton">
+            <div class="hero__grid"></div>
+            <div class="hero__overlay"></div>
+            
+            <!-- 加载动画装饰 -->
+            <div class="hero__loading-fx">
+                <div class="hero__loading-ring"></div>
+                <div class="hero__loading-ring hero__loading-ring--delay"></div>
+            </div>
+            
+            <div class="hero__content">
+                <!-- 状态标签骨架 -->
+                <div class="skeleton-hero__tag">
+                    <span class="skeleton-hero__tag-dot"></span>
+                    <span class="skeleton-hero__tag-text">INITIALIZING...</span>
+                </div>
+                
+                <!-- 标题骨架 - 带闪烁效果 -->
+                <div class="skeleton-hero__title">
+                    <div class="skeleton skeleton--glow" style="width: 70%; max-width: 550px; height: 4.5rem; margin: 0 auto;"></div>
+                </div>
+                
+                <!-- 副标题骨架 -->
+                <div class="skeleton-hero__subtitle">
+                    <span class="skeleton-hero__line"></span>
+                    <div class="skeleton skeleton--glow" style="width: 50%; max-width: 400px; height: 1.25rem;"></div>
+                    <span class="skeleton-hero__line"></span>
+                </div>
+                
+                <!-- 按钮骨架 -->
+                <div class="skeleton-hero__actions">
+                    <div class="skeleton skeleton--button skeleton--glow" style="width: 160px; height: 52px;"></div>
+                    <div class="skeleton skeleton--button" style="width: 160px; height: 52px; opacity: 0.5;"></div>
+                </div>
+            </div>
+            
+            <!-- 滚动提示骨架 -->
+            <div class="hero__scroll" style="opacity: 0.3;">
+                <div class="hero__scroll-icon"></div>
+                <span>Loading</span>
             </div>
         </section>
 
         <div class="container page-layout">
             <div class="page-content">
                 <!-- Video Section Skeleton -->
-                <div class="home-video-section" style="margin-bottom: 2rem;">
-                    <div class="skeleton skeleton--block" style="height: 300px; border-radius: var(--radius-lg);"></div>
+                <div class="skeleton-video">
+                    <div class="skeleton-video__player">
+                        <div class="skeleton skeleton--block" style="height: 100%;"></div>
+                        <div class="skeleton-video__play-icon">
+                            <i class="fa fa-play"></i>
+                        </div>
+                    </div>
+                    <div class="skeleton-video__info">
+                        <div class="skeleton skeleton--text skeleton--w-60"></div>
+                        <div class="skeleton skeleton--text skeleton--w-30" style="opacity: 0.5;"></div>
+                    </div>
                 </div>
 
                 <!-- Section Header Skeleton -->
-                <div class="section-header" style="border: none;">
-                    <div class="skeleton skeleton--title skeleton--w-20" style="margin: 0;"></div>
+                <div class="section-header skeleton-section-header">
+                    <div class="section-title">
+                        <div class="skeleton skeleton--circle" style="width: 32px; height: 32px;"></div>
+                        <div class="skeleton skeleton--title skeleton--w-25" style="margin: 0;"></div>
+                    </div>
+                    <div class="skeleton skeleton--button" style="width: 100px; height: 32px;"></div>
                 </div>
 
                 <!-- Articles Skeleton -->
                 <div class="article-grid">
                     @for (var i = 0; i < 3; i++)
                     {
-                        <article class="article-card" style="pointer-events: none;">
-                            <div class="article-card__cover skeleton skeleton--block"></div>
+                        var delay = i * 100;
+                        <article class="article-card skeleton-article" style="pointer-events: none; animation-delay: @(delay)ms;">
+                            <div class="article-card__cover">
+                                <div class="skeleton skeleton--block" style="height: 100%;"></div>
+                                <div class="skeleton-article__cover-overlay"></div>
+                            </div>
                             <div class="article-card__content">
-                                <div class="article-card__meta">
-                                    <div class="skeleton skeleton--text skeleton--w-20"></div>
-                                    <div class="skeleton skeleton--text skeleton--w-10"></div>
+                                <div class="article-card__meta" style="display: flex; gap: 1rem; margin-bottom: 0.75rem;">
+                                    <div class="skeleton skeleton--text" style="width: 80px;"></div>
+                                    <div class="skeleton skeleton--text" style="width: 60px; opacity: 0.5;"></div>
                                 </div>
-                                <div class="article-card__title">
-                                    <div class="skeleton skeleton--title skeleton--w-80"></div>
+                                <div class="article-card__title" style="margin-bottom: 0.75rem;">
+                                    <div class="skeleton skeleton--title skeleton--w-90"></div>
                                 </div>
                                 <div class="article-card__excerpt">
-                                    <div class="skeleton skeleton--text skeleton--block"></div>
-                                    <div class="skeleton skeleton--text skeleton--block"></div>
-                                    <div class="skeleton skeleton--text skeleton--w-60"></div>
+                                    <div class="skeleton skeleton--text skeleton--w-100"></div>
+                                    <div class="skeleton skeleton--text skeleton--w-100"></div>
+                                    <div class="skeleton skeleton--text skeleton--w-70"></div>
                                 </div>
-                                <div class="article-card__footer">
-                                    <div class="article-card__tags" style="display: flex; gap: 0.5rem;">
-                                        <div class="skeleton skeleton--button skeleton--w-20"></div>
-                                        <div class="skeleton skeleton--button skeleton--w-20"></div>
+                                <div class="article-card__footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                                    <div style="display: flex; gap: 0.5rem;">
+                                        <div class="skeleton skeleton--button" style="width: 60px; height: 24px;"></div>
+                                        <div class="skeleton skeleton--button" style="width: 50px; height: 24px; opacity: 0.6;"></div>
                                     </div>
-                                    <div class="article-card__stats">
-                                        <div class="skeleton skeleton--text skeleton--w-10"></div>
-                                    </div>
+                                    <div class="skeleton skeleton--text" style="width: 40px;"></div>
                                 </div>
                             </div>
                         </article>
@@ -62,41 +113,72 @@
             <!-- Sidebar Skeleton -->
             <aside class="page-sidebar">
                 <!-- Profile Skeleton -->
-                <div class="widget card">
+                <div class="widget card skeleton-profile">
                     <div class="card__body text-center">
-                        <div class="skeleton skeleton--circle" style="width: 80px; height: 80px; margin: 0 auto 1rem auto;"></div>
-                        <div class="skeleton skeleton--title skeleton--w-40" style="margin: 0 auto 0.5rem auto;"></div>
-                        <div class="skeleton skeleton--text skeleton--w-20" style="margin: 0 auto 1rem auto;"></div>
-                        <div class="social-links mt-1" style="justify-content: center; gap: 1rem; display: flex;">
-                             <div class="skeleton skeleton--circle" style="width: 32px; height: 32px;"></div>
-                             <div class="skeleton skeleton--circle" style="width: 32px; height: 32px;"></div>
-                             <div class="skeleton skeleton--circle" style="width: 32px; height: 32px;"></div>
-                             <div class="skeleton skeleton--circle" style="width: 32px; height: 32px;"></div>
+                        <!-- 核能头像骨架 -->
+                        <div class="skeleton-avatar-reactor">
+                            <div class="skeleton-avatar-reactor__ring"></div>
+                            <div class="skeleton-avatar-reactor__ring skeleton-avatar-reactor__ring--inner"></div>
+                            <div class="skeleton skeleton--circle" style="width: 80px; height: 80px;"></div>
+                        </div>
+                        <div class="skeleton skeleton--title" style="width: 100px; margin: 1rem auto 0.5rem;"></div>
+                        <div class="skeleton skeleton--text" style="width: 60px; margin: 0 auto 1rem; opacity: 0.5;"></div>
+                        <div class="social-links" style="justify-content: center;">
+                            @for (int j = 0; j < 4; j++)
+                            {
+                                <div class="skeleton skeleton--button" style="width: 40px; height: 40px;"></div>
+                            }
                         </div>
                     </div>
                 </div>
 
-                <!-- Intro Skeleton -->
-                <div class="widget card">
-                     <div class="card__header" style="border-bottom: 1px solid var(--color-border);">
-                         <div class="skeleton skeleton--title skeleton--w-30" style="margin: 0;"></div>
-                     </div>
-                     <div class="card__body">
-                         <div class="skeleton skeleton--text"></div>
-                         <div class="skeleton skeleton--text"></div>
-                         <div class="skeleton skeleton--text"></div>
-                         <div class="skeleton skeleton--text skeleton--w-60"></div>
-                     </div>
+                <!-- Intro Skeleton - 档案卡骨架 -->
+                <div class="widget card intro-card">
+                    <div class="intro-card__header">
+                        <div class="skeleton" style="height: 4px; width: 100%;"></div>
+                        <div class="intro-card__title-wrapper">
+                            <div class="skeleton skeleton--circle" style="width: 28px; height: 28px;"></div>
+                            <div class="skeleton skeleton--title" style="width: 120px; margin: 0;"></div>
+                            <div class="skeleton skeleton--text" style="width: 50px; margin: 0;"></div>
+                        </div>
+                    </div>
+                    <div class="intro-card__body">
+                        <div class="intro-card__meta">
+                            <div class="intro-card__meta-item">
+                                <div class="skeleton skeleton--text" style="width: 20px; height: 10px;"></div>
+                                <div class="skeleton skeleton--text" style="width: 40px;"></div>
+                            </div>
+                            <div class="intro-card__meta-item">
+                                <div class="skeleton skeleton--text" style="width: 35px; height: 10px;"></div>
+                                <div class="skeleton skeleton--text" style="width: 35px;"></div>
+                            </div>
+                            <div class="intro-card__meta-item">
+                                <div class="skeleton skeleton--text" style="width: 40px; height: 10px;"></div>
+                                <div class="skeleton skeleton--text" style="width: 20px;"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton skeleton--text" style="width: 80px; margin-bottom: var(--spacing-md);"></div>
+                        <div class="intro-card__content">
+                            @for (int j = 0; j < 5; j++)
+                            {
+                                <div class="skeleton skeleton--text skeleton--w-100"></div>
+                            }
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Tag Cloud Skeleton -->
-                 <div class="widget">
-                      <div class="tag-cloud">
-                          @for(int k=0; k<10; k++) {
-                              <div class="skeleton skeleton--button skeleton--w-20" style="width: 60px; height: 24px; border-radius: 99px;"></div>
-                          }
-                      </div>
-                 </div>
+                <div class="widget skeleton-tags">
+                    <div class="tag-cloud">
+                        @{
+                            var tagWidths = new[] { 55, 70, 45, 80, 60, 50, 75, 65, 55, 70 };
+                        }
+                        @for (int k = 0; k < tagWidths.Length; k++)
+                        {
+                            <div class="skeleton skeleton--button" style="width: @(tagWidths[k])px; height: 28px;"></div>
+                        }
+                    </div>
+                </div>
             </aside>
         </div>
     </div>
@@ -105,41 +187,64 @@ else
 {
     <!-- Real Content -->
     <div class="home-view">
-        <!-- Hero Section -->
+        <!-- Hero Section - 全屏沉浸式 -->
         <section class="hero" id="hero-slider">
             @if (_banners.Count > 0)
             {
-                var currentBanner = _banners[_currentBannerIndex];
-                var description = string.IsNullOrEmpty(currentBanner.Description) ? "自由 · 开放 · 合作 · 共享" : currentBanner.Description;
-                
                 @for (var i = 0; i < _banners.Count; i++)
                 {
                     var pic = _banners[i];
                     var isActive = i == _currentBannerIndex ? "active" : "";
                     <div class="hero__bg @isActive" style="background-image: url('@pic.AccessUrl')"></div>
                 }
-                
-                <div class="hero__overlay"></div>
-                <div class="container hero__content">
-                    <h1 class="hero__title" id="hero-title">@description</h1>
-                    <p class="hero__subtitle" id="hero-subtitle">保持热爱，奔赴山海</p>
-                    <div class="hero__actions">
-                        <a href="#latest-articles" class="btn btn--primary">开始阅读</a>
-                    </div>
-                </div>
             }
             else
             {
-                 <div class="hero__bg active" style="background-color: #333;"></div>
-                 <div class="hero__overlay"></div>
-                 <div class="container hero__content">
-                    <h1 class="hero__title" id="hero-title">自由 · 开放 · 合作 · 共享</h1>
-                    <p class="hero__subtitle" id="hero-subtitle">保持热爱，奔赴山海</p>
-                    <div class="hero__actions">
-                        <a href="#latest-articles" class="btn btn--primary">开始阅读</a>
-                    </div>
-                </div>
+                <div class="hero__bg active" style="background: linear-gradient(135deg, #1a1816 0%, #2b2626 50%, #1a1816 100%);"></div>
             }
+            
+            <!-- 网格装饰层 -->
+            <div class="hero__grid"></div>
+            
+            <!-- 渐变遮罩层 -->
+            <div class="hero__overlay"></div>
+            
+            <!-- 内容区域 -->
+            <div class="hero__content">
+                <!-- 装饰性标签 -->
+                <div class="hero__tag">
+                    <span class="hero__tag-icon"></span>
+                    <span>SYSTEM ONLINE</span>
+                </div>
+                
+                <!-- 主标题 - 态度语 -->
+                <h1 class="hero__title" id="hero-title" data-text="保持热爱，奔赴山海">
+                    保持热爱，奔赴山海
+                </h1>
+                
+                <!-- 副标题 -->
+                <p class="hero__subtitle" id="hero-subtitle">
+                    KEEP THE PASSION, HEAD FOR THE MOUNTAINS AND SEAS
+                </p>
+                
+                <!-- 行动按钮 -->
+                <div class="hero__actions">
+                    <a href="#latest-articles" class="btn btn--primary">
+                        <i class="fa fa-rocket"></i>
+                        开始探索
+                    </a>
+                    <a href="/article/list" class="btn btn--secondary">
+                        <i class="fa fa-book"></i>
+                        浏览文章
+                    </a>
+                </div>
+            </div>
+            
+            <!-- 滚动提示 -->
+            <div class="hero__scroll">
+                <div class="hero__scroll-icon"></div>
+                <span>Scroll</span>
+            </div>
         </section>
     
         <!-- Main Content Area -->
@@ -164,7 +269,10 @@ else
                 }
     
                 <div class="section-header">
-                    <h2 class="section-title">最新文章</h2>
+                    <h2 class="section-title">
+                        <span class="section-title__icon"><i class="fa fa-fire"></i></span>
+                        <span class="section-title__text">最新文章</span>
+                    </h2>
                     <a href="/article/list" class="section-more">查看更多 <i class="fa fa-arrow-right"></i></a>
                 </div>
                 
@@ -178,7 +286,18 @@ else
                 <!-- Profile Card -->
                 <div class="widget card">
                     <div class="card__body text-center">
-                        <img src="@Program.AssetsHost/images/Lara-Croft.png" alt="Avatar" class="avatar avatar--lg mb-1">
+                        <!-- Nuclear Reactor Avatar -->
+                        <div class="avatar-reactor">
+                            <img src="@Program.AssetsHost/images/Lara-Croft.png" alt="Avatar" class="avatar-reactor__core">
+                            <div class="avatar-reactor__orbit avatar-reactor__orbit--inner"></div>
+                            <div class="avatar-reactor__orbit avatar-reactor__orbit--middle"></div>
+                            <div class="avatar-reactor__orbit avatar-reactor__orbit--outer"></div>
+                            <div class="avatar-reactor__particle avatar-reactor__particle--1"></div>
+                            <div class="avatar-reactor__particle avatar-reactor__particle--2"></div>
+                            <div class="avatar-reactor__particle avatar-reactor__particle--3"></div>
+                            <div class="avatar-reactor__energy"></div>
+                            <div class="avatar-reactor__scanline"></div>
+                        </div>
                         <h3 class="widget__title">叫我阿胖</h3>
                         <p class="text-muted">彭迁</p>
                         <div class="social-links mt-1">
@@ -199,21 +318,79 @@ else
                 </div>
     
                 
-                <!-- Introduction -->
-                <div class="widget card">
-                    <div class="card__header">
-                        <h4 class="card__title">
-                            <i class="fa-solid fa-address-card"></i>
-                            关于我
-                        </h4>
+                <!-- Introduction - 赛博朋克档案卡 -->
+                <div class="widget card intro-card">
+                    <div class="intro-card__header">
+                        <div class="intro-card__header-line"></div>
+                        <div class="intro-card__title-wrapper">
+                            <span class="intro-card__icon">
+                                <i class="fa-solid fa-fingerprint"></i>
+                            </span>
+                            <h4 class="intro-card__title">PROFILE_DATA</h4>
+                            <span class="intro-card__status">
+                                <span class="intro-card__status-dot"></span>
+                                ACTIVE
+                            </span>
+                        </div>
                     </div>
-                    <div class="card__body widget__intro">
-                        <p>彭氏胖纸者，名迁，江陵人，诞于夏。少聪慧，敏于学。</p>
-                        <p>古人有言，曰：趋于地，就于时。迁者诞于炎炎之夏，故活泼而好动。</p>
-                        <p>江陵者襟江带河，集日月精华，文人骚客多出于此，迁虽芸芸之其一，实粹粹然也。</p>
-                        <p>迁之性，稳而健，平而滑。若得于古，不可为刺客而说客也夫刺客，静若处子，动若蛇蝎。偏安于角落，偶然爆发。而说客者，平滑婉转，若流水，或缓或急，然不可断绝也。</p>
-                        <p>迁者，柔弱如水，暴怒如江。遏飞舟击巉石曲回肠终归海。</p>
+                    
+                    <div class="intro-card__body">
+                        <!-- 档案信息条 -->
+                        <div class="intro-card__meta">
+                            <div class="intro-card__meta-item">
+                                <span class="intro-card__meta-label">ID</span>
+                                <span class="intro-card__meta-value">彭迁</span>
+                            </div>
+                            <div class="intro-card__meta-item">
+                                <span class="intro-card__meta-label">ORIGIN</span>
+                                <span class="intro-card__meta-value">沙市</span>
+                            </div>
+                            <div class="intro-card__meta-item">
+                                <span class="intro-card__meta-label">SEASON</span>
+                                <span class="intro-card__meta-value">夏</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 分隔线 -->
+                        <div class="intro-card__divider">
+                            <span class="intro-card__divider-text">// BIOGRAPHY</span>
+                        </div>
+                        
+                        <!-- 正文内容 -->
+                        <div class="intro-card__content">
+                            <p class="intro-card__paragraph">
+                                <span class="intro-card__line-num">01</span>
+                                彭氏胖纸者，名迁，江陵人，诞于夏。少聪慧，敏于学。
+                            </p>
+                            <p class="intro-card__paragraph">
+                                <span class="intro-card__line-num">02</span>
+                                古人有言，曰：趋于地，就于时。迁者诞于炎炎之夏，故活泼而好动。
+                            </p>
+                            <p class="intro-card__paragraph">
+                                <span class="intro-card__line-num">03</span>
+                                江陵者襟江带河，集日月精华，文人骚客多出于此，迁虽芸芸之其一，实粹粹然也。
+                            </p>
+                            <p class="intro-card__paragraph intro-card__paragraph--highlight">
+                                <span class="intro-card__line-num">04</span>
+                                迁之性，稳而健，平而滑。若得于古，不可为刺客而说客也。
+                            </p>
+                            <p class="intro-card__paragraph">
+                                <span class="intro-card__line-num">05</span>
+                                迁者，柔弱如水，暴怒如江。遏飞舟击巉石曲回肠终归海。
+                            </p>
+                        </div>
+                        
+                        <!-- 底部装饰 -->
+                        <div class="intro-card__footer">
+                            <span class="intro-card__footer-code">&lt;/PROFILE&gt;</span>
+                            <div class="intro-card__footer-bars">
+                                <span></span><span></span><span></span><span></span><span></span>
+                            </div>
+                        </div>
                     </div>
+                    
+                    <!-- 扫描线效果 -->
+                    <div class="intro-card__scanline"></div>
                 </div>
     
                 <!-- Tags Cloud -->
