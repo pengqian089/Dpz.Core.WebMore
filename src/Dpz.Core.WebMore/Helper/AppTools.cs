@@ -100,7 +100,7 @@ public static class AppTools
         return pagedList;
     }
 
-    public static T GetQueryString<T>(this NavigationManager navManager, string key)
+    public static T? GetQueryString<T>(this NavigationManager navManager, string key)
     {
         var uri = navManager.ToAbsoluteUri(navManager.Uri);
 
@@ -126,7 +126,7 @@ public static class AppTools
             }
         }
 
-        return default(T);
+        return default;
     }
 
     public static string TimeAgo(this DateTime time)
