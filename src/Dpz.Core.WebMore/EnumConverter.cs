@@ -13,6 +13,17 @@ public class EnumConverter<T> : JsonConverter<T>
         JsonSerializerOptions options
     )
     {
+        try
+        {
+            var enumValue = reader.GetInt32();
+            return (T)Enum.ToObject(typeof(T), enumValue);
+        }
+        catch
+        {
+            // ignore
+        }
+            
+            
         if (Enum.TryParse(reader.GetString(), out T value))
         {
             return value;
@@ -36,6 +47,17 @@ public class EnumNullableConverter<T> : JsonConverter<T?>
         {
             return null;
         }
+        try
+        {
+            var enumValue = reader.GetInt32();
+            return (T)Enum.ToObject(typeof(T), enumValue);
+        }
+        catch
+        {
+            // ignore
+        }
+        
+        
         if (Enum.TryParse(reader.GetString(), out T value))
         {
             return value;
