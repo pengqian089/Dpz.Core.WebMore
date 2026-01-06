@@ -1,0 +1,64 @@
+@if (_isVisible)
+{
+    <div class="group-chat @(_isVisible ? "group-chat--visible" : "")">
+        <div class="group-chat__header">
+            <h3 class="group-chat__title">群组聊天</h3>
+            <button class="group-chat__close" @onclick="CloseAsync" aria-label="关闭">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+        <div class="group-chat__messages" @ref="_messagesContainer">
+            @if (_isLoadingHistory)
+            {
+                <div class="group-chat__load-more group-chat__load-more--loading">
+                    <span>加载中...</span>
+                </div>
+            }
+            else if (_hasMoreHistory && _loadedPageIndex > 1)
+            {
+                <div class="group-chat__load-more" @onclick="LoadMoreHistoryAsync">
+                    <span>加载更多...</span>
+                </div>
+            }
+            @foreach (var message in _messages)
+            {
+                @if (string.IsNullOrEmpty(message.UserId))
+                {
+                    <div class="group-chat__system-message">@message.Message</div>
+                }
+                else
+                {
+                    <div class="group-chat__message @(message.UserId == _currentUserId ? "group-chat__message--own" : "")">
+                        <img class="group-chat__avatar" src="@message.Avatar" alt="@message.UserName" />
+                        <div class="group-chat__message-content">
+                            <div class="group-chat__username">@message.UserName</div>
+                            <div class="group-chat__bubble">@message.Message</div>
+                            <div class="group-chat__timestamp">
+                                <ShowDateTime DateTime="@message.SendTime"></ShowDateTime>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+        <div class="group-chat__input-area">
+            <div class="group-chat__commands @(_showCommands ? "group-chat__commands--visible" : "")">
+                <div class="group-chat__command-item" @onclick='() => SelectCommand("/canvas")'>
+                    <span class="group-chat__command-name">/canvas</span>
+                    <span class="group-chat__command-desc">开启/加入 你画我猜</span>
+                </div>
+            </div>
+            <textarea 
+                class="group-chat__input" 
+                value="@_inputMessage"
+                @oninput="HandleInputChange"
+                @onkeydown="HandleKeyDown"
+                placeholder="输入消息... (/ 显示命令)"
+                rows="1"
+                disabled="@_isSending"
+            ></textarea>
+            <button class="group-chat__send-btn" @onclick="SendMessageAsync" disabled="@_isSending">发送</button>
+        </div>
+    </div>
+}
+

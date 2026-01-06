@@ -453,3 +453,36 @@ mark {
     50% { opacity: 0.2; }
     100% { opacity: 1; }
 }
+
+/* Version Text Click Feedback */
+.version-text {
+    cursor: pointer;
+    user-select: none;
+    transition: transform var(--transition-fast), color var(--transition-fast);
+    display: inline-block;
+}
+
+.version-text:hover {
+    color: var(--color-accent);
+}
+
+.version-text--clicked {
+    transform: scale(1.1);
+    color: var(--color-accent);
+    text-shadow: 
+        0 0 3px var(--color-accent),
+        0 0 6px var(--color-accent);
+    animation: version-click-pulse 0.2s ease-out;
+}
+
+@keyframes version-click-pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
+    100% {
+        transform: scale(1.1);
+    }
+}

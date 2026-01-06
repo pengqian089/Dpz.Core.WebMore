@@ -11,7 +11,9 @@
                 <a href="https://beian.miit.gov.cn/" target="_blank">鄂ICP备20001883号-1</a>
             </p>
             <p class="mt-1" id="app-version">
-                当前版本：@Program.Version
+                <span class="version-text @_versionClickClass" @onclick="HandleVersionClick" @onclick:preventDefault>
+                    当前版本：@Program.Version
+                </span>
                 <Tooltip Text="@_connectionStatus.Title">
                     <span class="connection-status @_connectionStatus.Class"></span>
                 </Tooltip>
@@ -26,4 +28,5 @@
 
     <MusicPlayer/>
     <Dpz.Core.WebMore.Shared.Components.Dialog.DialogContainer/>
+    <Dpz.Core.WebMore.Shared.Components.GroupChat @ref="_groupChat"/>
 </div>

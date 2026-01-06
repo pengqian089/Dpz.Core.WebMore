@@ -17,6 +17,10 @@ public partial class MainLayout(
     private IJSObjectReference? _jsModule;
     private IJSObjectReference? _loggerModule;
     private NotificationModel? _newsPublishBox;
+    private Components.GroupChat? _groupChat;
+    private int _versionClickCount;
+    private DateTime _lastVersionClickTime = DateTime.MinValue;
+    private string _versionClickClass = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -276,6 +280,45 @@ public partial class MainLayout(
         if (_loggerModule != null)
         {
             await _loggerModule.DisposeAsync();
+        }
+    }
+
+    private async Task HandleVersionClick()
+    {
+        var now = DateTime.Now;
+
+        // 如果距离上次点击超过2秒，重置计数
+        if ((now - _lastVersionClickTime).TotalSeconds > 2)
+        {
+            _versionClickCount = 0;
+        }
+
+        _lastVersionClickTime = now;
+        _versionClickCount++;
+
+        // 添加点击反馈
+        _versionClickClass = "version-text--clicked";
+        StateHasChanged();
+
+        // 移除点击反馈样式
+        _ = Task.Delay(200)
+            .ContinueWith(_ =>
+            {
+                InvokeAsync(() =>
+                {
+                    _versionClickClass = "";
+                    StateHasChanged();
+                });
+            });
+
+        // 如果点击了10次，打开群聊
+        if (_versionClickCount >= 10)
+        {
+            _versionClickCount = 0;
+            if (_groupChat != null)
+            {
+                await _groupChat.OpenAsync();
+            }
         }
     }
 
