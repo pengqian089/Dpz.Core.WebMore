@@ -61,15 +61,9 @@ public class GroupChatService : IGroupChatService
             message => OnMessageReceived?.Invoke(message)
         );
 
-        _hubConnection.On<UserInfo>(
-            "OnUserJoined",
-            user => OnUserJoined?.Invoke(user)
-        );
+        _hubConnection.On<UserInfo>("OnUserJoined", user => OnUserJoined?.Invoke(user));
 
-        _hubConnection.On<UserInfo>(
-            "OnUserLeft",
-            user => OnUserLeft?.Invoke(user)
-        );
+        _hubConnection.On<UserInfo>("OnUserLeft", user => OnUserLeft?.Invoke(user));
 
         _hubConnection.On<List<GroupChatMessage>, bool>(
             "OnHistoryLoaded",
@@ -99,10 +93,7 @@ public class GroupChatService : IGroupChatService
                 await _hubConnection.StartAsync();
 
                 // 加入群组
-                CurrentUser = await _hubConnection.InvokeAsync<UserInfo>(
-                    "JoinGroup",
-                    sessionId
-                );
+                CurrentUser = await _hubConnection.InvokeAsync<UserInfo>("JoinGroup", sessionId);
 
                 if (CurrentUser != null)
                 {

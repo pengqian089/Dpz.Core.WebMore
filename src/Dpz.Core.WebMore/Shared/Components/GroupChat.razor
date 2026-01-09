@@ -1,3 +1,5 @@
+<CanvasChat @ref="_canvasChat" />
+
 @if (_isVisible)
 {
     <div class="group-chat @(_isVisible ? "group-chat--visible" : "")">
@@ -7,7 +9,7 @@
                 <i class="fa fa-times"></i>
             </button>
         </div>
-        <div class="group-chat__messages" @ref="_messagesContainer">
+        <div class="group-chat__messages">
             @if (_isLoadingHistory)
             {
                 <div class="group-chat__load-more group-chat__load-more--loading">

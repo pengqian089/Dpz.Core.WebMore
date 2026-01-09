@@ -1,0 +1,53 @@
+@if (_isVisible)
+{
+    <div class="canvas-chat @(_isVisible ? "canvas-chat--visible" : "")">
+        <div class="canvas-chat__container">
+            <div class="canvas-chat__header">
+                <div style="display:flex; align-items:center;">
+                    <h3 class="canvas-chat__title">你画我猜 (实时画板)</h3>
+                    <span class="canvas-chat__status" style="color: @_statusColor">@_statusText</span>
+                </div>
+                <button class="canvas-chat__close" @onclick="CloseAsync" aria-label="关闭">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+            <div class="canvas-chat__body">
+                @if (!_canDraw && _drawingUser == null)
+                {
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 10;">
+                        <button class="canvas-chat__tool-btn" style="width: auto; padding: 10px 20px; font-size: 16px;" @onclick="RequestAccessAsync" title="开始画图">
+                            <i class="fa fa-pencil"></i> 开始画图
+                        </button>
+                    </div>
+                }
+                <canvas 
+                    class="canvas-chat__canvas" 
+                    width="@_canvasWidth"
+                    height="@_canvasHeight"
+                    @onmousedown="OnMouseDown"
+                    @onmousemove="OnMouseMove"
+                    @onmouseup="OnMouseUp"
+                    @onmouseout="OnMouseUp"
+                    @ontouchstart="OnTouchStart"
+                    @ontouchmove="OnTouchMove"
+                    @ontouchend="OnTouchEnd"
+                    @ontouchstart:preventDefault="true"
+                    @ontouchmove:preventDefault="true"
+                ></canvas>
+            </div>
+            @if (_canDraw)
+            {
+                <div class="canvas-chat__toolbar">
+                    <input type="color" class="canvas-chat__color-picker" @bind="_color" @bind:event="oninput" @bind:after="OnColorChangedAsync" title="选择颜色">
+                    <input type="range" class="canvas-chat__size-slider" min="1" max="20" @bind="_brushSize" @bind:event="oninput" title="笔刷大小">
+                    <button class="canvas-chat__tool-btn" @onclick="ClearCanvasAsync" title="清空画板">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                    <button class="canvas-chat__tool-btn canvas-chat__tool-btn--active" title="画笔">
+                        <i class="fa fa-pencil"></i>
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+}
