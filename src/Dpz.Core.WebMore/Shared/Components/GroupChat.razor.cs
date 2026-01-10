@@ -74,6 +74,12 @@ public partial class GroupChat(
         // 等待 DOM 更新
         await Task.Delay(50);
 
+        // 阻止输入框 Enter 键默认行为
+        if (_jsModule != null)
+        {
+            await _jsModule.InvokeVoidAsync("preventEnterKey");
+        }
+
         // 滚动到底部
         await ScrollToBottomAsync();
 
@@ -192,8 +198,25 @@ public partial class GroupChat(
         }
         else
         {
-            // 未知命令，当做普通消息发送
-            await SendMessageAsync();
+            // 未知命令，当作普通消息发送
+            _showCommands = false;
+            _isSending = true;
+            StateHasChanged();
+
+            try
+            {
+                await groupChatService.SendMessageAsync(command);
+                _inputMessage = "";
+            }
+            catch (Exception ex)
+            {
+                dialogService.Toast($"发送失败: {ex.Message}", ToastType.Error);
+            }
+            finally
+            {
+                _isSending = false;
+                StateHasChanged();
+            }
         }
     }
 
@@ -433,7 +456,7 @@ public partial class GroupChat(
     public async ValueTask DisposeAsync()
     {
         Dispose();
-        
+
         if (_jsModule != null)
         {
             await _jsModule.DisposeAsync();

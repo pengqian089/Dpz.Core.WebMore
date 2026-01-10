@@ -313,22 +313,24 @@ public partial class CanvasChat(
         }
 
         var pos = await GetMousePositionAsync(e);
+        var (oldX, oldY) = _lastPos;
 
-        await DrawLineAsync(_lastPos.X, _lastPos.Y, pos.X, pos.Y, _color, _brushSize);
+        // 立即更新 _lastPos，防止快速移动时使用旧的位置
+        _lastPos = pos;
+
+        await DrawLineAsync(oldX, oldY, pos.X, pos.Y, _color, _brushSize);
         await SendDrawDataAsync(
             new
             {
                 type = "path",
-                x0 = _lastPos.X / _canvasWidth,
-                y0 = _lastPos.Y / _canvasHeight,
+                x0 = oldX / _canvasWidth,
+                y0 = oldY / _canvasHeight,
                 x1 = pos.X / _canvasWidth,
                 y1 = pos.Y / _canvasHeight,
                 color = _color,
                 size = _brushSize,
             }
         );
-
-        _lastPos = pos;
     }
 
     private void OnMouseUp(MouseEventArgs e)
@@ -343,6 +345,7 @@ public partial class CanvasChat(
             return;
         }
 
+        // 标记触摸输入活跃
         _isDrawing = true;
         var pos = await GetTouchPositionAsync(e.Touches[0]);
         _lastPos = pos;
@@ -370,22 +373,24 @@ public partial class CanvasChat(
         }
 
         var pos = await GetTouchPositionAsync(e.Touches[0]);
+        var oldPos = _lastPos;
 
-        await DrawLineAsync(_lastPos.X, _lastPos.Y, pos.X, pos.Y, _color, _brushSize);
+        // 立即更新 _lastPos，防止快速移动时使用旧的位置
+        _lastPos = pos;
+
+        await DrawLineAsync(oldPos.X, oldPos.Y, pos.X, pos.Y, _color, _brushSize);
         await SendDrawDataAsync(
             new
             {
                 type = "path",
-                x0 = _lastPos.X / _canvasWidth,
-                y0 = _lastPos.Y / _canvasHeight,
+                x0 = oldPos.X / _canvasWidth,
+                y0 = oldPos.Y / _canvasHeight,
                 x1 = pos.X / _canvasWidth,
                 y1 = pos.Y / _canvasHeight,
                 color = _color,
                 size = _brushSize,
             }
         );
-
-        _lastPos = pos;
     }
 
     private void OnTouchEnd(TouchEventArgs e)

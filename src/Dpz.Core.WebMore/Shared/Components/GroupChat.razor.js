@@ -51,3 +51,14 @@ export function scrollToBottom() {
         }, 0);
     }
 }
+
+export function preventEnterKey() {
+    const textarea = document.querySelector('.group-chat__input');
+    if (textarea) {
+        textarea.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+            }
+        });
+    }
+}
