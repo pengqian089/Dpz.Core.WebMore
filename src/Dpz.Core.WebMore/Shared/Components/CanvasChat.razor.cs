@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Concurrent;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Dpz.Core.WebMore.Models;
 using Dpz.Core.WebMore.Service;
@@ -27,7 +29,15 @@ public partial class CanvasChat(
     private int _canvasWidth = 800;
     private int _canvasHeight = 600;
     private bool _canDraw;
-    private bool _isAutoOpened; // 标记是否是自动打开的
+
+    // 优化：发送队列和防抖
+    private readonly ConcurrentQueue<object> _sendQueue = new();
+    private readonly CancellationTokenSource _cts = new();
+    private Task? _sendTask;
+    private CanvasRect? _canvasRectInfo;
+
+    // 是否是自动打开的
+    private bool _isAutoOpened; 
     private IJSObjectReference? _jsModule;
     private DotNetObjectReference<CanvasChat>? _dotNetRef;
 
@@ -36,6 +46,31 @@ public partial class CanvasChat(
         groupChatService.OnDrawingUserChanged += HandleDrawingUserChanged;
         groupChatService.OnDraw += HandleDraw;
         _currentUserId = groupChatService.CurrentUser?.Id;
+        _sendTask = ProcessSendQueueAsync();
+    }
+
+    private async Task ProcessSendQueueAsync()
+    {
+        while (!_cts.Token.IsCancellationRequested)
+        {
+            try
+            {
+                if (!_sendQueue.IsEmpty)
+                {
+                    while (_sendQueue.TryDequeue(out var data))
+                    {
+                        await groupChatService.SendDrawingDataAsync(data);
+                    }
+                }
+            }
+            catch
+            {
+                // ignore
+            }
+
+            // 避免空转
+            await Task.Delay(15, _cts.Token);
+        }
     }
 
     public async Task OpenAsync(bool autoOpen = false)
@@ -154,6 +189,9 @@ public partial class CanvasChat(
 
             var size = await _jsModule.InvokeAsync<ViewportSize>("getViewportSize");
             _canvasWidth = size.Width;
+            _canvasHeight = size.Height;
+
+            _canvasRectInfo = await _jsModule.InvokeAsync<CanvasRect>("getCanvasBoundingRect");
             _canvasHeight = size.Height;
             StateHasChanged();
         }
@@ -312,21 +350,29 @@ public partial class CanvasChat(
             return;
         }
 
-        var pos = await GetMousePositionAsync(e);
+        // 直接使用 Event 数据
+        var x = e.OffsetX;
+        var y = e.OffsetY;
         var (oldX, oldY) = _lastPos;
 
-        // 立即更新 _lastPos，防止快速移动时使用旧的位置
-        _lastPos = pos;
+        // 距离防抖
+        if ((x - oldX) * (x - oldX) + (y - oldY) * (y - oldY) < 16)
+        {
+            return;
+        }
 
-        await DrawLineAsync(oldX, oldY, pos.X, pos.Y, _color, _brushSize);
-        await SendDrawDataAsync(
+        _lastPos = (x, y);
+
+        await DrawLineAsync(oldX, oldY, x, y, _color, _brushSize);
+
+        _sendQueue.Enqueue(
             new
             {
                 type = "path",
                 x0 = oldX / _canvasWidth,
                 y0 = oldY / _canvasHeight,
-                x1 = pos.X / _canvasWidth,
-                y1 = pos.Y / _canvasHeight,
+                x1 = x / _canvasWidth,
+                y1 = y / _canvasHeight,
                 color = _color,
                 size = _brushSize,
             }
@@ -345,20 +391,33 @@ public partial class CanvasChat(
             return;
         }
 
-        // 标记触摸输入活跃
         _isDrawing = true;
-        var pos = await GetTouchPositionAsync(e.Touches[0]);
-        _lastPos = pos;
 
-        await DrawLineAsync(_lastPos.X, _lastPos.Y, pos.X, pos.Y, _color, _brushSize);
-        await SendDrawDataAsync(
+        double x,
+            y;
+        if (_canvasRectInfo != null)
+        {
+            x = e.Touches[0].ClientX - _canvasRectInfo.Left;
+            y = e.Touches[0].ClientY - _canvasRectInfo.Top;
+        }
+        else
+        {
+            var p = await GetTouchPositionAsync(e.Touches[0]);
+            x = p.X;
+            y = p.Y;
+        }
+
+        _lastPos = (x, y);
+
+        await DrawLineAsync(x, y, x, y, _color, _brushSize);
+        _sendQueue.Enqueue(
             new
             {
                 type = "path",
-                x0 = _lastPos.X / _canvasWidth,
-                y0 = _lastPos.Y / _canvasHeight,
-                x1 = pos.X / _canvasWidth,
-                y1 = pos.Y / _canvasHeight,
+                x0 = x / _canvasWidth,
+                y0 = y / _canvasHeight,
+                x1 = x / _canvasWidth,
+                y1 = y / _canvasHeight,
                 color = _color,
                 size = _brushSize,
             }
@@ -372,21 +431,38 @@ public partial class CanvasChat(
             return;
         }
 
-        var pos = await GetTouchPositionAsync(e.Touches[0]);
-        var oldPos = _lastPos;
+        double x,
+            y;
+        if (_canvasRectInfo != null)
+        {
+            x = e.Touches[0].ClientX - _canvasRectInfo.Left;
+            y = e.Touches[0].ClientY - _canvasRectInfo.Top;
+        }
+        else
+        {
+            var p = await GetTouchPositionAsync(e.Touches[0]);
+            x = p.X;
+            y = p.Y;
+        }
 
-        // 立即更新 _lastPos，防止快速移动时使用旧的位置
-        _lastPos = pos;
+        var (oldX, oldY) = _lastPos;
 
-        await DrawLineAsync(oldPos.X, oldPos.Y, pos.X, pos.Y, _color, _brushSize);
-        await SendDrawDataAsync(
+        if ((x - oldX) * (x - oldX) + (y - oldY) * (y - oldY) < 16)
+        {
+            return;
+        }
+
+        _lastPos = (x, y);
+
+        await DrawLineAsync(oldX, oldY, x, y, _color, _brushSize);
+        _sendQueue.Enqueue(
             new
             {
                 type = "path",
-                x0 = oldPos.X / _canvasWidth,
-                y0 = oldPos.Y / _canvasHeight,
-                x1 = pos.X / _canvasWidth,
-                y1 = pos.Y / _canvasHeight,
+                x0 = oldX / _canvasWidth,
+                y0 = oldY / _canvasHeight,
+                x1 = x / _canvasWidth,
+                y1 = y / _canvasHeight,
                 color = _color,
                 size = _brushSize,
             }
@@ -519,6 +595,20 @@ public partial class CanvasChat(
 
     public async ValueTask DisposeAsync()
     {
+        _cts.Cancel();
+        if (_sendTask != null)
+        {
+            try
+            {
+                await _sendTask;
+            }
+            catch
+            {
+                // ignore
+            }
+        }
+        _cts.Dispose();
+
         Dispose();
 
         if (_jsModule != null)
@@ -549,5 +639,13 @@ public partial class CanvasChat(
     {
         public double X { get; set; }
         public double Y { get; set; }
+    }
+
+    private class CanvasRect
+    {
+        public double Left { get; set; }
+        public double Top { get; set; }
+        public double Width { get; set; }
+        public double Height { get; set; }
     }
 }

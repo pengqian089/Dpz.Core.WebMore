@@ -130,6 +130,20 @@ export function getCanvasPosition(clientX, clientY) {
     };
 }
 
+export function getCanvasBoundingRect() {
+    const canvas = document.querySelector('.canvas-chat__canvas');
+    if (!canvas) {
+        return null;
+    }
+    const rect = canvas.getBoundingClientRect();
+    return {
+        left: rect.left,
+        top: rect.top,
+        width: rect.width,
+        height: rect.height
+    };
+}
+
 export function drawLine(x0, y0, x1, y1, color, size) {
     const canvas = document.querySelector('.canvas-chat__canvas');
     if (!canvas) {
