@@ -1,0 +1,194 @@
+@page "/tools/hash-check"
+@layout ToolsLayout
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+
+<PageTitle>哈希校验 - 个人文章分享</PageTitle>
+
+<div class="hash-tool">
+    <div class="hash-tool__header">
+        <div class="hash-tool__title-group">
+            <h1 class="hash-tool__title">哈希校验</h1>
+            <div class="hash-tool__title-accent"></div>
+        </div>
+        <p class="hash-tool__subtitle">/// GENERATE • VERIFY • TEXT OR FILE</p>
+    </div>
+
+    <div class="hash-tool__section">
+        <div class="hash-tool__label-bar">
+            <span class="hash-tool__section-label">
+                <i class="fa-solid fa-shield-halved"></i> HASH ALGORITHM
+            </span>
+            <div class="hash-tool__label-actions">
+                <span class="hash-tool__hint">MD5 / SHA1 / SHA256 / SHA384 / SHA512</span>
+                @if (!string.IsNullOrEmpty(_hashValue) || !string.IsNullOrEmpty(_inputText) || !string.IsNullOrEmpty(_fileName))
+                {
+                    <button class="hash-tool__clear-btn" @onclick="ClearAll" title="清除所有数据">
+                        <i class="fa-solid fa-eraser"></i>
+                        <span>清除</span>
+                    </button>
+                }
+            </div>
+        </div>
+        <div class="hash-tool__algo-list">
+            @foreach (var algorithm in _algorithms)
+            {
+                <button class="hash-tool__algo-btn @(algorithm == _algorithm ? "hash-tool__algo-btn--active" : "")"
+                        disabled="@_isProcessing"
+                        @onclick="() => SelectAlgorithmAsync(algorithm)">
+                    @algorithm
+                </button>
+            }
+        </div>
+    </div>
+
+    <div class="hash-tool__grid">
+        <div class="hash-tool__section">
+            <div class="hash-tool__label-bar">
+                <span class="hash-tool__section-label">
+                    <i class="fa-solid fa-pen-to-square"></i> TEXT INPUT
+                </span>
+                <span class="hash-tool__hint">UTF-8</span>
+            </div>
+            <textarea class="hash-tool__textarea"
+                      @bind="_inputText"
+                      @bind:event="oninput"
+                      @bind:after="OnTextChanged"
+                      disabled="@_isProcessing"
+                      placeholder="输入要生成哈希的文本内容..."></textarea>
+        </div>
+
+        <div class="hash-tool__section">
+            <div class="hash-tool__label-bar">
+                <span class="hash-tool__section-label">
+                    <i class="fa-solid fa-file"></i> FILE INPUT
+                </span>
+                <span class="hash-tool__hint">MAX @($"{AppTools.MaxFileSize / 1024d / 1024d:F2}")MB</span>
+            </div>
+            <div class="hash-tool__file-area">
+                <div class="hash-tool__dropzone @(_isDragging ? "hash-tool__dropzone--dragging" : "")"
+                     @ondragenter="HandleDragEnter"
+                     @ondragleave="HandleDragLeave"
+                     @ondragover:preventDefault="true"
+                     @ondrop="HandleDrop"
+                     @ondrop:preventDefault="true">
+                    <InputFile OnChange="OnFileSelected" class="hash-tool__file-input" id="hashFile" disabled="@_isProcessing" />
+                    <div class="hash-tool__dropzone-content">
+                        <i class="fa-solid fa-cloud-arrow-up hash-tool__dropzone-icon"></i>
+                        <div class="hash-tool__dropzone-text">拖拽文件到此处或</div>
+                        <label for="hashFile" class="hash-tool__btn hash-tool__btn--secondary">
+                            <i class="fa-solid fa-folder-open"></i>
+                            <span>选择文件</span>
+                        </label>
+                    </div>
+                </div>
+                @if (!string.IsNullOrEmpty(_fileName))
+                {
+                    <div class="hash-tool__file-meta">
+                        <i class="fa-solid fa-file-lines"></i>
+                        <span class="hash-tool__file-name">@_fileName</span>
+                        <span class="hash-tool__file-size">@($"{_fileSize:N0}") bytes</span>
+                        <button class="hash-tool__file-remove" @onclick="ClearFile" title="移除文件">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                }
+                @if (_isProcessing)
+                {
+                    <div class="hash-tool__loading">
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                        <span>正在计算哈希...</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(_errorMessage))
+    {
+        <div class="hash-tool__error">
+            <div class="hash-tool__error-icon">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div class="hash-tool__error-content">
+                <strong>ERROR</strong>
+                <span>@_errorMessage</span>
+            </div>
+        </div>
+    }
+
+    <div class="hash-tool__section">
+        <div class="hash-tool__label-bar">
+            <span class="hash-tool__section-label">
+                <i class="fa-solid fa-hashtag"></i> HASH RESULT
+            </span>
+            <div class="hash-tool__label-actions">
+                <span class="hash-tool__hint">@CurrentSourceLabel</span>
+                @if (!string.IsNullOrEmpty(_hashValue))
+                {
+                    <button class="hash-tool__copy-btn" @onclick="CopyHashAsync" disabled="@_justCopied" title="复制哈希值">
+                        @if (_justCopied)
+                        {
+                            <i class="fa-solid fa-check"></i>
+                            <span>已复制</span>
+                        }
+                        else
+                        {
+                            <i class="fa-solid fa-copy"></i>
+                            <span>复制</span>
+                        }
+                    </button>
+                }
+            </div>
+        </div>
+        @if (string.IsNullOrEmpty(_hashValue))
+        {
+            <div class="hash-tool__empty">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>等待输入文本或选择文件</span>
+            </div>
+        }
+        else
+        {
+            <div class="hash-tool__result">
+                <div class="hash-tool__result-value">@_hashValue</div>
+            </div>
+        }
+    </div>
+
+    <div class="hash-tool__section">
+        <div class="hash-tool__label-bar">
+            <span class="hash-tool__section-label">
+                <i class="fa-solid fa-check-double"></i> HASH VERIFY
+            </span>
+            <span class="hash-tool__hint">输入要校验的哈希值</span>
+        </div>
+        <input type="text"
+               class="hash-tool__input"
+               @bind="_verifyHash"
+               @bind:event="oninput"
+               @bind:after="OnVerifyChanged"
+               placeholder="在此输入待校验的哈希值..." />
+        @if (_verifyMatched == true)
+        {
+            <div class="hash-tool__status hash-tool__status--success">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>哈希值一致</span>
+            </div>
+        }
+        else if (_verifyMatched == false)
+        {
+            <div class="hash-tool__status hash-tool__status--error">
+                <i class="fa-solid fa-circle-xmark"></i>
+                <span>哈希值不一致</span>
+            </div>
+        }
+        else
+        {
+            <div class="hash-tool__status hash-tool__status--hint">
+                <i class="fa-solid fa-info-circle"></i>
+                <span>请输入哈希值以进行校验</span>
+            </div>
+        }
+    </div>
+</div>
