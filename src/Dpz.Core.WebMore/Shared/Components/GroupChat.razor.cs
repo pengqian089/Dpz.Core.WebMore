@@ -43,7 +43,7 @@ public partial class GroupChat(
         // 导入 JS 模块
         _jsModule = await jsRuntime.InvokeAsync<IJSObjectReference>(
             "import",
-            "./Shared/Components/GroupChat.razor.js"
+            $"{Program.AssetsPrefix}/Shared/Components/GroupChat.razor.js"
         );
 
         // 检测是否为移动端

@@ -248,13 +248,15 @@ public partial class HashTool(IJSRuntime jsRuntime) : ComponentBase, IAsyncDispo
     [JSInvokable]
     public async Task HandleDroppedFile(DropFileInfo fileInfo)
     {
-        if (_isProcessing) return;
+        if (_isProcessing)
+            return;
 
         _errorMessage = string.Empty;
 
         if (fileInfo.Size > AppTools.MaxFileSize)
         {
-            _errorMessage = $"文件过大,请选择小于 {AppTools.MaxFileSize / 1024d / 1024d:F2} MB 的文件";
+            _errorMessage =
+                $"文件过大,请选择小于 {AppTools.MaxFileSize / 1024d / 1024d:F2} MB 的文件";
             await InvokeAsync(StateHasChanged);
             return;
         }
@@ -320,9 +322,11 @@ public partial class HashTool(IJSRuntime jsRuntime) : ComponentBase, IAsyncDispo
             try
             {
                 _module = await jsRuntime.InvokeAsync<IJSObjectReference>(
-                    "import", "./Pages/Tools/HashTool.razor.js");
+                    "import",
+                    $"{Program.AssetsPrefix}/Pages/Tools/HashTool.razor.js"
+                );
                 _dotNetHelper = DotNetObjectReference.Create(this);
-                
+
                 // 设置拖拽区域
                 if (_module != null && _dotNetHelper != null)
                 {

@@ -47,7 +47,7 @@ public partial class Tooltip(IJSRuntime jsRuntime) : ComponentBase, IAsyncDispos
         {
             _module = await jsRuntime.InvokeAsync<IJSObjectReference>(
                 "import",
-                "./Shared/Components/Tooltip.razor.js"
+                $"{Program.AssetsPrefix}/Shared/Components/Tooltip.razor.js"
             );
         }
     }

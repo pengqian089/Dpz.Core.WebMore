@@ -53,7 +53,7 @@ public partial class Bookmark(
         {
             _module = await jsRuntime.InvokeAsync<IJSObjectReference>(
                 "import",
-                "./Pages/Bookmark.razor.js"
+                $"{Program.AssetsPrefix}/Pages/Bookmark.razor.js"
             );
             await _module.InvokeVoidAsync("init", ".bookmark__grid");
         }

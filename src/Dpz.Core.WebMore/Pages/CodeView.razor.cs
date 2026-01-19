@@ -54,7 +54,7 @@ public partial class CodeView(
             {
                 _module = await jsRuntime.InvokeAsync<IJSObjectReference>(
                     "import",
-                    "./Pages/CodeView.razor.js"
+                    $"{Program.AssetsPrefix}/Pages/CodeView.razor.js"
                 );
                 await _module.InvokeVoidAsync(
                     "initResizableSidebar",

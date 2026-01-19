@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dpz.Core.WebMore", "Dpz.Core.WebMore\Dpz.Core.WebMore.csproj", "{47151D46-CDD4-4C7F-93F3-F8CC09A2422D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dpz.Core.WebMore.App", "Dpz.Core.WebMore.App\Dpz.Core.WebMore.App.csproj", "{8F1EAD6E-26DE-4D4D-9A4B-5B5C7CC29D7C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dpz.Core.WebMore.SPA", "Dpz.Core.WebMore.SPA\Dpz.Core.WebMore.SPA.csproj", "{9C5C9B12-7D58-44E9-9C50-8A56B0E8E9C1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{47151D46-CDD4-4C7F-93F3-F8CC09A2422D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47151D46-CDD4-4C7F-93F3-F8CC09A2422D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47151D46-CDD4-4C7F-93F3-F8CC09A2422D}.Release|Any CPU.Build.0 = Release|Any CPU
+			{8F1EAD6E-26DE-4D4D-9A4B-5B5C7CC29D7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+			{8F1EAD6E-26DE-4D4D-9A4B-5B5C7CC29D7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+			{8F1EAD6E-26DE-4D4D-9A4B-5B5C7CC29D7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+			{8F1EAD6E-26DE-4D4D-9A4B-5B5C7CC29D7C}.Release|Any CPU.Build.0 = Release|Any CPU
+			{9C5C9B12-7D58-44E9-9C50-8A56B0E8E9C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+			{9C5C9B12-7D58-44E9-9C50-8A56B0E8E9C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+			{9C5C9B12-7D58-44E9-9C50-8A56B0E8E9C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+			{9C5C9B12-7D58-44E9-9C50-8A56B0E8E9C1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

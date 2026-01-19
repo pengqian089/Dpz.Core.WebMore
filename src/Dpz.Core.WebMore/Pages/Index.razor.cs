@@ -64,7 +64,7 @@ public partial class Index(
             {
                 _videoModule = await jsRuntime.InvokeAsync<IJSObjectReference>(
                     "import",
-                    "./Pages/Index.razor.js"
+                    $"{Program.AssetsPrefix}/Pages/Index.razor.js"
                 );
                 await _videoModule.InvokeVoidAsync("initVideo", _currentVideo, Program.BaseAddress);
             }

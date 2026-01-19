@@ -40,7 +40,7 @@ public partial class DialogBox(IJSRuntime jsRuntime) : IAsyncDisposable
         {
             _dialogModule = await jsRuntime.InvokeAsync<IJSObjectReference>(
                 "import",
-                "./js/modules/dialog-interop.js"
+                $"{Program.AssetsPrefix}/js/modules/dialog-interop.js"
             );
 
             if (Model.Type == DialogType.Prompt)

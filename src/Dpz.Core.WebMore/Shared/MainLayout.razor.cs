@@ -41,11 +41,11 @@ public partial class MainLayout(
         {
             _jsModule = await jsRuntime.InvokeAsync<IJSObjectReference>(
                 "import",
-                "./js/modules/notification-interop.js"
+                $"{Program.AssetsPrefix}/js/modules/notification-interop.js"
             );
             _loggerModule = await jsRuntime.InvokeAsync<IJSObjectReference>(
                 "import",
-                "./js/modules/console-logger.js"
+                $"{Program.AssetsPrefix}/js/modules/console-logger.js"
             );
         }
         catch (Exception e)

@@ -37,7 +37,7 @@ public partial class CanvasChat(
     private CanvasRect? _canvasRectInfo;
 
     // 是否是自动打开的
-    private bool _isAutoOpened; 
+    private bool _isAutoOpened;
     private IJSObjectReference? _jsModule;
     private DotNetObjectReference<CanvasChat>? _dotNetRef;
 
@@ -91,7 +91,7 @@ public partial class CanvasChat(
         // 导入 JS 模块
         _jsModule ??= await jsRuntime.InvokeAsync<IJSObjectReference>(
             "import",
-            "./Shared/Components/CanvasChat.razor.js"
+            $"{Program.AssetsPrefix}/Shared/Components/CanvasChat.razor.js"
         );
 
         // 初始化画笔颜色（从 localStorage 读取或根据主题设置）

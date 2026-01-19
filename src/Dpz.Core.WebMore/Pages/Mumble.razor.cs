@@ -50,7 +50,7 @@ public partial class Mumble(
             {
                 _module = await jsRuntime.InvokeAsync<IJSObjectReference>(
                     "import",
-                    "./Pages/Mumble.razor.js"
+                    $"{Program.AssetsPrefix}/Pages/Mumble.razor.js"
                 );
                 // Create instance via factory function
                 _observer = await _module.InvokeAsync<IJSObjectReference>("createObserver");

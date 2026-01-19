@@ -77,7 +77,7 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
             // 导入隔离的 JS 模块
             _jsModule = await jsRuntime.InvokeAsync<IJSObjectReference>(
                 "import",
-                "./Shared/Components/MusicPlayer.razor.js"
+                $"{Program.AssetsPrefix}/Shared/Components/MusicPlayer.razor.js"
             );
             _objRef = DotNetObjectReference.Create(this);
             _jsPlayer = await _jsModule.InvokeAsync<IJSObjectReference>("initAudioPlayer", _objRef);

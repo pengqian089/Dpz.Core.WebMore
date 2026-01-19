@@ -30,7 +30,7 @@ public partial class DialogContainer(IAppDialogService dialogService, IJSRuntime
         {
             _dialogModule = await jsRuntime.InvokeAsync<IJSObjectReference>(
                 "import",
-                "./js/modules/dialog-interop.js"
+                $"{Program.AssetsPrefix}/js/modules/dialog-interop.js"
             );
 
             // 初始化全局按键监听

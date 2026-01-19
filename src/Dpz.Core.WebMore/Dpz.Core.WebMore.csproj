@@ -1,35 +1,25 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
     <Version>2.0.2</Version>
-    <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="1.4.0" />
     <PackageReference Include="dpz.core.enumlibrary" Version="1.0.1.4" />
     <PackageReference Include="Markdig" Version="0.44.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.1" />
     <PackageReference Include="MongoDB.Bson" Version="3.5.2" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
-    <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\js\modules\group-chat\canvas-chat.js" />
     <_ContentIncludedByDefault Remove="wwwroot\js\modules\group-chat\index.js" />
+    <_ContentIncludedByDefault Remove="Properties\launchSettings.json" />
   </ItemGroup>
 
 </Project>

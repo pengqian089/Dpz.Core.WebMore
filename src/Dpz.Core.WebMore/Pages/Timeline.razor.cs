@@ -41,7 +41,7 @@ public partial class Timeline(ITimelineService timelineService, IJSRuntime jsRun
             {
                 _jsModule = await jsRuntime.InvokeAsync<IJSObjectReference>(
                     "import",
-                    "./Pages/Timeline.razor.js"
+                    $"{Program.AssetsPrefix}/Pages/Timeline.razor.js"
                 );
 
                 _dotNetRef = DotNetObjectReference.Create(this);

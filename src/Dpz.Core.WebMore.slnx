@@ -1,3 +1,5 @@
 <Solution>
+  <Project Path="Dpz.Core.WebMore.App/Dpz.Core.WebMore.App.csproj" />
+  <Project Path="Dpz.Core.WebMore.SPA/Dpz.Core.WebMore.SPA.csproj" />
   <Project Path="Dpz.Core.WebMore/Dpz.Core.WebMore.csproj" />
 </Solution>

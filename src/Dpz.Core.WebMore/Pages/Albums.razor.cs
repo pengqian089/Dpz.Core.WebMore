@@ -38,7 +38,7 @@ public partial class Albums(
         {
             _module = await jsRuntime.InvokeAsync<IJSObjectReference>(
                 "import",
-                "./Pages/Albums.razor.js"
+                $"{Program.AssetsPrefix}/Pages/Albums.razor.js"
             );
             _objRef = DotNetObjectReference.Create(this);
             _jsAlbums = await _module.InvokeAsync<IJSObjectReference>("create", _objRef, ".albums");

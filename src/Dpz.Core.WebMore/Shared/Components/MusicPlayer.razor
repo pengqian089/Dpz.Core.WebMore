@@ -2,7 +2,7 @@
 <div class="music-player__mini" id="mp-mini" @onclick="OnMiniClick" @ondblclick="OnMiniDblClick"
     title="双击或者长按打开播放器/点击暂停或播放音乐">
     <div class="music-player__mini-cover @(_isPlaying ? "music-player__cover--rotating" : "")"
-        style="background-image: url('@(_currentTrack?.CoverUrl ?? "/images/music.png")')"></div>
+        style="background-image: url('@(_currentTrack?.CoverUrl ?? "/_content/Dpz.Core.WebMore/images/music.png")')"></div>
     <svg class="music-player__progress-ring" viewBox="0 0 80 80">
         <circle stroke="var(--music-player-theme)" stroke-width="3" fill="transparent" r="34" cx="40" cy="40"
             style="stroke-dasharray: 213.6; stroke-dashoffset: @_progressOffset;" />
@@ -53,7 +53,7 @@
                     <div class="music-player__reactor-ring-2"></div>
                     <div class="music-player__reactor-ring-3"></div>
                     <div class="music-player__cover"
-                        style="background-image: url('@(_currentTrack?.CoverUrl ?? "/images/music.png")')"></div>
+                        style="background-image: url('@(_currentTrack?.CoverUrl ?? "/_content/Dpz.Core.WebMore//images/music.png")')"></div>
                 </div>
 
                 <!-- Lyrics Container -->
