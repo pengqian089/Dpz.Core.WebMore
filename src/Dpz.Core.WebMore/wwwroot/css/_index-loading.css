@@ -163,7 +163,7 @@
 /* Progress Bar Fill */
 .app-startup__bar {
     height: 100%;
-    width: var(--blazor-load-percentage, 10%);
+    width: var(--blazor-load-percentage, 0%);
     background: repeating-linear-gradient(
         45deg,
         #bc13fe,

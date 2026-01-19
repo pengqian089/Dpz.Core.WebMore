@@ -10,17 +10,27 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
-            .ConfigureFonts(fonts => { fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular"); });
+            .ConfigureFonts(fonts =>
+            {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+            });
 
         builder.Services.AddMauiBlazorWebView();
 
         builder.Services.AddWebMoreUi(
             new WebMoreOptions
             {
+#if DEBUG
+                BaseAddress = "https://localhost:53381",
+                WebHost = "https://localhost:37701",
+                AssetsHost = "https://localhost:5505/core",
+                LibraryHost = "https://localhost:5505"
+#else
                 BaseAddress = "https://api.dpangzi.com",
                 WebHost = "https://core.dpangzi.com",
                 AssetsHost = "https://assets.dpangzi.com/core",
                 LibraryHost = "https://dpangzi.com"
+#endif
             }
         );
 
