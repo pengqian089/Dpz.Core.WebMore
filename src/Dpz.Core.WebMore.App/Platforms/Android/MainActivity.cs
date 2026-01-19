@@ -2,8 +2,10 @@
 using Android.Content.PM;
 using Android.OS;
 using Android.Views;
+using Android.Webkit;
 using AndroidX.Core.View;
 using Dpz.Core.WebMore.Service;
+using WebView = Android.Webkit.WebView;
 
 namespace Dpz.Core.WebMore.App;
 
@@ -45,14 +47,33 @@ public class MainActivity : MauiAppCompatActivity
     public override void OnBackPressed()
 #pragma warning restore CS0672 // 成员将重写过时的成员
     {
-        var webView =
-            MainPage.BlazorWebViewInstance?.Handler?.PlatformView as Android.Webkit.WebView;
-        if (webView?.CanGoBack() == true)
+        if (MainPage.BlazorWebViewInstance?.Handler?.PlatformView is WebView webView)
         {
-            webView.GoBack();
+            if (webView.CanGoBack())
+            {
+                webView.GoBack();
+                return;
+            }
+
+            webView.EvaluateJavascript(
+                "(function(){if(history.length>1){history.back();return '1';}return '0';})()",
+                new JsValueCallback(result =>
+                {
+                    if (result == "1")
+                    {
+                        return;
+                    }
+                    HandleExitRequest();
+                })
+            );
             return;
         }
 
+        HandleExitRequest();
+    }
+
+    private void HandleExitRequest()
+    {
         var now = DateTime.UtcNow;
         if ((now - _lastBackPressedUtc).TotalSeconds <= 2)
         {
@@ -71,9 +92,16 @@ public class MainActivity : MauiAppCompatActivity
         }
         else
         {
-#pragma warning disable CS0612 // 类型或成员已过时
-            base.OnBackPressed();
-#pragma warning restore CS0612 // 类型或成员已过时
+            Finish();
+        }
+    }
+
+    private sealed class JsValueCallback(Action<string> onResult) : Java.Lang.Object, IValueCallback
+    {
+        public void OnReceiveValue(Java.Lang.Object? value)
+        {
+            var str = value?.ToString()?.Trim('"') ?? "0";
+            onResult(str);
         }
     }
 
