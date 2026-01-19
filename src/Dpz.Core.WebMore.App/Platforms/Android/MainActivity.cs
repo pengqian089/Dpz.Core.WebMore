@@ -1,6 +1,8 @@
 ﻿using Android.App;
 using Android.Content.PM;
 using Android.OS;
+using Android.Views;
+using AndroidX.Core.View;
 
 namespace Dpz.Core.WebMore.App;
 
@@ -9,4 +11,15 @@ namespace Dpz.Core.WebMore.App;
                            ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
 public class MainActivity : MauiAppCompatActivity
 {
+    protected override void OnCreate(Bundle? savedInstanceState)
+    {
+        base.OnCreate(savedInstanceState);
+
+        WindowCompat.SetDecorFitsSystemWindows(Window, false);
+
+        if (Build.VERSION.SdkInt >= BuildVersionCodes.P)
+        {
+            Window?.Attributes?.LayoutInDisplayCutoutMode = LayoutInDisplayCutoutMode.ShortEdges;
+        }
+    }
 }

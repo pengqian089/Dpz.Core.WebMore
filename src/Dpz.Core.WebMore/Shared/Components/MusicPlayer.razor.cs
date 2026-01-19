@@ -689,13 +689,35 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
 
         if (_jsPlayer != null)
         {
-            // 停止进度保存
-            await _jsPlayer.InvokeVoidAsync("stopProgressSave");
-            await _jsPlayer.DisposeAsync();
+            try
+            {
+                // 停止进度保存
+                await _jsPlayer.InvokeVoidAsync("stopProgressSave");
+                await _jsPlayer.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // WebView 重载/关闭时 JS 运行时已释放，忽略
+            }
+            catch (JSException)
+            {
+                // JS 运行时已释放或对象不存在，忽略
+            }
         }
         if (_jsModule != null)
         {
-            await _jsModule.DisposeAsync();
+            try
+            {
+                await _jsModule.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+                // WebView 重载/关闭时 JS 运行时已释放，忽略
+            }
+            catch (JSException)
+            {
+                // JS 运行时已释放或对象不存在，忽略
+            }
         }
         _objRef?.Dispose();
     }

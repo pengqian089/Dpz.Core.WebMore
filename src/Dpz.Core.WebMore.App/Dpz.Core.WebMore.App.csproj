@@ -24,6 +24,7 @@
 
         <!-- App Identifier -->
         <ApplicationId>com.companyname.dpz.core.webmore.app</ApplicationId>
+        <ApplicationIcon>Resources\AppIcon\appicon.ico</ApplicationIcon>
 
         <!-- Versions -->
         <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
@@ -41,7 +42,7 @@
 
     <ItemGroup>
         <!-- App Icon -->
-        <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4"/>
+        <MauiIcon Include="Resources\AppIcon\appicon.png" />
 
         <!-- Splash Screen -->
         <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128"/>
