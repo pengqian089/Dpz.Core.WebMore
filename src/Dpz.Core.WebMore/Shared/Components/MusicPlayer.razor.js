@@ -5,56 +5,8 @@ export class AudioPlayer {
         this.storageKey = 'dpz_music_player_state';
         this.saveInterval = null;
         this.setupEvents();
-        this.initTouchEvents('mp-mini');
-        this.initHashHandler();
     }
     
-    // Hash 和滚动条管理
-    initHashHandler() {
-        window.addEventListener('hashchange', () => {
-            const hash = window.location.hash;
-            if (hash === '#music-player') {
-                this.dotNetHelper.invokeMethodAsync('OpenPanel');
-            } else if (this._panelOpen && hash !== '#music-player') {
-                this.dotNetHelper.invokeMethodAsync('ClosePanel');
-            }
-        });
-        
-        // 检查初始 hash
-        if (window.location.hash === '#music-player') {
-            setTimeout(() => {
-                this.dotNetHelper.invokeMethodAsync('OpenPanel');
-            }, 100);
-        }
-    }
-    
-    setPanelOpen(isOpen) {
-        this._panelOpen = isOpen;
-        
-        // 检测是否为移动设备
-        const isMobile = window.innerWidth <= 768;
-        
-        if (isOpen) {
-            // 保存当前完整 URL
-            this._originalUrl = window.location.pathname + window.location.search;
-            // 添加 hash，保留原有路径
-            if (window.location.hash !== '#music-player') {
-                history.pushState(null, '', this._originalUrl + '#music-player');
-            }
-            // 只在移动端禁用滚动
-            if (isMobile) {
-                document.body.style.overflow = 'hidden';
-            }
-        } else {
-            // 清除 hash，恢复原有 URL
-            if (window.location.hash === '#music-player') {
-                const restoreUrl = this._originalUrl || (window.location.pathname + window.location.search);
-                history.pushState(null, '', restoreUrl);
-            }
-            // 恢复滚动
-            document.body.style.overflow = '';
-        }
-    }
     
     // 状态保存到 localStorage
     saveState(state) {
@@ -170,6 +122,58 @@ export class AudioPlayer {
         }
     }
 
+}
+
+export function initAudioPlayer(dotNetHelper) {
+    return new AudioPlayer(dotNetHelper);
+}
+
+export class MusicPlayerUi {
+    constructor(dotNetHelper) {
+        this.dotNetHelper = dotNetHelper;
+        this._panelOpen = false;
+        this._onHashChange = () => {
+            const hash = window.location.hash;
+            if (hash === '#music-player') {
+                this.dotNetHelper.invokeMethodAsync('OpenPanel');
+            } else if (this._panelOpen && hash !== '#music-player') {
+                this.dotNetHelper.invokeMethodAsync('ClosePanel');
+            }
+        };
+
+        window.addEventListener('hashchange', this._onHashChange);
+
+        if (window.location.hash === '#music-player') {
+            setTimeout(() => {
+                this.dotNetHelper.invokeMethodAsync('OpenPanel');
+            }, 100);
+        }
+
+        this.initTouchEvents('mp-mini');
+    }
+
+    setPanelOpen(isOpen) {
+        this._panelOpen = isOpen;
+
+        const isMobile = window.innerWidth <= 768;
+
+        if (isOpen) {
+            this._originalUrl = window.location.pathname + window.location.search;
+            if (window.location.hash !== '#music-player') {
+                history.pushState(null, '', this._originalUrl + '#music-player');
+            }
+            if (isMobile) {
+                document.body.style.overflow = 'hidden';
+            }
+        } else {
+            if (window.location.hash === '#music-player') {
+                const restoreUrl = this._originalUrl || (window.location.pathname + window.location.search);
+                history.pushState(null, '', restoreUrl);
+            }
+            document.body.style.overflow = '';
+        }
+    }
+
     scrollToItem(elementId, block = 'center') {
         const el = document.getElementById(elementId);
         if (el) {
@@ -178,13 +182,13 @@ export class AudioPlayer {
     }
 
     scrollToBgLyric(index) {
-         const container = document.getElementById('mp-bg-lyrics-inner');
-         if (!container) return;
-         const lines = container.children;
-         if (lines[index]) {
-             const offset = lines[index].offsetTop;
-             container.style.transform = `translateY(-${offset}px)`;
-         }
+        const container = document.getElementById('mp-bg-lyrics-inner');
+        if (!container) return;
+        const lines = container.children;
+        if (lines[index]) {
+            const offset = lines[index].offsetTop;
+            container.style.transform = `translateY(-${offset}px)`;
+        }
     }
 
     initTouchEvents(elementId) {
@@ -221,9 +225,13 @@ export class AudioPlayer {
         element.addEventListener('touchmove', move, { passive: true });
         element.addEventListener('touchcancel', move);
     }
+
+    dispose() {
+        window.removeEventListener('hashchange', this._onHashChange);
+    }
 }
 
-export function initAudioPlayer(dotNetHelper) {
-    return new AudioPlayer(dotNetHelper);
+export function initMusicPlayerUi(dotNetHelper) {
+    return new MusicPlayerUi(dotNetHelper);
 }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Dpz.Core.WebMore.Models;
 using Dpz.Core.WebMore.Service;
@@ -10,13 +11,18 @@ using Microsoft.JSInterop;
 
 namespace Dpz.Core.WebMore.Shared.Components;
 
-public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntime)
+public partial class MusicPlayer(
+    IMusicService musicService,
+    IMusicPlayerService musicPlayerService,
+    IJSRuntime jsRuntime
+)
     : ComponentBase,
         IAsyncDisposable
 {
-    private IJSObjectReference? _jsModule;
-    private IJSObjectReference? _jsPlayer;
-    private DotNetObjectReference<MusicPlayer>? _objRef;
+    private IJSObjectReference? _uiModule;
+    private IJSObjectReference? _uiController;
+    private DotNetObjectReference<MusicPlayer>? _uiRef;
+    private Timer? _progressSaveTimer;
 
     private List<MusicModel> _musics = [];
     private MusicModel? _currentTrack;
@@ -49,6 +55,14 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
 
     protected override async Task OnInitializedAsync()
     {
+        musicPlayerService.TimeUpdated += HandleTimeUpdate;
+        musicPlayerService.DurationChanged += HandleDurationChange;
+        musicPlayerService.PlayStateChanged += HandlePlayStateChange;
+        musicPlayerService.Ended += HandleEnded;
+        musicPlayerService.Error += HandleError;
+        musicPlayerService.NextRequested += HandleNextRequested;
+        musicPlayerService.PrevRequested += HandlePrevRequested;
+
         // 启动音乐列表加载（只加载一次）
         _musicLoadTask ??= LoadMusicsAsync();
         await _musicLoadTask;
@@ -74,13 +88,18 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
     {
         if (firstRender)
         {
-            // 导入隔离的 JS 模块
-            _jsModule = await jsRuntime.InvokeAsync<IJSObjectReference>(
+            // 导入 UI JS 模块
+            _uiModule = await jsRuntime.InvokeAsync<IJSObjectReference>(
                 "import",
                 $"{Program.AssetsPrefix}/Shared/Components/MusicPlayer.razor.js"
             );
-            _objRef = DotNetObjectReference.Create(this);
-            _jsPlayer = await _jsModule.InvokeAsync<IJSObjectReference>("initAudioPlayer", _objRef);
+            _uiRef = DotNetObjectReference.Create(this);
+            _uiController = await _uiModule.InvokeAsync<IJSObjectReference>(
+                "initMusicPlayerUi",
+                _uiRef
+            );
+
+            await musicPlayerService.InitializeAsync();
 
             // 确保音乐列表加载完成
             if (_musicLoadTask != null)
@@ -98,7 +117,7 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
     /// </summary>
     private async Task RestoreStateAsync()
     {
-        if (_jsPlayer == null || _musics.Count == 0)
+        if (_musics.Count == 0)
         {
             Console.WriteLine("RestoreStateAsync: Player or music list not ready");
             return;
@@ -109,7 +128,7 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
 
         try
         {
-            var state = await _jsPlayer.InvokeAsync<PlayerState?>("loadState");
+            var state = await musicPlayerService.LoadStateAsync();
 
             if (state != null)
             {
@@ -144,11 +163,11 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
             await LoadTrack(trackIndexToLoad, false);
 
             // 如果有保存的播放进度，设置播放位置
-            if (startTime > 0 && _jsPlayer != null)
+            if (startTime > 0)
             {
                 // 延迟一下确保音频源已加载
                 await Task.Delay(100);
-                await _jsPlayer.InvokeVoidAsync("setCurrentTime", startTime);
+                await musicPlayerService.SetCurrentTimeAsync(startTime);
             }
 
             StateHasChanged();
@@ -166,21 +185,15 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
 
     private async Task SaveStateAsync()
     {
-        if (_jsPlayer == null)
-        {
-            return;
-        }
-
-        var state = new PlayerState
-        {
-            PlayModeStr = _playMode.ToString(),
-            ShowLyrics = _showLyrics,
-            LyricsOnBackground = _lyricsOnBackground,
-            TrackId = _currentTrack?.Id,
-            CurrentTime = _currentTime,
-        };
-
-        await _jsPlayer.InvokeVoidAsync("saveState", state);
+        await musicPlayerService.SaveStateAsync(
+            new MusicPlayerState(
+                _playMode.ToString(),
+                _showLyrics,
+                _lyricsOnBackground,
+                _currentTrack?.Id,
+                _currentTime
+            )
+        );
     }
 
     /// <summary>
@@ -189,33 +202,15 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
     [JSInvokable]
     public async Task SavePlayProgress(string trackId, double currentTime)
     {
-        if (_jsPlayer == null)
-        {
-            return;
-        }
-
-        var state = new PlayerState
-        {
-            PlayModeStr = _playMode.ToString(),
-            ShowLyrics = _showLyrics,
-            LyricsOnBackground = _lyricsOnBackground,
-            TrackId = trackId,
-            CurrentTime = currentTime,
-        };
-
-        await _jsPlayer.InvokeVoidAsync("saveState", state);
-    }
-
-    /// <summary>
-    /// 播放器状态模型
-    /// </summary>
-    private class PlayerState
-    {
-        public string? PlayModeStr { get; set; }
-        public bool ShowLyrics { get; set; }
-        public bool LyricsOnBackground { get; set; }
-        public string? TrackId { get; set; }
-        public double CurrentTime { get; set; }
+        await musicPlayerService.SaveStateAsync(
+            new MusicPlayerState(
+                _playMode.ToString(),
+                _showLyrics,
+                _lyricsOnBackground,
+                trackId,
+                currentTime
+            )
+        );
     }
 
     /// <summary>
@@ -234,36 +229,26 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
         _currentTrack = _musics[_currentIndex];
         ParseLyrics(_currentTrack.LyricContent);
 
-        if (_jsPlayer != null)
+        await musicPlayerService.SetSourceAsync(_currentTrack.MusicUrl, _currentTrack.Id);
+        await UpdateMediaSession();
+
+        if (_showList && _uiController != null)
         {
-            await _jsPlayer.InvokeVoidAsync("setSrc", _currentTrack.MusicUrl);
-            // 设置当前歌曲 ID 用于进度保存
-            await _jsPlayer.InvokeVoidAsync("startProgressSave", _currentTrack.Id);
-            await UpdateMediaSession();
+            await _uiController.InvokeVoidAsync(
+                "scrollToItem",
+                $"track-item-{_currentIndex}",
+                "nearest"
+            );
+        }
 
-            if (_showList)
-            {
-                await _jsPlayer.InvokeVoidAsync(
-                    "scrollToItem",
-                    $"track-item-{_currentIndex}",
-                    "nearest"
-                );
-            }
-
-            if (autoPlay)
-            {
-                await Play();
-            }
-            else
-            {
-                _isPlaying = false;
-                StateHasChanged();
-            }
+        if (autoPlay)
+        {
+            await Play();
         }
         else
         {
-            // JS 就绪前的初始加载状态
             _isPlaying = false;
+            StateHasChanged();
         }
     }
 
@@ -272,13 +257,12 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
     /// </summary>
     private async Task UpdateMediaSession()
     {
-        if (_jsPlayer != null && _currentTrack != null)
+        if (_currentTrack != null)
         {
-            await _jsPlayer.InvokeVoidAsync(
-                "updateMediaSession",
-                _currentTrack.Title,
-                _currentTrack.Artist,
-                _currentTrack.CoverUrl
+            await musicPlayerService.UpdateMediaSessionAsync(
+                _currentTrack.Title ?? string.Empty,
+                _currentTrack.Artist ?? string.Empty,
+                _currentTrack.CoverUrl ?? string.Empty
             );
         }
     }
@@ -328,35 +312,24 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
     /// </summary>
     private async Task TogglePlay()
     {
-        if (_jsPlayer == null)
-        {
-            return;
-        }
-
         if (_isPlaying)
         {
-            await _jsPlayer.InvokeVoidAsync("pause");
+            await musicPlayerService.PauseAsync();
         }
         else
         {
-            await _jsPlayer.InvokeVoidAsync("play");
+            await musicPlayerService.PlayAsync();
         }
     }
 
     private async Task Play()
     {
-        if (_jsPlayer != null)
-        {
-            await _jsPlayer.InvokeVoidAsync("play");
-        }
+        await musicPlayerService.PlayAsync();
     }
 
     private async Task Pause()
     {
-        if (_jsPlayer != null)
-        {
-            await _jsPlayer.InvokeVoidAsync("pause");
-        }
+        await musicPlayerService.PauseAsync();
     }
 
     private async Task Next()
@@ -412,10 +385,7 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
         if (double.TryParse(e.Value?.ToString(), out var pct))
         {
             var time = _duration * (pct / 100.0);
-            if (_jsPlayer != null)
-            {
-                await _jsPlayer.InvokeVoidAsync("setCurrentTime", time);
-            }
+            await musicPlayerService.SetCurrentTimeAsync(time);
         }
     }
 
@@ -466,15 +436,18 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
     private async Task ToggleListAsync()
     {
         _showList = !_showList;
-        if (_showList && _currentIndex >= 0 && _jsPlayer != null)
+        if (_showList && _currentIndex >= 0)
         {
             // 延迟一点以确保 DOM 渲染完成
             await Task.Delay(100);
-            await _jsPlayer.InvokeVoidAsync(
-                "scrollToItem",
-                $"track-item-{_currentIndex}",
-                "center"
-            );
+            if (_uiController != null)
+            {
+                await _uiController.InvokeVoidAsync(
+                    "scrollToItem",
+                    $"track-item-{_currentIndex}",
+                    "center"
+                );
+            }
         }
     }
 
@@ -495,9 +468,9 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
         }
 
         // 通知 JS 更新 hash 和滚动条状态
-        if (_jsPlayer != null)
+        if (_uiController != null)
         {
-            await _jsPlayer.InvokeVoidAsync("setPanelOpen", _isPanelOpen);
+            await _uiController.InvokeVoidAsync("setPanelOpen", _isPanelOpen);
         }
     }
 
@@ -557,7 +530,7 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
     /// 播放进度更新回调
     /// </summary>
     [JSInvokable]
-    public void OnTimeUpdate(double currentTime)
+    private void HandleTimeUpdate(double currentTime)
     {
         _currentTime = currentTime;
         if (_duration > 0)
@@ -585,12 +558,12 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
             if (activeIdx != _currentLyricIndex)
             {
                 _currentLyricIndex = activeIdx;
-                if (_currentLyricIndex >= 0 && _jsPlayer != null)
+                if (_currentLyricIndex >= 0 && _uiController != null)
                 {
                     if (_showLyrics && !_lyricsOnBackground)
                     {
                         // 滚动面板内的歌词
-                        _jsPlayer.InvokeVoidAsync(
+                        _uiController.InvokeVoidAsync(
                             "scrollToItem",
                             $"lyric-line-{_currentLyricIndex}",
                             "center"
@@ -599,7 +572,7 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
                     else if (_lyricsOnBackground)
                     {
                         // 滚动背景歌词
-                        _jsPlayer.InvokeVoidAsync("scrollToBgLyric", _currentLyricIndex);
+                        _uiController.InvokeVoidAsync("scrollToBgLyric", _currentLyricIndex);
                     }
                 }
             }
@@ -612,15 +585,12 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
     /// 播放结束回调
     /// </summary>
     [JSInvokable]
-    public async Task OnEnded()
+    private async void HandleEnded()
     {
         if (_playMode == PlayMode.Single)
         {
-            if (_jsPlayer != null)
-            {
-                await _jsPlayer.InvokeVoidAsync("setCurrentTime", 0);
-                await _jsPlayer.InvokeVoidAsync("play");
-            }
+            await musicPlayerService.SetCurrentTimeAsync(0);
+            await musicPlayerService.PlayAsync();
         }
         else
         {
@@ -632,7 +602,7 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
     /// 时长改变回调
     /// </summary>
     [JSInvokable]
-    public void OnDurationChange(double duration)
+    private void HandleDurationChange(double duration)
     {
         _duration = duration;
         StateHasChanged();
@@ -642,9 +612,18 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
     /// 播放状态改变回调
     /// </summary>
     [JSInvokable]
-    public void OnPlayStateChange(bool isPlaying)
+    private void HandlePlayStateChange(bool isPlaying)
     {
         _isPlaying = isPlaying;
+        if (_isPlaying)
+        {
+            StartProgressSaveTimer();
+        }
+        else
+        {
+            StopProgressSaveTimer();
+            _ = SaveStateAsync();
+        }
         StateHasChanged();
     }
 
@@ -655,10 +634,14 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
     public async Task OnPrev() => await Prev();
 
     [JSInvokable]
-    public void OnError(string message)
+    private void HandleError(string message)
     {
         Console.WriteLine($"Audio Error: {message}");
     }
+
+    private void HandleNextRequested() => InvokeAsync(Next);
+
+    private void HandlePrevRequested() => InvokeAsync(Prev);
 
     [JSInvokable]
     public void OpenPanel()
@@ -682,44 +665,78 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
 
     public async ValueTask DisposeAsync()
     {
+        musicPlayerService.TimeUpdated -= HandleTimeUpdate;
+        musicPlayerService.DurationChanged -= HandleDurationChange;
+        musicPlayerService.PlayStateChanged -= HandlePlayStateChange;
+        musicPlayerService.Ended -= HandleEnded;
+        musicPlayerService.Error -= HandleError;
+        musicPlayerService.NextRequested -= HandleNextRequested;
+        musicPlayerService.PrevRequested -= HandlePrevRequested;
+
+        StopProgressSaveTimer();
+
         if (_clickTimer != null)
         {
             await _clickTimer.DisposeAsync();
         }
 
-        if (_jsPlayer != null)
+        if (_uiController != null)
         {
             try
             {
-                // 停止进度保存
-                await _jsPlayer.InvokeVoidAsync("stopProgressSave");
-                await _jsPlayer.DisposeAsync();
+                await _uiController.DisposeAsync();
             }
             catch (JSDisconnectedException)
             {
-                // WebView 重载/关闭时 JS 运行时已释放，忽略
             }
             catch (JSException)
             {
-                // JS 运行时已释放或对象不存在，忽略
             }
         }
-        if (_jsModule != null)
+        if (_uiModule != null)
         {
             try
             {
-                await _jsModule.DisposeAsync();
+                await _uiModule.DisposeAsync();
             }
             catch (JSDisconnectedException)
             {
-                // WebView 重载/关闭时 JS 运行时已释放，忽略
             }
             catch (JSException)
             {
-                // JS 运行时已释放或对象不存在，忽略
             }
         }
-        _objRef?.Dispose();
+        _uiRef?.Dispose();
+
+        await musicPlayerService.DisposeAsync();
+    }
+
+    private void StartProgressSaveTimer()
+    {
+        if (_progressSaveTimer != null)
+        {
+            return;
+        }
+
+        _progressSaveTimer = new Timer(
+            _ =>
+            {
+                if (!_isPlaying || _currentTrack == null)
+                {
+                    return;
+                }
+                _ = SaveStateAsync();
+            },
+            null,
+            TimeSpan.FromSeconds(5),
+            TimeSpan.FromSeconds(5)
+        );
+    }
+
+    private void StopProgressSaveTimer()
+    {
+        _progressSaveTimer?.Dispose();
+        _progressSaveTimer = null;
     }
 
     [GeneratedRegex(@"\[(\d{2}):(\d{2})\.(\d{2,3})\](.*)")]

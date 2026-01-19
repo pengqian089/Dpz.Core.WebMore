@@ -1,4 +1,5 @@
 ﻿using Dpz.Core.WebMore;
+using Dpz.Core.WebMore.Service;
 using Microsoft.Extensions.Logging;
 
 namespace Dpz.Core.WebMore.App;
@@ -33,6 +34,10 @@ public static class MauiProgram
 #endif
             }
         );
+
+        #if ANDROID
+            builder.Services.AddScoped<IMusicPlayerService, Platforms.Android.AndroidMusicPlayerService>();
+        #endif
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();
