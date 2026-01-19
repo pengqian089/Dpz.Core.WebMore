@@ -1,10 +1,16 @@
 #if ANDROID
+#pragma warning disable CA1416
+#pragma warning disable CS0618
+using System;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using Android.Content;
 using Android.Media;
 using Android.Media.Session;
 using Android.OS;
 using Dpz.Core.WebMore.Service;
+using Microsoft.Maui.Storage;
 
 namespace Dpz.Core.WebMore.App.Platforms.Android;
 
@@ -17,6 +23,11 @@ public sealed class AndroidMusicPlayerService : Java.Lang.Object, IMusicPlayerSe
     private Timer? _tickTimer;
     private bool _isPrepared;
     private string? _currentTrackId;
+    private bool _playWhenReady;
+    private AudioManager? _audioManager;
+#if ANDROID
+    private AudioFocusRequestClass? _audioFocusRequest;
+#endif
 
     public event Action<double>? TimeUpdated;
     public event Action<double>? DurationChanged;
@@ -49,6 +60,8 @@ public sealed class AndroidMusicPlayerService : Java.Lang.Object, IMusicPlayerSe
         _mediaSession.SetCallback(new MediaSessionCallback(this));
         _mediaSession.Active = true;
 
+        _audioManager = _context.GetSystemService(Context.AudioService) as AudioManager;
+
         return Task.CompletedTask;
     }
 
@@ -74,10 +87,18 @@ public sealed class AndroidMusicPlayerService : Java.Lang.Object, IMusicPlayerSe
 
     public Task PlayAsync()
     {
-        if (_player == null || !_isPrepared)
+        if (_player == null)
         {
             return Task.CompletedTask;
         }
+
+        if (!_isPrepared)
+        {
+            _playWhenReady = true;
+            return Task.CompletedTask;
+        }
+
+        RequestAudioFocus();
 
         _player.Start();
         StartTickTimer();
@@ -97,9 +118,11 @@ public sealed class AndroidMusicPlayerService : Java.Lang.Object, IMusicPlayerSe
         {
             _player.Pause();
         }
+        _playWhenReady = false;
         StopTickTimer();
         PlayStateChanged?.Invoke(false);
         UpdatePlaybackState(PlaybackStateCode.Paused);
+        AbandonAudioFocus();
         return Task.CompletedTask;
     }
 
@@ -177,6 +200,12 @@ public sealed class AndroidMusicPlayerService : Java.Lang.Object, IMusicPlayerSe
             DurationChanged?.Invoke(_player.Duration / 1000.0);
         }
         UpdatePlaybackState(PlaybackStateCode.Paused);
+
+        if (_playWhenReady)
+        {
+            _playWhenReady = false;
+            _ = PlayAsync();
+        }
     }
 
     private void OnCompletion(object? sender, EventArgs e)
@@ -242,6 +271,7 @@ public sealed class AndroidMusicPlayerService : Java.Lang.Object, IMusicPlayerSe
     public async ValueTask DisposeAsync()
     {
         StopTickTimer();
+        AbandonAudioFocus();
 
         if (_player != null)
         {
@@ -269,6 +299,60 @@ public sealed class AndroidMusicPlayerService : Java.Lang.Object, IMusicPlayerSe
         _player?.Dispose();
         _mediaSession?.Dispose();
         await Task.CompletedTask;
+    }
+
+    private void RequestAudioFocus()
+    {
+        if (_audioManager == null)
+        {
+            return;
+        }
+
+        if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
+        {
+            _audioFocusRequest ??= new AudioFocusRequestClass.Builder(AudioFocus.Gain)
+                .SetAudioAttributes(
+                    new AudioAttributes.Builder()
+                        .SetContentType(AudioContentType.Music)!
+                        .SetUsage(AudioUsageKind.Media)!
+                        .Build()!
+                )
+                .SetAcceptsDelayedFocusGain(true)
+                .Build();
+
+#pragma warning disable CA1416
+            if (_audioFocusRequest != null)
+            {
+                _audioManager.RequestAudioFocus(_audioFocusRequest);
+            }
+#pragma warning restore CA1416
+        }
+        else
+        {
+            // API < 26: 不请求音频焦点以避免过时 API 警告
+        }
+    }
+
+    private void AbandonAudioFocus()
+    {
+        if (_audioManager == null)
+        {
+            return;
+        }
+
+        if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
+        {
+            if (_audioFocusRequest != null)
+            {
+#pragma warning disable CA1416
+                _audioManager.AbandonAudioFocusRequest(_audioFocusRequest);
+#pragma warning restore CA1416
+            }
+        }
+        else
+        {
+            // API < 26: 不释放音频焦点
+        }
     }
 
     private sealed class MediaSessionCallback(AndroidMusicPlayerService service)

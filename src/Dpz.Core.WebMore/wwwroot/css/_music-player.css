@@ -190,6 +190,10 @@
 }
 
 /* Open State */
+.music-player__panel--open {
+    pointer-events: auto;
+}
+
 .music-player__panel--open .music-player__backdrop {
     opacity: 1;
     pointer-events: auto;
