@@ -71,14 +71,17 @@ public sealed class MD5Hash : HashAlgorithm
     protected override byte[] HashFinal()
     {
         // Add padding
-        var totalBits = _totalBytesProcessed * 8;
-        var paddingLength = (56 - (_bufferLength % 64)) % 64;
-        if (paddingLength == 0)
-            paddingLength = 56;
-
+        var totalBits = (ulong)_totalBytesProcessed * 8;
+        var paddingLength = (int)((56 - (_bufferLength % 64) + 64) % 64);
+        
         var padding = new byte[paddingLength + 8];
         padding[0] = 0x80;
-        BitConverter.GetBytes(totalBits).CopyTo(padding, paddingLength);
+        
+        // Write length as little-endian 64-bit integer
+        for (int i = 0; i < 8; i++)
+        {
+            padding[paddingLength + i] = (byte)(totalBits >> (i * 8));
+        }
 
         HashCore(padding, 0, padding.Length);
 

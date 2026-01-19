@@ -67,6 +67,7 @@
             </div>
             <div class="hash-tool__file-area">
                 <div class="hash-tool__dropzone @(_isDragging ? "hash-tool__dropzone--dragging" : "")"
+                     @ref="_dropzoneRef"
                      @ondragenter="HandleDragEnter"
                      @ondragleave="HandleDragLeave"
                      @ondragover:preventDefault="true"

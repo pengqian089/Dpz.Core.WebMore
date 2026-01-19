@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -11,11 +12,8 @@ using Microsoft.JSInterop;
 
 namespace Dpz.Core.WebMore.Pages.Tools;
 
-public partial class HashTool : ComponentBase
+public partial class HashTool(IJSRuntime jsRuntime) : ComponentBase, IAsyncDisposable
 {
-    [Inject]
-    private IJSRuntime JSRuntime { get; set; } = null!;
-
     private enum HashAlgorithmType
     {
         MD5,
@@ -47,6 +45,11 @@ public partial class HashTool : ComponentBase
     private long _fileSize;
     private HashSource _source = HashSource.Text;
     private bool _isDragging;
+    private ElementReference _dropzoneRef;
+    private IJSObjectReference? _module;
+    private DotNetObjectReference<HashTool>? _dotNetHelper;
+    private HashAlgorithm? _currentHashAlgorithm;
+    private MemoryStream? _fileBuffer;
 
     private string CurrentSourceLabel =>
         _source == HashSource.File && !string.IsNullOrWhiteSpace(_fileName)
@@ -137,7 +140,10 @@ public partial class HashTool : ComponentBase
 
         try
         {
+            var st = Stopwatch.StartNew();
             _hashValue = await ComputeHashFromFileAsync(_selectedFile);
+            st.Stop();
+            Console.WriteLine($"计算文件哈希耗时：{st.ElapsedMilliseconds} ms");
             UpdateVerifyState();
         }
         catch (Exception ex)
@@ -182,7 +188,7 @@ public partial class HashTool : ComponentBase
 
         try
         {
-            await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", _hashValue);
+            await jsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", _hashValue);
             _justCopied = true;
             StateHasChanged();
             await Task.Delay(2000);
@@ -235,16 +241,121 @@ public partial class HashTool : ComponentBase
     private async Task HandleDrop(Microsoft.AspNetCore.Components.Web.DragEventArgs e)
     {
         _isDragging = false;
+        // 实际的文件处理通过JavaScript互操作完成
+        await Task.CompletedTask;
+    }
 
-        if (_isProcessing)
+    [JSInvokable]
+    public async Task HandleDroppedFile(DropFileInfo fileInfo)
+    {
+        if (_isProcessing) return;
+
+        _errorMessage = string.Empty;
+
+        if (fileInfo.Size > AppTools.MaxFileSize)
         {
+            _errorMessage = $"文件过大,请选择小于 {AppTools.MaxFileSize / 1024d / 1024d:F2} MB 的文件";
+            await InvokeAsync(StateHasChanged);
             return;
         }
 
-        // 注意：Blazor WebAssembly 不支持直接从 DragEventArgs 获取文件
-        // 用户需要使用 InputFile 组件来选择文件
-        // 这里只是重置拖拽状态
-        await Task.CompletedTask;
+        _isProcessing = true;
+        _fileName = fileInfo.Name;
+        _fileSize = fileInfo.Size;
+        _source = HashSource.File;
+        _fileBuffer = new MemoryStream();
+        _currentHashAlgorithm = CreateAlgorithm();
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    [JSInvokable]
+    public async Task ProcessFileChunk(string base64Chunk, bool isLast)
+    {
+        try
+        {
+            if (_fileBuffer == null || _currentHashAlgorithm == null)
+            {
+                return;
+            }
+
+            var chunk = Convert.FromBase64String(base64Chunk);
+            await _fileBuffer.WriteAsync(chunk);
+
+            if (isLast)
+            {
+                _fileBuffer.Position = 0;
+                var hashBytes = await _currentHashAlgorithm.ComputeHashAsync(_fileBuffer);
+                _hashValue = ToHexString(hashBytes);
+                UpdateVerifyState();
+
+                _currentHashAlgorithm.Dispose();
+                _currentHashAlgorithm = null;
+                await _fileBuffer.DisposeAsync();
+                _fileBuffer = null;
+
+                _isProcessing = false;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"处理文件失败：{ex.Message}";
+            _isProcessing = false;
+            _currentHashAlgorithm?.Dispose();
+            _currentHashAlgorithm = null;
+            if (_fileBuffer != null)
+            {
+                await _fileBuffer.DisposeAsync();
+                _fileBuffer = null;
+            }
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                _module = await jsRuntime.InvokeAsync<IJSObjectReference>(
+                    "import", "./Pages/Tools/HashTool.razor.js");
+                _dotNetHelper = DotNetObjectReference.Create(this);
+                
+                // 设置拖拽区域
+                if (_module != null && _dotNetHelper != null)
+                {
+                    await _module.InvokeVoidAsync("setupFileDropzone", _dotNetHelper, _dropzoneRef);
+                }
+            }
+            catch
+            {
+                // JS模块加载失败,拖拽功能将不可用
+            }
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        _currentHashAlgorithm?.Dispose();
+        if (_fileBuffer != null)
+        {
+            await _fileBuffer.DisposeAsync();
+        }
+        if (_module != null)
+        {
+            try
+            {
+                await _module.InvokeVoidAsync("cleanupFileDropzone", _dropzoneRef);
+            }
+            catch
+            {
+                // 忽略清理错误
+            }
+            await _module.DisposeAsync();
+        }
+        _dotNetHelper?.Dispose();
     }
 
     private string ComputeHash(byte[] bytes)
@@ -285,4 +396,12 @@ public partial class HashTool : ComponentBase
 
         return sb.ToString();
     }
+}
+
+public class DropFileInfo
+{
+    public string Name { get; set; } = string.Empty;
+    public long Size { get; set; }
+    public string Type { get; set; } = string.Empty;
+    public long LastModified { get; set; }
 }
