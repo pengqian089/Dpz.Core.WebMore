@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Dpz.Core.WebMore.App.NativeMusicPlayerPage"
+             BackgroundColor="#0D0D0D">
+
+    <ContentPage.Resources>
+        <Color x:Key="ThemeColor">#FFB700</Color>
+        <Color x:Key="TextPrimary">#F2F2F2</Color>
+        <Color x:Key="TextSecondary">#A0A0A0</Color>
+        <Style TargetType="Button" x:Key="IconButton">
+            <Setter Property="WidthRequest" Value="56" />
+            <Setter Property="HeightRequest" Value="56" />
+            <Setter Property="CornerRadius" Value="28" />
+            <Setter Property="BackgroundColor" Value="Transparent" />
+            <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+        </Style>
+        <Style TargetType="Button" x:Key="MainButton">
+            <Setter Property="WidthRequest" Value="72" />
+            <Setter Property="HeightRequest" Value="72" />
+            <Setter Property="CornerRadius" Value="36" />
+            <Setter Property="BackgroundColor" Value="{StaticResource ThemeColor}" />
+            <Setter Property="TextColor" Value="#000000" />
+        </Style>
+        <Style TargetType="Button" x:Key="MiniIconButton">
+            <Setter Property="WidthRequest" Value="40" />
+            <Setter Property="HeightRequest" Value="40" />
+            <Setter Property="CornerRadius" Value="20" />
+            <Setter Property="BackgroundColor" Value="#1A1A1A" />
+            <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+            <Setter Property="FontSize" Value="16" />
+        </Style>
+    </ContentPage.Resources>
+
+    <Grid>
+        <CollectionView x:Name="bgLyricsView" IsVisible="False" Opacity="0.08" InputTransparent="True">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="6" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Label Text="{Binding Text}" TextColor="{Binding Color}" FontSize="20" HorizontalTextAlignment="Center" />
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Grid x:Name="fullPanel" RowDefinitions="Auto,*,Auto" Padding="24" RowSpacing="20">
+            <Grid ColumnDefinitions="*,Auto" Grid.Row="0">
+                <VerticalStackLayout Spacing="4">
+                    <Label x:Name="titleLabel" Text="Loading..." FontSize="22" TextColor="{StaticResource TextPrimary}" FontAttributes="Bold" LineBreakMode="TailTruncation" />
+                    <Label x:Name="artistLabel" Text="-" FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                </VerticalStackLayout>
+                <HorizontalStackLayout Grid.Column="1" Spacing="8">
+                    <Button Text="▾" BackgroundColor="Transparent" TextColor="{StaticResource TextPrimary}" Clicked="OnToggleMini" />
+                    <Button Text="✕" BackgroundColor="Transparent" TextColor="{StaticResource TextPrimary}" Clicked="OnClose" />
+                </HorizontalStackLayout>
+            </Grid>
+
+            <Grid Grid.Row="1">
+                <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="18" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Grid Grid.Row="0">
+                        <Border x:Name="coverFrame" WidthRequest="260" HeightRequest="260" StrokeShape="RoundRectangle 130" StrokeThickness="2" Stroke="{StaticResource ThemeColor}" Background="#1E1E1E">
+                            <Border.Content>
+                                <Image x:Name="coverImage" Aspect="AspectFill" />
+                            </Border.Content>
+                        </Border>
+                    </Grid>
+
+                    <CollectionView x:Name="lyricsView" Grid.Row="0" IsVisible="False" WidthRequest="260" HeightRequest="260">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout Orientation="Vertical" ItemSpacing="8" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Label Text="{Binding Text}" TextColor="{Binding Color}" FontSize="18" HorizontalTextAlignment="Center" />
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" VerticalOptions="Center" WidthRequest="320">
+                        <Label x:Name="currentTimeLabel" Text="0:00" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                        <Slider x:Name="seekSlider" Grid.Column="1" Minimum="0" Maximum="100" ValueChanged="OnSeekChanged" DragStarted="OnSeekDragStarted" DragCompleted="OnSeekDragCompleted" MinimumTrackColor="{StaticResource ThemeColor}" MaximumTrackColor="#2A2A2A" ThumbColor="{StaticResource ThemeColor}" />
+                        <Label x:Name="durationLabel" Grid.Column="2" Text="0:00" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                    </Grid>
+
+                    <HorizontalStackLayout Grid.Row="2" Spacing="24" HorizontalOptions="Center">
+                        <Button Text="⏮" FontSize="20" Style="{StaticResource IconButton}" Clicked="OnPrev" />
+                        <Button x:Name="playButton" Text="▶" FontSize="22" Style="{StaticResource MainButton}" Clicked="OnPlayPause" />
+                        <Button Text="⏭" FontSize="20" Style="{StaticResource IconButton}" Clicked="OnNext" />
+                    </HorizontalStackLayout>
+
+                    <HorizontalStackLayout Grid.Row="2" Spacing="16" HorizontalOptions="Center" Margin="0,84,0,0">
+                        <Button x:Name="modeButton" Text="顺序" FontSize="12" Style="{StaticResource IconButton}" Clicked="OnCycleMode" />
+                        <Button x:Name="lyricButton" Text="歌词" FontSize="12" Style="{StaticResource IconButton}" Clicked="OnToggleLyrics" />
+                        <Button x:Name="listButton" Text="列表" FontSize="12" Style="{StaticResource IconButton}" Clicked="OnToggleList" />
+                    </HorizontalStackLayout>
+                </Grid>
+            </Grid>
+
+            <Grid Grid.Row="2" IsVisible="False" x:Name="listPanel">
+                <CollectionView x:Name="trackList" SelectionMode="Single" SelectionChanged="OnTrackSelected">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Padding="12" ColumnDefinitions="Auto,*" BackgroundColor="#141414">
+                                <Grid.Triggers>
+                                    <DataTrigger TargetType="Grid" Binding="{Binding IsActive}" Value="True">
+                                        <Setter Property="BackgroundColor" Value="#2A2310" />
+                                    </DataTrigger>
+                                </Grid.Triggers>
+                                <Label Text="{Binding Index}" TextColor="{StaticResource TextSecondary}" WidthRequest="28" />
+                                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                    <Label Text="{Binding Title}" TextColor="{StaticResource TextPrimary}" />
+                                    <Label Text="{Binding Artist}" TextColor="{StaticResource TextSecondary}" FontSize="12" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+        </Grid>
+
+        <Grid x:Name="miniPanel" IsVisible="False" WidthRequest="84" HeightRequest="84" VerticalOptions="End" HorizontalOptions="End" Margin="16">
+            <GraphicsView x:Name="miniRingView" />
+            <Border WidthRequest="64" HeightRequest="64" StrokeShape="RoundRectangle 32" StrokeThickness="1" Stroke="#2A2A2A" Background="#1E1E1E" HorizontalOptions="Center" VerticalOptions="Center">
+                <Border.Content>
+                    <Image x:Name="miniCoverImage" Aspect="AspectFill" />
+                </Border.Content>
+            </Border>
+            <Grid WidthRequest="64" HeightRequest="64" HorizontalOptions="Center" VerticalOptions="Center">
+                <Border StrokeShape="RoundRectangle 32" BackgroundColor="#66000000" />
+                <Label x:Name="miniPlayIcon" Text="▶" TextColor="{StaticResource TextPrimary}" FontSize="18" HorizontalTextAlignment="Center" VerticalTextAlignment="Center" />
+            </Grid>
+            <Button x:Name="miniTouchButton" BackgroundColor="Transparent" Opacity="0.01" Pressed="OnMiniPressed" Released="OnMiniReleased" />
+        </Grid>
+    </Grid>
+</ContentPage>

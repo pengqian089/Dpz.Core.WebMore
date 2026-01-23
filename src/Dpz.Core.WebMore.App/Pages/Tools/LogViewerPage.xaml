@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Dpz.Core.WebMore.App.Pages.Tools.LogViewerPage"
+             Title="日志查看"
+             BackgroundColor="#0D0D0D">
+
+    <ContentPage.Resources>
+        <Color x:Key="ThemeColor">#FFB700</Color>
+        <Color x:Key="TextPrimary">#F2F2F2</Color>
+        <Color x:Key="TextSecondary">#A0A0A0</Color>
+    </ContentPage.Resources>
+
+    <Grid Padding="16" RowDefinitions="Auto,Auto,*" RowSpacing="12">
+        <Grid ColumnDefinitions="*,Auto,Auto" Grid.Row="0" ColumnSpacing="8">
+            <Label Text="MAUI 日志" TextColor="{StaticResource TextPrimary}" FontSize="20" FontAttributes="Bold" VerticalOptions="Center" />
+            <Button Grid.Column="1" Text="刷新" BackgroundColor="#1A1A1A" TextColor="{StaticResource TextPrimary}" Clicked="OnRefresh" />
+            <Button Grid.Column="2" Text="清空" BackgroundColor="#2A1A1A" TextColor="{StaticResource TextPrimary}" Clicked="OnClear" />
+        </Grid>
+
+        <CollectionView x:Name="fileList" Grid.Row="1" HeightRequest="120" SelectionMode="Single" SelectionChanged="OnFileSelected">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Padding="10" ColumnDefinitions="*,Auto" BackgroundColor="#141414">
+                        <Label Text="{Binding Name}" TextColor="{StaticResource TextPrimary}" LineBreakMode="TailTruncation" />
+                        <Label Grid.Column="1" Text="{Binding LastWriteText}" TextColor="{StaticResource TextSecondary}" FontSize="12" />
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Grid Grid.Row="2" RowDefinitions="Auto,*" RowSpacing="8">
+            <Label x:Name="selectedFileLabel" Text="未选择日志文件" TextColor="{StaticResource TextSecondary}" FontSize="12" />
+            <Editor x:Name="logContent" Grid.Row="1" TextColor="{StaticResource TextPrimary}" BackgroundColor="#121212" FontFamily="Consolas" IsReadOnly="True" AutoSize="TextChanges" />
+        </Grid>
+    </Grid>
+</ContentPage>

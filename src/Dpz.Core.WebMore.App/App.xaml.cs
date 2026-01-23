@@ -9,6 +9,9 @@ public partial class App : Application
 
     protected override Window CreateWindow(IActivationState? activationState)
     {
-        return new Window(new MainPage()) { Title = "Dpz.Core" };
+        var mainPage = new MainPage();
+        var nav = new NavigationPage(mainPage);
+        NavigationPage.SetHasNavigationBar(mainPage, false);
+        return new Window(nav) { Title = "Dpz.Core" };
     }
 }

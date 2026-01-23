@@ -1,6 +1,9 @@
 ﻿using Dpz.Core.WebMore;
+using Dpz.Core.WebMore.App.Pages.Tools;
 using Dpz.Core.WebMore.Service;
 using Microsoft.Extensions.Logging;
+using Serilog;
+using Serilog.Events;
 
 namespace Dpz.Core.WebMore.App;
 
@@ -35,13 +38,40 @@ public static class MauiProgram
             }
         );
 
-        #if ANDROID
-            builder.Services.AddScoped<IMusicPlayerService, Platforms.Android.AndroidMusicPlayerService>();
-        #endif
+        builder.Services.AddTransient<NativeMusicPlayerPage>();
+        builder.Services.AddTransient<LogViewerPage>();
+
+#if ANDROID
+        builder.Services.AddScoped<
+            IMusicPlayerService,
+            Platforms.Android.AndroidMusicPlayerService
+        >();
+#endif
+
+        var logDirectory = Path.Combine(FileSystem.AppDataDirectory, "logs");
+        Directory.CreateDirectory(logDirectory);
+
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+            .MinimumLevel.Override("System", LogEventLevel.Warning)
+            .Enrich.FromLogContext()
+            .WriteTo.Console()
+            .WriteTo.File(
+                Path.Combine(logDirectory, "app-.log"),
+                rollingInterval: RollingInterval.Day,
+                retainedFileCountLimit: 14,
+                fileSizeLimitBytes: 5_000_000,
+                rollOnFileSizeLimit: true,
+                shared: true
+            )
+            .CreateLogger();
+
+        builder.Logging.ClearProviders();
+        builder.Logging.AddSerilog(Log.Logger, dispose: true);
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();
-        builder.Logging.AddDebug();
 #endif
 
         return builder.Build();

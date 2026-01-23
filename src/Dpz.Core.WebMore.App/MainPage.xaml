@@ -5,10 +5,39 @@
              xmlns:webmore="clr-namespace:Dpz.Core.WebMore;assembly=Dpz.Core.WebMore"
              x:Class="Dpz.Core.WebMore.App.MainPage">
 
-    <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html">
-        <BlazorWebView.RootComponents>
-            <RootComponent Selector="#app" ComponentType="{x:Type webmore:WebMoreApp}" />
-        </BlazorWebView.RootComponents>
-    </BlazorWebView>
+    <Grid>
+        <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html">
+            <BlazorWebView.RootComponents>
+                <RootComponent Selector="#app" ComponentType="{x:Type webmore:WebMoreApp}" />
+            </BlazorWebView.RootComponents>
+        </BlazorWebView>
+
+        <VerticalStackLayout HorizontalOptions="End" VerticalOptions="End" Spacing="12" Margin="16">
+            <Button
+                x:Name="logViewerButton"
+                Text="🧾"
+                FontSize="18"
+                WidthRequest="48"
+                HeightRequest="48"
+                CornerRadius="24"
+                Padding="0"
+                BackgroundColor="#1A1A1A"
+                TextColor="#F2F2F2"
+                Clicked="OnOpenLogViewer" />
+
+            <Button
+                x:Name="nativePlayerButton"
+                Text="🎵"
+                FontSize="22"
+                WidthRequest="56"
+                HeightRequest="56"
+                CornerRadius="28"
+                Padding="0"
+                BackgroundColor="#FFB700"
+                TextColor="#000000"
+                IsVisible="{OnPlatform Android=true, Default=false}"
+                Clicked="OnOpenNativePlayer" />
+        </VerticalStackLayout>
+    </Grid>
 
 </ContentPage>

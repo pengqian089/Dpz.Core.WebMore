@@ -26,7 +26,10 @@
         <i class="fa fa-arrow-up"></i>
     </div>
 
-    <MusicPlayer/>
+    @if (!OperatingSystem.IsAndroid())
+    {
+        <MusicPlayer/>
+    }
     <Dpz.Core.WebMore.Shared.Components.Dialog.DialogContainer/>
     <Dpz.Core.WebMore.Shared.Components.GroupChat @ref="_groupChat"/>
 </div>
