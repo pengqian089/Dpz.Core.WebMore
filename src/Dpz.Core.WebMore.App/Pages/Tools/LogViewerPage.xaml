@@ -12,10 +12,11 @@
     </ContentPage.Resources>
 
     <Grid Padding="16" RowDefinitions="Auto,Auto,*" RowSpacing="12">
-        <Grid ColumnDefinitions="*,Auto,Auto" Grid.Row="0" ColumnSpacing="8">
+        <Grid ColumnDefinitions="*,Auto,Auto,Auto" Grid.Row="0" ColumnSpacing="8">
             <Label Text="MAUI 日志" TextColor="{StaticResource TextPrimary}" FontSize="20" FontAttributes="Bold" VerticalOptions="Center" />
             <Button Grid.Column="1" Text="刷新" BackgroundColor="#1A1A1A" TextColor="{StaticResource TextPrimary}" Clicked="OnRefresh" />
-            <Button Grid.Column="2" Text="清空" BackgroundColor="#2A1A1A" TextColor="{StaticResource TextPrimary}" Clicked="OnClear" />
+            <Button Grid.Column="2" Text="复制" BackgroundColor="#1A1A1A" TextColor="{StaticResource TextPrimary}" Clicked="OnCopy" />
+            <Button Grid.Column="3" Text="清空" BackgroundColor="#2A1A1A" TextColor="{StaticResource TextPrimary}" Clicked="OnClear" />
         </Grid>
 
         <CollectionView x:Name="fileList" Grid.Row="1" HeightRequest="120" SelectionMode="Single" SelectionChanged="OnFileSelected">

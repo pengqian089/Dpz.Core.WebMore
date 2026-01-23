@@ -7,6 +7,7 @@ using Dpz.Core.WebMore.Models;
 using Dpz.Core.WebMore.Service;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Graphics;
+using Serilog;
 
 namespace Dpz.Core.WebMore.App;
 
@@ -95,50 +96,57 @@ public partial class NativeMusicPlayerPage : ContentPage
         {
             return;
         }
-        var list = await _musicService.GetMusicPageAsync(1, 1000);
-        _musics.AddRange(list);
+
+        await RunSafeAsync(async () =>
+        {
+            var list = await _musicService.GetMusicPageAsync(1, 1000);
+            _musics.AddRange(list);
+        }, "加载播放列表");
     }
 
     private async Task LoadTrackById(string id, bool autoPlay = true)
     {
-        if (string.IsNullOrWhiteSpace(id))
+        await RunSafeAsync(async () =>
         {
-            return;
-        }
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return;
+            }
 
-        var index = _musics.FindIndex(m => m.Id == id);
-        if (index < 0 || index >= _musics.Count)
-        {
-            return;
-        }
+            var index = _musics.FindIndex(m => m.Id == id);
+            if (index < 0 || index >= _musics.Count)
+            {
+                return;
+            }
 
-        _currentIndex = index;
-        var track = _musics[_currentIndex];
+            _currentIndex = index;
+            var track = _musics[_currentIndex];
 
-        titleLabel.Text = track.Title ?? "";
-        artistLabel.Text = track.Artist ?? "";
-        coverImage.Source = string.IsNullOrWhiteSpace(track.CoverUrl) ? null : track.CoverUrl;
-        miniCoverImage.Source = string.IsNullOrWhiteSpace(track.CoverUrl) ? null : track.CoverUrl;
-        ParseLyrics(track.LyricContent);
-        lyricsView.ItemsSource = _lyrics;
-        bgLyricsView.ItemsSource = _lyrics;
-        RefreshTrackList();
+            titleLabel.Text = track.Title ?? "";
+            artistLabel.Text = track.Artist ?? "";
+            coverImage.Source = string.IsNullOrWhiteSpace(track.CoverUrl) ? null : track.CoverUrl;
+            miniCoverImage.Source = string.IsNullOrWhiteSpace(track.CoverUrl) ? null : track.CoverUrl;
+            ParseLyrics(track.LyricContent);
+            lyricsView.ItemsSource = _lyrics;
+            bgLyricsView.ItemsSource = _lyrics;
+            RefreshTrackList();
 
-        await _playerService.SetSourceAsync(track.MusicUrl, track.Id);
-        await _playerService.UpdateMediaSessionAsync(
-            track.Title ?? string.Empty,
-            track.Artist ?? string.Empty,
-            track.CoverUrl ?? string.Empty
-        );
+            await _playerService.SetSourceAsync(track.MusicUrl, track.Id);
+            await _playerService.UpdateMediaSessionAsync(
+                track.Title ?? string.Empty,
+                track.Artist ?? string.Empty,
+                track.CoverUrl ?? string.Empty
+            );
 
-        if (autoPlay)
-        {
-            await _playerService.PlayAsync();
-        }
-        else
-        {
-            UpdatePlayButton(false);
-        }
+            if (autoPlay)
+            {
+                await _playerService.PlayAsync();
+            }
+            else
+            {
+                UpdatePlayButton(false);
+            }
+        }, "加载音乐");
     }
 
     private void UpdatePlayButton(bool isPlaying)
@@ -187,13 +195,16 @@ public partial class NativeMusicPlayerPage : ContentPage
 
     private async void OnEnded()
     {
-        if (_playMode == PlayMode.Single && _currentIndex >= 0)
+        await RunSafeAsync(async () =>
         {
-            await _playerService.SetCurrentTimeAsync(0);
-            await _playerService.PlayAsync();
-            return;
-        }
-        await Next();
+            if (_playMode == PlayMode.Single && _currentIndex >= 0)
+            {
+                await _playerService.SetCurrentTimeAsync(0);
+                await _playerService.PlayAsync();
+                return;
+            }
+            await Next();
+        }, "播放结束处理");
     }
 
     private void OnError(string message)
@@ -206,42 +217,51 @@ public partial class NativeMusicPlayerPage : ContentPage
 
     private async Task Next()
     {
-        if (_musics.Count == 0)
+        await RunSafeAsync(async () =>
         {
-            return;
-        }
-        int next;
-        if (_playMode == PlayMode.Random)
-        {
-            next = _musics.Count == 1 ? 0 : new Random().Next(_musics.Count);
-        }
-        else
-        {
-            next = (_currentIndex + 1) % _musics.Count;
-        }
-        await LoadTrackById(_musics[next].Id);
+            if (_musics.Count == 0)
+            {
+                return;
+            }
+            int next;
+            if (_playMode == PlayMode.Random)
+            {
+                next = _musics.Count == 1 ? 0 : new Random().Next(_musics.Count);
+            }
+            else
+            {
+                next = (_currentIndex + 1) % _musics.Count;
+            }
+            await LoadTrackById(_musics[next].Id);
+        }, "切换下一首");
     }
 
     private async Task Prev()
     {
-        if (_musics.Count == 0)
+        await RunSafeAsync(async () =>
         {
-            return;
-        }
-        var prev = (_currentIndex - 1 + _musics.Count) % _musics.Count;
-        await LoadTrackById(_musics[prev].Id);
+            if (_musics.Count == 0)
+            {
+                return;
+            }
+            var prev = (_currentIndex - 1 + _musics.Count) % _musics.Count;
+            await LoadTrackById(_musics[prev].Id);
+        }, "切换上一首");
     }
 
     private async void OnPlayPause(object sender, EventArgs e)
     {
-        if (_isPlaying)
+        await RunSafeAsync(async () =>
         {
-            await _playerService.PauseAsync();
-        }
-        else
-        {
-            await _playerService.PlayAsync();
-        }
+            if (_isPlaying)
+            {
+                await _playerService.PauseAsync();
+            }
+            else
+            {
+                await _playerService.PlayAsync();
+            }
+        }, "播放/暂停");
     }
 
     private async void OnNext(object sender, EventArgs e) => await Next();
@@ -259,7 +279,7 @@ public partial class NativeMusicPlayerPage : ContentPage
             return;
         }
         var time = _duration * (e.NewValue / 100.0);
-        await _playerService.SetCurrentTimeAsync(time);
+        await RunSafeAsync(() => _playerService.SetCurrentTimeAsync(time), "进度调整");
     }
 
     private void OnSeekDragStarted(object sender, EventArgs e)
@@ -282,7 +302,7 @@ public partial class NativeMusicPlayerPage : ContentPage
 
     private async void OnClose(object sender, EventArgs e)
     {
-        await Navigation.PopModalAsync();
+        await RunSafeAsync(() => Navigation.PopModalAsync(), "关闭播放器");
     }
 
     private void OnTrackSelected(object sender, SelectionChangedEventArgs e)
@@ -360,14 +380,17 @@ public partial class NativeMusicPlayerPage : ContentPage
             return;
         }
 
-        if (_isPlaying)
+        await RunSafeAsync(async () =>
         {
-            await _playerService.PauseAsync();
-        }
-        else
-        {
-            await _playerService.PlayAsync();
-        }
+            if (_isPlaying)
+            {
+                await _playerService.PauseAsync();
+            }
+            else
+            {
+                await _playerService.PlayAsync();
+            }
+        }, "迷你播放/暂停");
     }
 
     private void SetMiniMode(bool isMini)
@@ -547,6 +570,19 @@ public partial class NativeMusicPlayerPage : ContentPage
 
     [GeneratedRegex(@"\[(\d{2}):(\d{2})\.(\d{2,3})\](.*)")]
     private static partial Regex LyricRegex();
+
+    private async Task RunSafeAsync(Func<Task> action, string actionName)
+    {
+        try
+        {
+            await action();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "播放器操作失败：{ActionName}", actionName);
+            await DisplayAlertAsync("播放器", $"操作失败：{actionName}", "确定");
+        }
+    }
 
     private static string FormatTime(double seconds)
     {

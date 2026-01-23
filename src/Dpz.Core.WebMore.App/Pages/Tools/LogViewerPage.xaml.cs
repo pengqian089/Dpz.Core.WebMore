@@ -53,6 +53,26 @@ public partial class LogViewerPage : ContentPage
         selectedFileLabel.Text = "未选择日志文件";
     }
 
+    private async void OnCopy(object sender, EventArgs e)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(logContent.Text))
+            {
+                await DisplayAlertAsync("日志", "没有可复制的内容。", "确定");
+                return;
+            }
+
+            await Clipboard.SetTextAsync(logContent.Text);
+            await DisplayAlertAsync("日志", "已复制到剪贴板。", "确定");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "复制日志失败");
+            await DisplayAlertAsync("日志", $"复制失败：{ex.Message}", "确定");
+        }
+    }
+
     private async void OnFileSelected(object sender, SelectionChangedEventArgs e)
     {
         if (e.CurrentSelection.FirstOrDefault() is not LogFileItem item)

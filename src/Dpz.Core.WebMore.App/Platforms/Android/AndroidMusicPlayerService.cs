@@ -9,6 +9,7 @@ using Android.Content;
 using Android.Media;
 using Android.Media.Session;
 using Android.OS;
+using Android.Runtime;
 using Dpz.Core.WebMore.Service;
 using Microsoft.Maui.Storage;
 
@@ -24,9 +25,12 @@ public sealed class AndroidMusicPlayerService : Java.Lang.Object, IMusicPlayerSe
     private bool _isPrepared;
     private string? _currentTrackId;
     private bool _playWhenReady;
+    private bool _resumeAfterFocusGain;
+    private bool _isDucked;
     private AudioManager? _audioManager;
 #if ANDROID
     private AudioFocusRequestClass? _audioFocusRequest;
+    private AudioFocusChangeListener? _audioFocusChangeListener;
 #endif
 
     public event Action<double>? TimeUpdated;
@@ -61,6 +65,7 @@ public sealed class AndroidMusicPlayerService : Java.Lang.Object, IMusicPlayerSe
         _mediaSession.Active = true;
 
         _audioManager = _context.GetSystemService(Context.AudioService) as AudioManager;
+        _audioFocusChangeListener ??= new AudioFocusChangeListener(this);
 
         return Task.CompletedTask;
     }
@@ -317,7 +322,7 @@ public sealed class AndroidMusicPlayerService : Java.Lang.Object, IMusicPlayerSe
                         .SetUsage(AudioUsageKind.Media)!
                         .Build()!
                 )
-                .SetAcceptsDelayedFocusGain(true)
+                .SetOnAudioFocusChangeListener(_audioFocusChangeListener)
                 .Build();
 
 #pragma warning disable CA1416
@@ -366,5 +371,48 @@ public sealed class AndroidMusicPlayerService : Java.Lang.Object, IMusicPlayerSe
 
         public override void OnPause() => _ = service.PauseAsync();
     }
+
+#if ANDROID
+    private sealed class AudioFocusChangeListener(AndroidMusicPlayerService service)
+        : Java.Lang.Object, AudioManager.IOnAudioFocusChangeListener
+    {
+        public void OnAudioFocusChange([GeneratedEnum] AudioFocus focusChange)
+        {
+            switch (focusChange)
+            {
+                case AudioFocus.Gain:
+                    if (service._isDucked && service._player != null)
+                    {
+                        service._player.SetVolume(1f, 1f);
+                        service._isDucked = false;
+                    }
+                    if (service._resumeAfterFocusGain)
+                    {
+                        service._resumeAfterFocusGain = false;
+                        _ = service.PlayAsync();
+                    }
+                    break;
+                case AudioFocus.Loss:
+                    service._resumeAfterFocusGain = false;
+                    _ = service.PauseAsync();
+                    break;
+                case AudioFocus.LossTransient:
+                    if (service._player?.IsPlaying == true)
+                    {
+                        service._resumeAfterFocusGain = true;
+                    }
+                    _ = service.PauseAsync();
+                    break;
+                case AudioFocus.LossTransientCanDuck:
+                    if (service._player != null)
+                    {
+                        service._player.SetVolume(0.2f, 0.2f);
+                        service._isDucked = true;
+                    }
+                    break;
+            }
+        }
+    }
+#endif
 }
 #endif
