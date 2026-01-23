@@ -11,23 +11,13 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-@media (hover: none) and (pointer: coarse) {
-    .tooltip {
-        display: contents;
-    }
-
-    .tooltip__content {
-        display: none !important;
-    }
-}
-
 .tooltip__content {
     /* Popover defaults */
     position: fixed;
     inset: auto; /* Reset popover default inset */
     border: none;
     margin: 0;
-    
+
     /* Styling */
     width: max-content;
     max-width: 250px;
@@ -40,7 +30,7 @@
     box-shadow: 0 4px 6px -1px var(--color-shadow), 0 2px 4px -1px var(--color-shadow);
     border: 1px solid var(--color-border);
     pointer-events: none;
-    
+
     /* Transition Support */
     opacity: 0;
     transition: opacity var(--transition-fast), display var(--transition-fast) allow-discrete, overlay var(--transition-fast) allow-discrete;
