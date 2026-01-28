@@ -12,7 +12,33 @@
             </BlazorWebView.RootComponents>
         </BlazorWebView>
 
-        <VerticalStackLayout HorizontalOptions="End" VerticalOptions="End" Spacing="12" Margin="16">
+        <!-- Background Lyrics (above WebView) -->
+        <VerticalStackLayout x:Name="mainBgLyricsContainer" 
+                            IsVisible="False" 
+                            VerticalOptions="End" 
+                            HorizontalOptions="Center" 
+                            Margin="0,0,0,140" 
+                            Spacing="12"
+                            MaximumWidthRequest="800"
+                            InputTransparent="True">
+            <Label x:Name="mainBgCurrentLyric" 
+                   Text="" 
+                   TextColor="#FFB700"
+                   FontSize="24" 
+                   FontAttributes="Bold"
+                   HorizontalTextAlignment="Center"
+                   Opacity="1.0"
+                   Padding="20,0" />
+            <Label x:Name="mainBgNextLyric" 
+                   Text="" 
+                   TextColor="Gray"
+                   FontSize="20" 
+                   HorizontalTextAlignment="Center"
+                   Opacity="0.6"
+                   Padding="20,0" />
+        </VerticalStackLayout>
+
+        <VerticalStackLayout HorizontalOptions="Start" VerticalOptions="End" Spacing="12" Margin="16">
             <Button
                 x:Name="logViewerButton"
                 Text="🧾"
@@ -31,9 +57,17 @@
                   HeightRequest="70"
                   IsVisible="{OnPlatform Android=true, WinUI=true, Default=false}">
                 <!-- Outer Ring -->
-                <GraphicsView x:Name="mainMiniOuterRingView" />
+                <GraphicsView x:Name="mainMiniOuterRingView"
+                              WidthRequest="70"
+                              HeightRequest="70"
+                              HorizontalOptions="Center"
+                              VerticalOptions="Center" />
                 <!-- Progress Ring -->
-                <GraphicsView x:Name="mainMiniProgressRingView" />
+                <GraphicsView x:Name="mainMiniProgressRingView"
+                              WidthRequest="70"
+                              HeightRequest="70"
+                              HorizontalOptions="Center"
+                              VerticalOptions="Center" />
                 <!-- Cover -->
                 <Border WidthRequest="50" 
                         HeightRequest="50" 

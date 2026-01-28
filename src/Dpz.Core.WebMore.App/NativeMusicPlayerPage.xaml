@@ -45,25 +45,29 @@
 
     <Grid>
         <!-- Background Lyrics Container -->
-        <Grid x:Name="bgLyricsContainer" IsVisible="False" VerticalOptions="End" HorizontalOptions="Center" Margin="0,0,0,20" 
-              Padding="20,0" MaximumWidthRequest="800" HeightRequest="100">
-            <CollectionView x:Name="bgLyricsView" InputTransparent="True" SelectionMode="None">
-                <CollectionView.ItemsLayout>
-                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="8" />
-                </CollectionView.ItemsLayout>
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Label Text="{Binding Text}" 
-                               TextColor="{Binding Color}" 
-                               FontSize="{Binding FontSize}" 
-                               Opacity="{Binding Opacity}"
-                               HorizontalTextAlignment="Center" 
-                               FontAttributes="{Binding FontWeight}"
-                               Padding="8,0" />
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-        </Grid>
+        <VerticalStackLayout x:Name="bgLyricsContainer" 
+                            IsVisible="False" 
+                            VerticalOptions="End" 
+                            HorizontalOptions="Center" 
+                            Margin="0,0,0,40" 
+                            Spacing="12"
+                            MaximumWidthRequest="800">
+            <Label x:Name="bgCurrentLyric" 
+                   Text="" 
+                   TextColor="#FFB700"
+                   FontSize="24" 
+                   FontAttributes="Bold"
+                   HorizontalTextAlignment="Center"
+                   Opacity="1.0"
+                   Padding="20,0" />
+            <Label x:Name="bgNextLyric" 
+                   Text="" 
+                   TextColor="Gray"
+                   FontSize="20" 
+                   HorizontalTextAlignment="Center"
+                   Opacity="0.6"
+                   Padding="20,0" />
+        </VerticalStackLayout>
 
         <!-- Full Panel -->
         <Grid x:Name="fullPanel" IsVisible="True" BackgroundColor="{StaticResource PanelBg}">
@@ -88,18 +92,12 @@
                            TextColor="{StaticResource TextSecondary}" />
                 </VerticalStackLayout>
                 
-                <HorizontalStackLayout Grid.Column="1" Spacing="0">
-                    <Button Text="{x:Static local:FontAwesomeIcons.AngleDown}" 
-                            FontFamily="FASolid"
-                            Style="{StaticResource TextButton}"
-                            Clicked="OnToggleMini" 
-                            ToolTipProperties.Text="最小化" />
-                    <Button Text="{x:Static local:FontAwesomeIcons.Times}" 
-                            FontFamily="FASolid"
-                            Style="{StaticResource TextButton}"
-                            Clicked="OnClose" 
-                            ToolTipProperties.Text="关闭" />
-                </HorizontalStackLayout>
+                <Button Grid.Column="1"
+                        Text="{x:Static local:FontAwesomeIcons.Times}" 
+                        FontFamily="FASolid"
+                        Style="{StaticResource TextButton}"
+                        Clicked="OnToggleMini" 
+                        ToolTipProperties.Text="最小化" />
             </Grid>
 
             <!-- Main Content -->
@@ -219,39 +217,62 @@
                     <Border x:Name="listPanel" 
                             IsVisible="False" 
                             Stroke="{StaticResource BorderColor}" 
-                            StrokeThickness="2" 
-                            Padding="0" 
-                            MinimumHeightRequest="300" 
-                            MaximumHeightRequest="400">
-                        <CollectionView x:Name="trackList" 
-                                        SelectionMode="Single" 
-                                        SelectionChanged="OnTrackSelected">
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid Padding="12,8" ColumnDefinitions="Auto,*">
-                                        <Grid.Triggers>
-                                            <DataTrigger TargetType="Grid" Binding="{Binding IsActive}" Value="True">
-                                                <Setter Property="BackgroundColor" Value="#33FFB700" />
-                                            </DataTrigger>
-                                        </Grid.Triggers>
-                                        <Label Text="{Binding Index}" 
-                                               TextColor="{StaticResource TextSecondary}" 
-                                               WidthRequest="32" 
-                                               FontSize="12" 
-                                               HorizontalTextAlignment="Center" />
-                                        <VerticalStackLayout Grid.Column="1" Spacing="2">
-                                            <Label Text="{Binding Title}" 
-                                                   TextColor="{StaticResource TextPrimary}" 
-                                                   FontSize="14" 
-                                                   LineBreakMode="TailTruncation" />
-                                            <Label Text="{Binding Artist}" 
+                            StrokeThickness="1"
+                            BackgroundColor="{StaticResource PanelBgLight}"
+                            Padding="12">
+                        <Grid RowDefinitions="Auto,*" RowSpacing="8">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="播放列表" 
+                                       TextColor="{StaticResource ThemeColor}"
+                                       FontSize="14"
+                                       FontAttributes="Bold" />
+                                <Label Grid.Column="1"
+                                       Text="滚动选择"
+                                       TextColor="{StaticResource TextSecondary}"
+                                       FontSize="12" />
+                            </Grid>
+                            <CollectionView x:Name="trackList" 
+                                            Grid.Row="1"
+                                            HeightRequest="{OnPlatform Android=320, WinUI=520}"
+                                            SelectionMode="Single" 
+                                            SelectionChanged="OnTrackSelected">
+                                <CollectionView.ItemsLayout>
+                                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="6" />
+                                </CollectionView.ItemsLayout>
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Padding="10,8" ColumnDefinitions="4,Auto,*" ColumnSpacing="8">
+                                            <BoxView Grid.Column="0" 
+                                                     Color="Transparent"
+                                                     CornerRadius="2"
+                                                     WidthRequest="4"
+                                                     HeightRequest="28">
+                                                <BoxView.Triggers>
+                                                    <DataTrigger TargetType="BoxView" Binding="{Binding IsActive}" Value="True">
+                                                        <Setter Property="Color" Value="#FFB700" />
+                                                    </DataTrigger>
+                                                </BoxView.Triggers>
+                                            </BoxView>
+                                            <Label Grid.Column="1"
+                                                   Text="{Binding Index}" 
                                                    TextColor="{StaticResource TextSecondary}" 
-                                                   FontSize="12" />
-                                        </VerticalStackLayout>
-                                    </Grid>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
+                                                   WidthRequest="32" 
+                                                   FontSize="12" 
+                                                   HorizontalTextAlignment="Center" />
+                                            <VerticalStackLayout Grid.Column="2" Spacing="2">
+                                                <Label Text="{Binding Title}" 
+                                                       TextColor="{StaticResource TextPrimary}" 
+                                                       FontSize="14" 
+                                                       LineBreakMode="TailTruncation" />
+                                                <Label Text="{Binding Artist}" 
+                                                       TextColor="{StaticResource TextSecondary}" 
+                                                       FontSize="12" />
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </Grid>
                     </Border>
                 </VerticalStackLayout>
             </ScrollView>
@@ -262,13 +283,21 @@
               IsVisible="False" 
               WidthRequest="70" 
               HeightRequest="70" 
-              VerticalOptions="Start" 
+              VerticalOptions="End" 
               HorizontalOptions="Start" 
               Margin="20">
             <!-- Outer Ring -->
-            <GraphicsView x:Name="miniOuterRingView" />
+            <GraphicsView x:Name="miniOuterRingView"
+                          WidthRequest="70"
+                          HeightRequest="70"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center" />
             <!-- Progress Ring -->
-            <GraphicsView x:Name="miniProgressRingView" />
+            <GraphicsView x:Name="miniProgressRingView"
+                          WidthRequest="70"
+                          HeightRequest="70"
+                          HorizontalOptions="Center"
+                          VerticalOptions="Center" />
             <!-- Cover -->
             <Border WidthRequest="50" 
                     HeightRequest="50" 

@@ -122,6 +122,9 @@ public partial class NativeMusicPlayerPage : ContentPage
         ring3View.Drawable = _ring3Drawable;
         miniOuterRingView.Drawable = _miniOuterRingDrawable;
         miniProgressRingView.Drawable = _miniProgressRingDrawable;
+
+        // Initialize progress to 0
+        _miniProgressRingDrawable.Progress = 0f;
     }
 
     protected override async void OnAppearing()
@@ -138,10 +141,82 @@ public partial class NativeMusicPlayerPage : ContentPage
 
         await _playerService.InitializeAsync();
         await EnsureListAsync();
-        SetMiniMode(false);
+
+        // Try to restore last state
         if (_currentIndex < 0 && _musics.Count > 0)
         {
-            await LoadTrackById(_musics[0].Id, false);
+            var savedState = await _playerService.LoadStateAsync();
+            var trackId = savedState?.TrackId;
+            var mainState = MainPage.CurrentInstance;
+            if (
+                mainState != null
+                && mainState.IsPlayerInitialized
+                && !string.IsNullOrEmpty(mainState.CurrentTrackId)
+            )
+            {
+                trackId = mainState.CurrentTrackId;
+            }
+            if (string.IsNullOrEmpty(trackId) && _musics.Count > 0)
+            {
+                trackId = _musics[0].Id;
+            }
+
+            // Restore play mode
+            if (
+                !string.IsNullOrEmpty(savedState?.PlayModeStr)
+                && Enum.TryParse<PlayMode>(savedState.PlayModeStr, out var mode)
+            )
+            {
+                _playMode = mode;
+            }
+
+            // Restore lyrics settings
+            if (savedState != null)
+            {
+                _showLyrics = savedState.ShowLyrics;
+                _lyricsOnBackground = savedState.LyricsOnBackground;
+                UpdateLyricsVisibility();
+            }
+
+            var index = !string.IsNullOrEmpty(trackId)
+                ? _musics.FindIndex(m => m.Id == trackId)
+                : -1;
+            if (index < 0)
+            {
+                index = 0;
+            }
+
+            if (
+                mainState != null
+                && mainState.IsPlayerInitialized
+                && mainState.CurrentTrackId == trackId
+            )
+            {
+                // Player already has the correct track, just sync UI state
+                var track = _musics[index];
+                _currentIndex = index;
+                ApplyTrackUi(track, updateMainPage: false);
+                _currentTime = mainState.CurrentTime;
+                _duration = mainState.Duration;
+                UpdateTimeUi();
+                UpdatePlayButton(mainState.IsPlaying);
+                UpdateLyricHighlight(_currentTime);
+            }
+            else if (!string.IsNullOrEmpty(trackId))
+            {
+                // Load saved track
+                await LoadTrackById(trackId, false);
+
+                // Restore playback position if valid
+                if (
+                    savedState != null
+                    && savedState.CurrentTime > 0
+                    && savedState.CurrentTime < _duration
+                )
+                {
+                    await _playerService.SetCurrentTimeAsync(savedState.CurrentTime);
+                }
+            }
         }
 
         UpdateModeButton();
@@ -158,6 +233,23 @@ public partial class NativeMusicPlayerPage : ContentPage
         _playerService.PrevRequested -= OnPrevRequested;
 
         StopAnimations();
+
+        // Save current state
+        var trackId =
+            _currentIndex >= 0 && _currentIndex < _musics.Count ? _musics[_currentIndex].Id : null;
+        if (!string.IsNullOrEmpty(trackId))
+        {
+            _ = _playerService.SaveStateAsync(
+                new MusicPlayerState(
+                    _playMode.ToString(),
+                    _showLyrics,
+                    _lyricsOnBackground,
+                    trackId,
+                    _currentTime
+                )
+            );
+        }
+
         base.OnDisappearing();
     }
 
@@ -196,19 +288,14 @@ public partial class NativeMusicPlayerPage : ContentPage
 
                 _currentIndex = index;
                 var track = _musics[_currentIndex];
+                ApplyTrackUi(track);
 
-                titleLabel.Text = track.Title ?? "";
-                artistLabel.Text = track.Artist ?? "";
-                coverImage.Source = string.IsNullOrWhiteSpace(track.CoverUrl)
-                    ? null
-                    : track.CoverUrl;
-                miniCoverImage.Source = string.IsNullOrWhiteSpace(track.CoverUrl)
-                    ? null
-                    : track.CoverUrl;
-                ParseLyrics(track.LyricContent);
-                lyricsView.ItemsSource = _lyrics;
-                bgLyricsView.ItemsSource = _lyrics;
-                RefreshTrackList();
+                // Reset progress
+                _currentTime = 0;
+                _duration = 0;
+                _miniProgressRingDrawable.Progress = 0f;
+                miniProgressRingView.Invalidate();
+                UpdateMiniProgress();
 
                 await _playerService.SetSourceAsync(track.MusicUrl, track.Id);
                 await _playerService.UpdateMediaSessionAsync(
@@ -228,6 +315,34 @@ public partial class NativeMusicPlayerPage : ContentPage
             },
             "加载音乐"
         );
+    }
+
+    private void ApplyTrackUi(MusicModel track, bool updateMainPage = true)
+    {
+        titleLabel.Text = track.Title ?? "";
+        artistLabel.Text = track.Artist ?? "";
+        coverImage.Source = string.IsNullOrWhiteSpace(track.CoverUrl) ? null : track.CoverUrl;
+        miniCoverImage.Source = string.IsNullOrWhiteSpace(track.CoverUrl) ? null : track.CoverUrl;
+        ParseLyrics(track.LyricContent);
+        lyricsView.ItemsSource = _lyrics;
+        RefreshTrackList();
+        if (updateMainPage)
+        {
+            MainPage.CurrentInstance?.SetCurrentTrack(track.Id, track.CoverUrl);
+        }
+    }
+
+    private void UpdateTimeUi()
+    {
+        currentTimeLabel.Text = FormatTime(_currentTime);
+        durationLabel.Text = FormatTime(_duration);
+        if (_duration > 0 && !_isUserSeeking)
+        {
+            _ignoreSeekChange = true;
+            seekSlider.Value = (_currentTime / _duration) * 100;
+            _ignoreSeekChange = false;
+        }
+        UpdateMiniProgress();
     }
 
     private void UpdatePlayButton(bool isPlaying)
@@ -251,14 +366,7 @@ public partial class NativeMusicPlayerPage : ContentPage
         _currentTime = time;
         MainThread.BeginInvokeOnMainThread(() =>
         {
-            currentTimeLabel.Text = FormatTime(_currentTime);
-            if (_duration > 0 && !_isUserSeeking)
-            {
-                _ignoreSeekChange = true;
-                seekSlider.Value = (_currentTime / _duration) * 100;
-                _ignoreSeekChange = false;
-            }
-            UpdateMiniProgress();
+            UpdateTimeUi();
             UpdateLyricHighlight(_currentTime);
 
             // Update MainPage mini player
@@ -276,8 +384,7 @@ public partial class NativeMusicPlayerPage : ContentPage
         _duration = duration;
         MainThread.BeginInvokeOnMainThread(() =>
         {
-            durationLabel.Text = FormatTime(_duration);
-            UpdateMiniProgress();
+            UpdateTimeUi();
         });
     }
 
@@ -474,9 +581,10 @@ public partial class NativeMusicPlayerPage : ContentPage
         lyricButton.TextColor = isActive ? Color.FromArgb("#FFB700") : Color.FromArgb("#A69E96");
     }
 
-    private void OnToggleMini(object sender, EventArgs e)
+    private async void OnToggleMini(object sender, EventArgs e)
     {
-        SetMiniMode(!_isMiniMode);
+        // 最小化时关闭Modal页面返回MainPage
+        await Navigation.PopModalAsync();
     }
 
     private void OnMiniPressed(object sender, EventArgs e)
@@ -716,7 +824,7 @@ public partial class NativeMusicPlayerPage : ContentPage
             canvas.SaveState();
             var centerX = dirtyRect.Center.X;
             var centerY = dirtyRect.Center.Y;
-            var radius = Math.Min(dirtyRect.Width, dirtyRect.Height) / 2f + 3f;
+            var radius = Math.Min(dirtyRect.Width, dirtyRect.Height) / 2f - 2f;
 
             canvas.Translate(centerX, centerY);
             canvas.Rotate(RotationAngle);
@@ -741,13 +849,27 @@ public partial class NativeMusicPlayerPage : ContentPage
             canvas.SaveState();
             var centerX = dirtyRect.Center.X;
             var centerY = dirtyRect.Center.Y;
-            var radius = Math.Min(dirtyRect.Width, dirtyRect.Height) / 2f - 2f;
+            var radius = Math.Min(dirtyRect.Width, dirtyRect.Height) / 2f - 4f;
             var rect = new RectF(centerX - radius, centerY - radius, radius * 2, radius * 2);
+            var startAngle = -90f;
+            var sweepAngle = 360f * Math.Clamp(Progress, 0f, 1f);
+            if (float.IsNaN(sweepAngle) || sweepAngle <= 0f)
+            {
+                canvas.RestoreState();
+                return;
+            }
 
             canvas.StrokeSize = 3f;
             canvas.StrokeColor = Color.FromArgb("#FFB700");
             canvas.StrokeLineCap = LineCap.Butt;
-            canvas.DrawArc(rect, -90, 360 * Progress, false, false);
+            if (sweepAngle >= 359.9f)
+            {
+                canvas.DrawCircle(centerX, centerY, radius);
+            }
+            else
+            {
+                canvas.DrawArc(rect, startAngle, startAngle + sweepAngle, false, false);
+            }
 
             canvas.RestoreState();
         }
@@ -892,10 +1014,44 @@ public partial class NativeMusicPlayerPage : ContentPage
             {
                 lyricsView.ScrollTo(current, position: ScrollToPosition.Center, animate: true);
             }
-            if (_lyricsOnBackground)
+        }
+
+        // Update background lyrics (two lines)
+        if (_lyricsOnBackground)
+        {
+            string currentText = "纯音乐 / 暂无歌词";
+            string? nextText = null;
+
+            if (_currentLyricIndex >= 0 && _currentLyricIndex < _lyrics.Count)
             {
-                bgLyricsView.ScrollTo(current, position: ScrollToPosition.Center, animate: true);
+                currentText = _lyrics[_currentLyricIndex].Text;
+                bgCurrentLyric.Text = currentText;
+
+                // Show next line
+                if (_currentLyricIndex + 1 < _lyrics.Count)
+                {
+                    nextText = _lyrics[_currentLyricIndex + 1].Text;
+                    bgNextLyric.Text = nextText;
+                    bgNextLyric.IsVisible = true;
+                }
+                else
+                {
+                    bgNextLyric.IsVisible = false;
+                }
             }
+            else
+            {
+                bgCurrentLyric.Text = currentText;
+                bgNextLyric.IsVisible = false;
+            }
+
+            // Update MainPage background lyrics
+            MainPage.CurrentInstance?.UpdateBackgroundLyrics(true, currentText, nextText);
+        }
+        else
+        {
+            // Hide MainPage background lyrics
+            MainPage.CurrentInstance?.UpdateBackgroundLyrics(false, "", null);
         }
     }
 

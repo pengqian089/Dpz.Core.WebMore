@@ -42,7 +42,7 @@ public static class MauiProgram
             }
         );
 
-        builder.Services.AddTransient<NativeMusicPlayerPage>();
+        builder.Services.AddSingleton<NativeMusicPlayerPage>();
         builder.Services.AddTransient<LogViewerPage>();
 
 #if ANDROID
