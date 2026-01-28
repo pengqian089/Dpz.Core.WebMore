@@ -125,12 +125,8 @@ public partial class NativeMusicPlayerPage : ContentPage
 
         // Initialize progress to 0
         _miniProgressRingDrawable.Progress = 0f;
-    }
 
-    protected override async void OnAppearing()
-    {
-        base.OnAppearing();
-
+        // Subscribe to player events once (page is singleton)
         _playerService.TimeUpdated += OnTimeUpdated;
         _playerService.DurationChanged += OnDurationChanged;
         _playerService.PlayStateChanged += OnPlayStateChanged;
@@ -138,6 +134,11 @@ public partial class NativeMusicPlayerPage : ContentPage
         _playerService.Error += OnError;
         _playerService.NextRequested += OnNextRequested;
         _playerService.PrevRequested += OnPrevRequested;
+    }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
 
         await _playerService.InitializeAsync();
         await EnsureListAsync();
@@ -224,14 +225,6 @@ public partial class NativeMusicPlayerPage : ContentPage
 
     protected override void OnDisappearing()
     {
-        _playerService.TimeUpdated -= OnTimeUpdated;
-        _playerService.DurationChanged -= OnDurationChanged;
-        _playerService.PlayStateChanged -= OnPlayStateChanged;
-        _playerService.Ended -= OnEnded;
-        _playerService.Error -= OnError;
-        _playerService.NextRequested -= OnNextRequested;
-        _playerService.PrevRequested -= OnPrevRequested;
-
         StopAnimations();
 
         // Save current state

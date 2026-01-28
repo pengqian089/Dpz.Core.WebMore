@@ -1,8 +1,9 @@
-﻿using Android.App;
+using Android.App;
 using Android.Content.PM;
 using Android.OS;
 using Android.Views;
 using Android.Webkit;
+using AndroidX.Core.App;
 using AndroidX.Core.View;
 using Dpz.Core.WebMore.Service;
 using WebView = Android.Webkit.WebView;
@@ -40,6 +41,23 @@ public class MainActivity : MauiAppCompatActivity
         if (content != null)
         {
             ViewCompat.SetOnApplyWindowInsetsListener(content, new InsetsListener());
+        }
+
+        // Request notification permission for Android 13+
+        RequestNotificationPermission();
+    }
+
+    private void RequestNotificationPermission()
+    {
+        if (Build.VERSION.SdkInt >= BuildVersionCodes.Tiramisu)
+        {
+            if (
+                CheckSelfPermission(Android.Manifest.Permission.PostNotifications)
+                != Permission.Granted
+            )
+            {
+                RequestPermissions(new[] { Android.Manifest.Permission.PostNotifications }, 1001);
+            }
         }
     }
 

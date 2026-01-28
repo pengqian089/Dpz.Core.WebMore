@@ -1,17 +1,13 @@
-#if ANDROID
-#pragma warning disable CA1416
-#pragma warning disable CS0618
-using System;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Android.Content;
 using Android.Media;
 using Android.Media.Session;
 using Android.OS;
 using Android.Runtime;
 using Dpz.Core.WebMore.Service;
-using Microsoft.Maui.Storage;
+
+#pragma warning disable CA1416
+#pragma warning disable CS0618
 
 namespace Dpz.Core.WebMore.App.Platforms.Android;
 
@@ -28,10 +24,8 @@ public sealed class AndroidMusicPlayerService : Java.Lang.Object, IMusicPlayerSe
     private bool _resumeAfterFocusGain;
     private bool _isDucked;
     private AudioManager? _audioManager;
-#if ANDROID
     private AudioFocusRequestClass? _audioFocusRequest;
     private AudioFocusChangeListener? _audioFocusChangeListener;
-#endif
 
     public event Action<double>? TimeUpdated;
     public event Action<double>? DurationChanged;
@@ -62,6 +56,12 @@ public sealed class AndroidMusicPlayerService : Java.Lang.Object, IMusicPlayerSe
 
         _mediaSession = new MediaSession(_context, "Dpz.Core.Music");
         _mediaSession.SetCallback(new MediaSessionCallback(this));
+
+        // Enable media buttons and transport controls
+        _mediaSession.SetFlags(
+            MediaSessionFlags.HandlesMediaButtons | MediaSessionFlags.HandlesTransportControls
+        );
+
         _mediaSession.Active = true;
 
         _audioManager = _context.GetSystemService(Context.AudioService) as AudioManager;
@@ -149,11 +149,24 @@ public sealed class AndroidMusicPlayerService : Java.Lang.Object, IMusicPlayerSe
             return Task.CompletedTask;
         }
 
-        var metadata = new MediaMetadata.Builder()
+        var metadataBuilder = new MediaMetadata.Builder()
             .PutString(MediaMetadata.MetadataKeyTitle, title)
-            ?.PutString(MediaMetadata.MetadataKeyArtist, artist)
-            ?.Build();
-        _mediaSession.SetMetadata(metadata);
+            .PutString(MediaMetadata.MetadataKeyArtist, artist)
+            .PutString(MediaMetadata.MetadataKeyAlbum, title);
+
+        // Note: Cover image loading from URL requires async download, skipped for now
+        // MediaSession will work without album art
+
+        _mediaSession.SetMetadata(metadataBuilder.Build());
+
+        // Update playback state with current position
+        if (_player != null && _isPrepared)
+        {
+            UpdatePlaybackState(
+                _player.IsPlaying ? PlaybackStateCode.Playing : PlaybackStateCode.Paused
+            );
+        }
+
         return Task.CompletedTask;
     }
 
@@ -239,7 +252,14 @@ public sealed class AndroidMusicPlayerService : Java.Lang.Object, IMusicPlayerSe
                 {
                     return;
                 }
-                TimeUpdated?.Invoke(_player.CurrentPosition / 1000.0);
+                var currentTime = _player.CurrentPosition / 1000.0;
+                TimeUpdated?.Invoke(currentTime);
+                
+                // Update MediaSession playback state with current position
+                if (_mediaSession != null && _isPrepared)
+                {
+                    UpdatePlaybackState(PlaybackStateCode.Playing);
+                }
             },
             null,
             TimeSpan.Zero,
@@ -260,15 +280,19 @@ public sealed class AndroidMusicPlayerService : Java.Lang.Object, IMusicPlayerSe
             return;
         }
 
+        var position = _isPrepared ? _player.CurrentPosition : 0L;
+        var playbackSpeed = state == PlaybackStateCode.Playing ? 1.0f : 0.0f;
+
         var playbackState = new PlaybackState.Builder()
-            .SetState(state, _player.CurrentPosition, 1.0f)
-            ?.SetActions(
+            .SetState(state, position, playbackSpeed)
+            .SetActions(
                 PlaybackState.ActionPlay
                     | PlaybackState.ActionPause
                     | PlaybackState.ActionSkipToNext
                     | PlaybackState.ActionSkipToPrevious
+                    | PlaybackState.ActionSeekTo
             )
-            ?.Build();
+            .Build();
 
         _mediaSession.SetPlaybackState(playbackState);
     }
@@ -372,9 +396,9 @@ public sealed class AndroidMusicPlayerService : Java.Lang.Object, IMusicPlayerSe
         public override void OnPause() => _ = service.PauseAsync();
     }
 
-#if ANDROID
     private sealed class AudioFocusChangeListener(AndroidMusicPlayerService service)
-        : Java.Lang.Object, AudioManager.IOnAudioFocusChangeListener
+        : Java.Lang.Object,
+            AudioManager.IOnAudioFocusChangeListener
     {
         public void OnAudioFocusChange([GeneratedEnum] AudioFocus focusChange)
         {
@@ -413,6 +437,4 @@ public sealed class AndroidMusicPlayerService : Java.Lang.Object, IMusicPlayerSe
             }
         }
     }
-#endif
 }
-#endif

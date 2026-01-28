@@ -163,49 +163,52 @@ public partial class MainPage : ContentPage
 
         _isAnimating = true;
 
-        mainMiniCoverImage.AbortAnimation("MiniCoverRotate");
-        mainMiniPlayIcon.AbortAnimation("MiniIconRotate");
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            while (_isAnimating)
+            {
+                try
+                {
+                    var coverTask = mainMiniCoverImage.RotateTo(360, 8000, Easing.Linear);
+                    var iconTask = mainMiniPlayIcon.RotateTo(360, 8000, Easing.Linear);
+                    await Task.WhenAll(coverTask, iconTask);
+                }
+                catch
+                {
+                    // ignore animation errors
+                }
 
-        var coverAnimation = new Animation(v => mainMiniCoverImage.Rotation = v, 0, 360);
-        mainMiniCoverImage.Animate(
-            "MiniCoverRotate",
-            coverAnimation,
-            16,
-            5000,
-            Easing.Linear,
-            repeat: () => _isAnimating
-        );
+                if (!_isAnimating)
+                {
+                    break;
+                }
 
-        var iconAnimation = new Animation(v => mainMiniPlayIcon.Rotation = v, 0, 360);
-        mainMiniPlayIcon.Animate(
-            "MiniIconRotate",
-            iconAnimation,
-            16,
-            5000,
-            Easing.Linear,
-            repeat: () => _isAnimating
-        );
+                mainMiniCoverImage.Rotation = 0;
+                mainMiniPlayIcon.Rotation = 0;
+            }
+        });
 
         var angle = 0f;
-        Dispatcher.StartTimer(TimeSpan.FromMilliseconds(16), () =>
-        {
-            if (!_isAnimating)
+        Dispatcher.StartTimer(
+            TimeSpan.FromMilliseconds(16),
+            () =>
             {
-                return false;
-            }
+                if (!_isAnimating)
+                {
+                    return false;
+                }
 
-            angle = (angle + 1f) % 360f;
-            _miniDrawables.OuterRing.RotationAngle = angle;
-            mainMiniOuterRingView.Invalidate();
-            return true;
-        });
+                angle = (angle + 1f) % 360f;
+                _miniDrawables.OuterRing.RotationAngle = angle;
+                mainMiniOuterRingView.Invalidate();
+                return true;
+            }
+        );
     }
 
     private void StopMiniAnimation()
     {
         _isAnimating = false;
-        mainMiniCoverImage.AbortAnimation("MiniCoverRotate");
-        mainMiniPlayIcon.AbortAnimation("MiniIconRotate");
 
         _miniDrawables.OuterRing.RotationAngle = 0;
         MainThread.BeginInvokeOnMainThread(() =>
