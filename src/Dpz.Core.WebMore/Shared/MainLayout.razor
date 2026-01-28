@@ -26,7 +26,7 @@
         <i class="fa fa-arrow-up"></i>
     </div>
 
-    @if (!OperatingSystem.IsAndroid())
+    @if (Program.UseBlazorMusicPlayer)
     {
         <MusicPlayer/>
     }

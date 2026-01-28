@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:Dpz.Core.WebMore.App"
@@ -25,18 +25,49 @@
                 TextColor="#F2F2F2"
                 Clicked="OnOpenLogViewer" />
 
-            <Button
-                x:Name="nativePlayerButton"
-                Text="🎵"
-                FontSize="22"
-                WidthRequest="56"
-                HeightRequest="56"
-                CornerRadius="28"
-                Padding="0"
-                BackgroundColor="#FFB700"
-                TextColor="#000000"
-                IsVisible="{OnPlatform Android=true, Default=false}"
-                Clicked="OnOpenNativePlayer" />
+            <!-- Mini Music Player -->
+            <Grid x:Name="miniMusicPlayer" 
+                  WidthRequest="70" 
+                  HeightRequest="70"
+                  IsVisible="{OnPlatform Android=true, WinUI=true, Default=false}">
+                <!-- Outer Ring -->
+                <GraphicsView x:Name="mainMiniOuterRingView" />
+                <!-- Progress Ring -->
+                <GraphicsView x:Name="mainMiniProgressRingView" />
+                <!-- Cover -->
+                <Border WidthRequest="50" 
+                        HeightRequest="50" 
+                        StrokeShape="RoundRectangle 25" 
+                        StrokeThickness="2" 
+                        Stroke="#2A2A2A" 
+                        HorizontalOptions="Center" 
+                        VerticalOptions="Center">
+                    <Image x:Name="mainMiniCoverImage" Aspect="AspectFill" />
+                </Border>
+                <!-- Overlay -->
+                <Grid x:Name="mainMiniOverlay" 
+                      WidthRequest="70" 
+                      HeightRequest="70" 
+                      Opacity="0">
+                    <Border StrokeShape="RoundRectangle 35" 
+                            BackgroundColor="#66000000" />
+                    <Label x:Name="mainMiniPlayIcon" 
+                           Text="{x:Static local:FontAwesomeIcons.Play}" 
+                           FontFamily="FASolid"
+                           TextColor="White" 
+                           FontSize="20" 
+                           HorizontalTextAlignment="Center" 
+                           VerticalTextAlignment="Center" />
+                </Grid>
+                <!-- Touch Button -->
+                <Button BackgroundColor="Transparent" 
+                        Opacity="0.01" 
+                        WidthRequest="70" 
+                        HeightRequest="70"
+                        Clicked="OnMiniPlayerClick"
+                        Pressed="OnMiniPlayerPressed" 
+                        Released="OnMiniPlayerReleased" />
+            </Grid>
         </VerticalStackLayout>
     </Grid>
 

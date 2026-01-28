@@ -1,13 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Dpz.Core.WebMore.Models;
 using Dpz.Core.WebMore.Service;
-using Microsoft.Maui.ApplicationModel;
-using Microsoft.Maui.Graphics;
 using Serilog;
+
+// ReSharper disable UnusedAutoPropertyAccessor.Local
 
 namespace Dpz.Core.WebMore.App;
 
@@ -17,7 +14,7 @@ public partial class NativeMusicPlayerPage : ContentPage
     private readonly IMusicPlayerService _playerService;
 
     private readonly List<MusicModel> _musics = [];
-    private readonly List<LyricLine> _lyrics = [];
+    private readonly ObservableCollection<LyricLineViewModel> _lyrics = [];
     private int _currentIndex = -1;
     private int _currentLyricIndex = -1;
     private bool _isPlaying;
@@ -31,7 +28,14 @@ public partial class NativeMusicPlayerPage : ContentPage
     private bool _isMiniMode;
     private bool _miniPressing;
     private bool _miniLongPressTriggered;
-    private readonly RingDrawable _miniRingDrawable = new();
+
+    private readonly ReactorRing1Drawable _ring1Drawable = new();
+    private readonly ReactorRing2Drawable _ring2Drawable = new();
+    private readonly ReactorRing3Drawable _ring3Drawable = new();
+    private readonly MiniOuterRingDrawable _miniOuterRingDrawable = new();
+    private readonly MiniProgressRingDrawable _miniProgressRingDrawable = new();
+
+    private CancellationTokenSource? _animationCts;
     private const int MiniLongPressThresholdMs = 450;
     private PlayMode _playMode = PlayMode.Order;
 
@@ -42,7 +46,67 @@ public partial class NativeMusicPlayerPage : ContentPage
         Single,
     }
 
-    private record LyricLine(double Time, string Text, Color Color);
+    private class LyricLineViewModel : BindableObject
+    {
+        public double Time { get; set; }
+        public string Text { get; set; } = string.Empty;
+
+        private Color _color = Colors.Gray;
+        public Color Color
+        {
+            get => _color;
+            set
+            {
+                if (_color != value)
+                {
+                    _color = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private int _fontSize = 14;
+        public int FontSize
+        {
+            get => _fontSize;
+            set
+            {
+                if (_fontSize != value)
+                {
+                    _fontSize = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private double _opacity = 0.5;
+        public double Opacity
+        {
+            get => _opacity;
+            set
+            {
+                if (Math.Abs(_opacity - value) > 0.001)
+                {
+                    _opacity = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private FontAttributes _fontWeight = FontAttributes.None;
+        public FontAttributes FontWeight
+        {
+            get => _fontWeight;
+            set
+            {
+                if (_fontWeight != value)
+                {
+                    _fontWeight = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+    }
 
     private record TrackItem(int Index, string? Title, string? Artist, string Id, bool IsActive);
 
@@ -51,7 +115,13 @@ public partial class NativeMusicPlayerPage : ContentPage
         InitializeComponent();
         _musicService = musicService;
         _playerService = playerService;
-        miniRingView.Drawable = _miniRingDrawable;
+
+        // Set drawables
+        ring1View.Drawable = _ring1Drawable;
+        ring2View.Drawable = _ring2Drawable;
+        ring3View.Drawable = _ring3Drawable;
+        miniOuterRingView.Drawable = _miniOuterRingDrawable;
+        miniProgressRingView.Drawable = _miniProgressRingDrawable;
     }
 
     protected override async void OnAppearing()
@@ -87,6 +157,7 @@ public partial class NativeMusicPlayerPage : ContentPage
         _playerService.NextRequested -= OnNextRequested;
         _playerService.PrevRequested -= OnPrevRequested;
 
+        StopAnimations();
         base.OnDisappearing();
     }
 
@@ -97,63 +168,82 @@ public partial class NativeMusicPlayerPage : ContentPage
             return;
         }
 
-        await RunSafeAsync(async () =>
-        {
-            var list = await _musicService.GetMusicPageAsync(1, 1000);
-            _musics.AddRange(list);
-        }, "加载播放列表");
+        await RunSafeAsync(
+            async () =>
+            {
+                var list = await _musicService.GetMusicPageAsync(1, 1000);
+                _musics.AddRange(list);
+            },
+            "加载播放列表"
+        );
     }
 
     private async Task LoadTrackById(string id, bool autoPlay = true)
     {
-        await RunSafeAsync(async () =>
-        {
-            if (string.IsNullOrWhiteSpace(id))
+        await RunSafeAsync(
+            async () =>
             {
-                return;
-            }
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    return;
+                }
 
-            var index = _musics.FindIndex(m => m.Id == id);
-            if (index < 0 || index >= _musics.Count)
-            {
-                return;
-            }
+                var index = _musics.FindIndex(m => m.Id == id);
+                if (index < 0 || index >= _musics.Count)
+                {
+                    return;
+                }
 
-            _currentIndex = index;
-            var track = _musics[_currentIndex];
+                _currentIndex = index;
+                var track = _musics[_currentIndex];
 
-            titleLabel.Text = track.Title ?? "";
-            artistLabel.Text = track.Artist ?? "";
-            coverImage.Source = string.IsNullOrWhiteSpace(track.CoverUrl) ? null : track.CoverUrl;
-            miniCoverImage.Source = string.IsNullOrWhiteSpace(track.CoverUrl) ? null : track.CoverUrl;
-            ParseLyrics(track.LyricContent);
-            lyricsView.ItemsSource = _lyrics;
-            bgLyricsView.ItemsSource = _lyrics;
-            RefreshTrackList();
+                titleLabel.Text = track.Title ?? "";
+                artistLabel.Text = track.Artist ?? "";
+                coverImage.Source = string.IsNullOrWhiteSpace(track.CoverUrl)
+                    ? null
+                    : track.CoverUrl;
+                miniCoverImage.Source = string.IsNullOrWhiteSpace(track.CoverUrl)
+                    ? null
+                    : track.CoverUrl;
+                ParseLyrics(track.LyricContent);
+                lyricsView.ItemsSource = _lyrics;
+                bgLyricsView.ItemsSource = _lyrics;
+                RefreshTrackList();
 
-            await _playerService.SetSourceAsync(track.MusicUrl, track.Id);
-            await _playerService.UpdateMediaSessionAsync(
-                track.Title ?? string.Empty,
-                track.Artist ?? string.Empty,
-                track.CoverUrl ?? string.Empty
-            );
+                await _playerService.SetSourceAsync(track.MusicUrl, track.Id);
+                await _playerService.UpdateMediaSessionAsync(
+                    track.Title ?? string.Empty,
+                    track.Artist ?? string.Empty,
+                    track.CoverUrl ?? string.Empty
+                );
 
-            if (autoPlay)
-            {
-                await _playerService.PlayAsync();
-            }
-            else
-            {
-                UpdatePlayButton(false);
-            }
-        }, "加载音乐");
+                if (autoPlay)
+                {
+                    await _playerService.PlayAsync();
+                }
+                else
+                {
+                    UpdatePlayButton(false);
+                }
+            },
+            "加载音乐"
+        );
     }
 
     private void UpdatePlayButton(bool isPlaying)
     {
         _isPlaying = isPlaying;
-        playButton.Text = _isPlaying ? "⏸" : "▶";
-        miniPlayIcon.Text = _isPlaying ? "⏸" : "▶";
+        playButton.Text = _isPlaying ? FontAwesomeIcons.Pause : FontAwesomeIcons.Play;
+        miniPlayIcon.Text = _isPlaying ? FontAwesomeIcons.Pause : FontAwesomeIcons.Play;
+
+        if (_isPlaying)
+        {
+            StartAnimations();
+        }
+        else
+        {
+            StopAnimations();
+        }
     }
 
     private void OnTimeUpdated(double time)
@@ -170,6 +260,14 @@ public partial class NativeMusicPlayerPage : ContentPage
             }
             UpdateMiniProgress();
             UpdateLyricHighlight(_currentTime);
+
+            // Update MainPage mini player
+            var progress = _duration > 0 ? _currentTime / _duration : 0;
+            var coverUrl =
+                _currentIndex >= 0 && _currentIndex < _musics.Count
+                    ? _musics[_currentIndex].CoverUrl
+                    : null;
+            MainPage.CurrentInstance?.UpdateMiniPlayer(coverUrl, progress, _isPlaying);
         });
     }
 
@@ -188,28 +286,27 @@ public partial class NativeMusicPlayerPage : ContentPage
         MainThread.BeginInvokeOnMainThread(() =>
         {
             UpdatePlayButton(isPlaying);
-            _miniRingDrawable.IsPlaying = isPlaying;
-            miniRingView.Invalidate();
         });
     }
 
     private async void OnEnded()
     {
-        await RunSafeAsync(async () =>
-        {
-            if (_playMode == PlayMode.Single && _currentIndex >= 0)
+        await RunSafeAsync(
+            async () =>
             {
-                await _playerService.SetCurrentTimeAsync(0);
-                await _playerService.PlayAsync();
-                return;
-            }
-            await Next();
-        }, "播放结束处理");
+                if (_playMode == PlayMode.Single && _currentIndex >= 0)
+                {
+                    await _playerService.SetCurrentTimeAsync(0);
+                    await _playerService.PlayAsync();
+                    return;
+                }
+                await Next();
+            },
+            "播放结束处理"
+        );
     }
 
-    private void OnError(string message)
-    {
-    }
+    private void OnError(string message) { }
 
     private void OnNextRequested() => MainThread.BeginInvokeOnMainThread(async () => await Next());
 
@@ -217,51 +314,60 @@ public partial class NativeMusicPlayerPage : ContentPage
 
     private async Task Next()
     {
-        await RunSafeAsync(async () =>
-        {
-            if (_musics.Count == 0)
+        await RunSafeAsync(
+            async () =>
             {
-                return;
-            }
-            int next;
-            if (_playMode == PlayMode.Random)
-            {
-                next = _musics.Count == 1 ? 0 : new Random().Next(_musics.Count);
-            }
-            else
-            {
-                next = (_currentIndex + 1) % _musics.Count;
-            }
-            await LoadTrackById(_musics[next].Id);
-        }, "切换下一首");
+                if (_musics.Count == 0)
+                {
+                    return;
+                }
+                int next;
+                if (_playMode == PlayMode.Random)
+                {
+                    next = _musics.Count == 1 ? 0 : new Random().Next(_musics.Count);
+                }
+                else
+                {
+                    next = (_currentIndex + 1) % _musics.Count;
+                }
+                await LoadTrackById(_musics[next].Id);
+            },
+            "切换下一首"
+        );
     }
 
     private async Task Prev()
     {
-        await RunSafeAsync(async () =>
-        {
-            if (_musics.Count == 0)
+        await RunSafeAsync(
+            async () =>
             {
-                return;
-            }
-            var prev = (_currentIndex - 1 + _musics.Count) % _musics.Count;
-            await LoadTrackById(_musics[prev].Id);
-        }, "切换上一首");
+                if (_musics.Count == 0)
+                {
+                    return;
+                }
+                var prev = (_currentIndex - 1 + _musics.Count) % _musics.Count;
+                await LoadTrackById(_musics[prev].Id);
+            },
+            "切换上一首"
+        );
     }
 
     private async void OnPlayPause(object sender, EventArgs e)
     {
-        await RunSafeAsync(async () =>
-        {
-            if (_isPlaying)
+        await RunSafeAsync(
+            async () =>
             {
-                await _playerService.PauseAsync();
-            }
-            else
-            {
-                await _playerService.PlayAsync();
-            }
-        }, "播放/暂停");
+                if (_isPlaying)
+                {
+                    await _playerService.PauseAsync();
+                }
+                else
+                {
+                    await _playerService.PlayAsync();
+                }
+            },
+            "播放/暂停"
+        );
     }
 
     private async void OnNext(object sender, EventArgs e) => await Next();
@@ -297,7 +403,15 @@ public partial class NativeMusicPlayerPage : ContentPage
         SetMiniMode(false);
         _listVisible = !_listVisible;
         listPanel.IsVisible = _listVisible;
-        RefreshTrackList();
+
+        // Update button style
+        listButton.BorderColor = _listVisible ? Color.FromArgb("#FFB700") : Colors.Transparent;
+        listButton.TextColor = _listVisible ? Color.FromArgb("#FFB700") : Color.FromArgb("#A69E96");
+
+        if (_listVisible)
+        {
+            RefreshTrackList();
+        }
     }
 
     private async void OnClose(object sender, EventArgs e)
@@ -323,25 +437,41 @@ public partial class NativeMusicPlayerPage : ContentPage
     private void OnToggleLyrics(object sender, EventArgs e)
     {
         SetMiniMode(false);
+
+        // Cycle through three modes: Off -> Panel -> Background -> Off
         if (!_showLyrics && !_lyricsOnBackground)
         {
+            // Mode 1: Show in panel
             _showLyrics = true;
             _lyricsOnBackground = false;
         }
         else if (_showLyrics && !_lyricsOnBackground)
         {
+            // Mode 2: Show on background
             _showLyrics = false;
             _lyricsOnBackground = true;
         }
         else
         {
+            // Mode 3: Hide all
             _showLyrics = false;
             _lyricsOnBackground = false;
         }
 
+        UpdateLyricsVisibility();
+        UpdateLyricHighlight(_currentTime);
+    }
+
+    private void UpdateLyricsVisibility()
+    {
         lyricsView.IsVisible = _showLyrics;
-        bgLyricsView.IsVisible = _lyricsOnBackground;
-        coverFrame.IsVisible = !_showLyrics;
+        reactorContainer.IsVisible = !_showLyrics;
+        bgLyricsContainer.IsVisible = _lyricsOnBackground;
+
+        // Update button style
+        var isActive = _showLyrics || _lyricsOnBackground;
+        lyricButton.BorderColor = isActive ? Color.FromArgb("#FFB700") : Colors.Transparent;
+        lyricButton.TextColor = isActive ? Color.FromArgb("#FFB700") : Color.FromArgb("#A69E96");
     }
 
     private void OnToggleMini(object sender, EventArgs e)
@@ -354,22 +484,25 @@ public partial class NativeMusicPlayerPage : ContentPage
         _miniPressing = true;
         _miniLongPressTriggered = false;
         var start = DateTime.UtcNow;
-        Dispatcher.StartTimer(TimeSpan.FromMilliseconds(50), () =>
-        {
-            if (!_miniPressing)
+        Dispatcher.StartTimer(
+            TimeSpan.FromMilliseconds(50),
+            () =>
             {
-                return false;
-            }
+                if (!_miniPressing)
+                {
+                    return false;
+                }
 
-            if ((DateTime.UtcNow - start).TotalMilliseconds >= MiniLongPressThresholdMs)
-            {
-                _miniLongPressTriggered = true;
-                SetMiniMode(false);
-                return false;
-            }
+                if ((DateTime.UtcNow - start).TotalMilliseconds >= MiniLongPressThresholdMs)
+                {
+                    _miniLongPressTriggered = true;
+                    SetMiniMode(false);
+                    return false;
+                }
 
-            return true;
-        });
+                return true;
+            }
+        );
     }
 
     private async void OnMiniReleased(object sender, EventArgs e)
@@ -380,17 +513,20 @@ public partial class NativeMusicPlayerPage : ContentPage
             return;
         }
 
-        await RunSafeAsync(async () =>
-        {
-            if (_isPlaying)
+        await RunSafeAsync(
+            async () =>
             {
-                await _playerService.PauseAsync();
-            }
-            else
-            {
-                await _playerService.PlayAsync();
-            }
-        }, "迷你播放/暂停");
+                if (_isPlaying)
+                {
+                    await _playerService.PauseAsync();
+                }
+                else
+                {
+                    await _playerService.PlayAsync();
+                }
+            },
+            "迷你播放/暂停"
+        );
     }
 
     private void SetMiniMode(bool isMini)
@@ -398,49 +534,221 @@ public partial class NativeMusicPlayerPage : ContentPage
         _isMiniMode = isMini;
         fullPanel.IsVisible = !_isMiniMode;
         miniPanel.IsVisible = _isMiniMode;
+
         if (_isMiniMode)
         {
             listPanel.IsVisible = false;
-            bgLyricsView.IsVisible = false;
-            lyricsView.IsVisible = false;
-            coverFrame.IsVisible = true;
+            // 在Mini模式下，如果启用了背景歌词，仍然显示
+            bgLyricsContainer.IsVisible = _lyricsOnBackground;
         }
         else
         {
-            lyricsView.IsVisible = _showLyrics;
-            bgLyricsView.IsVisible = _lyricsOnBackground;
-            coverFrame.IsVisible = !_showLyrics;
+            UpdateLyricsVisibility();
         }
     }
 
     private void UpdateMiniProgress()
     {
         var progress = _duration > 0 ? (float)(_currentTime / _duration) : 0f;
-        _miniRingDrawable.Progress = Math.Clamp(progress, 0f, 1f);
-        miniRingView.Invalidate();
+        _miniProgressRingDrawable.Progress = Math.Clamp(progress, 0f, 1f);
+        miniProgressRingView.Invalidate();
     }
 
-    private sealed class RingDrawable : IDrawable
+    // Animation Methods
+    private void StartAnimations()
     {
-        public float Progress { get; set; }
-        public bool IsPlaying { get; set; }
+        StopAnimations();
+        _animationCts = new CancellationTokenSource();
+        var token = _animationCts.Token;
+
+        // Start rotation animations
+        Task.Run(
+            async () =>
+            {
+                var ring1Angle = 0f;
+                var ring2Angle = 0f;
+                var ring3Angle = 0f;
+                var miniOuterAngle = 0f;
+
+                while (!token.IsCancellationRequested)
+                {
+                    // Update rotation angles
+                    ring1Angle = (ring1Angle + 0.5f) % 360f; // Slow rotation reverse
+                    ring2Angle = (ring2Angle + 1.5f) % 360f; // Medium rotation
+                    ring3Angle = (ring3Angle + 2f) % 360f; // Fast rotation with pulse
+                    miniOuterAngle = (miniOuterAngle + 1f) % 360f;
+
+                    _ring1Drawable.RotationAngle = -ring1Angle; // Reverse
+                    _ring2Drawable.RotationAngle = ring2Angle;
+                    _ring3Drawable.RotationAngle = ring3Angle;
+                    _miniOuterRingDrawable.RotationAngle = miniOuterAngle;
+
+                    // Pulse effect for ring 3
+                    var pulsePhase = (ring3Angle / 180f) % 2f;
+                    _ring3Drawable.Scale =
+                        0.95f + (pulsePhase > 1f ? (2f - pulsePhase) : pulsePhase) * 0.1f;
+
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        ring1View.Invalidate();
+                        ring2View.Invalidate();
+                        ring3View.Invalidate();
+                        miniOuterRingView.Invalidate();
+                    });
+
+                    await Task.Delay(30, token); // ~33 FPS
+                }
+            },
+            token
+        );
+    }
+
+    private void StopAnimations()
+    {
+        _animationCts?.Cancel();
+        _animationCts?.Dispose();
+        _animationCts = null;
+
+        // Reset angles
+        _ring1Drawable.RotationAngle = 0;
+        _ring2Drawable.RotationAngle = 0;
+        _ring3Drawable.RotationAngle = 0;
+        _ring3Drawable.Scale = 1f;
+        _miniOuterRingDrawable.RotationAngle = 0;
+
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            ring1View.Invalidate();
+            ring2View.Invalidate();
+            ring3View.Invalidate();
+            miniOuterRingView.Invalidate();
+        });
+    }
+
+    // Drawable Classes
+    private sealed class ReactorRing1Drawable : IDrawable
+    {
+        public float RotationAngle { get; set; }
 
         public void Draw(ICanvas canvas, RectF dirtyRect)
         {
             canvas.SaveState();
-            var size = Math.Min(dirtyRect.Width, dirtyRect.Height);
-            var stroke = 4f;
-            var radius = size / 2 - stroke;
             var centerX = dirtyRect.Center.X;
             var centerY = dirtyRect.Center.Y;
-            var rect = new RectF(centerX - radius, centerY - radius, radius * 2, radius * 2);
+            var radius = Math.Min(dirtyRect.Width, dirtyRect.Height) / 2f - 2f;
 
-            canvas.StrokeSize = stroke;
-            canvas.StrokeColor = Color.FromArgb("#2A2A2A");
+            canvas.Translate(centerX, centerY);
+            canvas.Rotate(RotationAngle);
+            canvas.Translate(-centerX, -centerY);
+
+            canvas.StrokeSize = 2f;
+            canvas.StrokeColor = Color.FromArgb("#FFB700");
+            canvas.StrokeDashPattern = new float[] { 10, 5 };
+            canvas.Alpha = 0.3f;
             canvas.DrawCircle(centerX, centerY, radius);
 
+            canvas.RestoreState();
+        }
+    }
+
+    private sealed class ReactorRing2Drawable : IDrawable
+    {
+        public float RotationAngle { get; set; }
+
+        public void Draw(ICanvas canvas, RectF dirtyRect)
+        {
+            canvas.SaveState();
+            var centerX = dirtyRect.Center.X;
+            var centerY = dirtyRect.Center.Y;
+            var radius = Math.Min(dirtyRect.Width, dirtyRect.Height) / 2f * 0.85f;
+
+            canvas.Translate(centerX, centerY);
+            canvas.Rotate(RotationAngle);
+            canvas.Translate(-centerX, -centerY);
+
+            canvas.StrokeSize = 1f;
+            canvas.StrokeColor = Color.FromArgb("#00F3FF");
+            canvas.Alpha = 0.5f;
+
+            // Draw partial circle (left and right arcs only)
+            var rect = new RectF(centerX - radius, centerY - radius, radius * 2, radius * 2);
+            canvas.DrawArc(rect, 45, 90, false, false);
+            canvas.DrawArc(rect, 225, 90, false, false);
+
+            canvas.RestoreState();
+        }
+    }
+
+    private sealed class ReactorRing3Drawable : IDrawable
+    {
+        public float RotationAngle { get; set; }
+        public float Scale { get; set; } = 1f;
+
+        public void Draw(ICanvas canvas, RectF dirtyRect)
+        {
+            canvas.SaveState();
+            var centerX = dirtyRect.Center.X;
+            var centerY = dirtyRect.Center.Y;
+            var baseRadius = Math.Min(dirtyRect.Width, dirtyRect.Height) / 2f * 0.72f;
+            var radius = baseRadius * Scale;
+
+            canvas.Translate(centerX, centerY);
+            canvas.Rotate(RotationAngle);
+            canvas.Scale(Scale, Scale);
+            canvas.Translate(-centerX, -centerY);
+
+            canvas.StrokeSize = 4f;
             canvas.StrokeColor = Color.FromArgb("#FFB700");
+            canvas.StrokeDashPattern = new float[] { 2, 3 };
+            canvas.Alpha = 0.4f;
+            canvas.DrawCircle(centerX, centerY, radius / Scale); // Compensate for scale
+
+            canvas.RestoreState();
+        }
+    }
+
+    private sealed class MiniOuterRingDrawable : IDrawable
+    {
+        public float RotationAngle { get; set; }
+
+        public void Draw(ICanvas canvas, RectF dirtyRect)
+        {
+            canvas.SaveState();
+            var centerX = dirtyRect.Center.X;
+            var centerY = dirtyRect.Center.Y;
+            var radius = Math.Min(dirtyRect.Width, dirtyRect.Height) / 2f + 3f;
+
+            canvas.Translate(centerX, centerY);
+            canvas.Rotate(RotationAngle);
+            canvas.Translate(-centerX, -centerY);
+
+            canvas.StrokeSize = 2f;
+            canvas.StrokeColor = Color.FromArgb("#FFB700");
+            canvas.StrokeDashPattern = new float[] { 8, 4 };
+            canvas.Alpha = 0.6f;
+            canvas.DrawCircle(centerX, centerY, radius);
+
+            canvas.RestoreState();
+        }
+    }
+
+    private sealed class MiniProgressRingDrawable : IDrawable
+    {
+        public float Progress { get; set; }
+
+        public void Draw(ICanvas canvas, RectF dirtyRect)
+        {
+            canvas.SaveState();
+            var centerX = dirtyRect.Center.X;
+            var centerY = dirtyRect.Center.Y;
+            var radius = Math.Min(dirtyRect.Width, dirtyRect.Height) / 2f - 2f;
+            var rect = new RectF(centerX - radius, centerY - radius, radius * 2, radius * 2);
+
+            canvas.StrokeSize = 3f;
+            canvas.StrokeColor = Color.FromArgb("#FFB700");
+            canvas.StrokeLineCap = LineCap.Butt;
             canvas.DrawArc(rect, -90, 360 * Progress, false, false);
+
             canvas.RestoreState();
         }
     }
@@ -451,7 +759,7 @@ public partial class NativeMusicPlayerPage : ContentPage
         {
             PlayMode.Order => PlayMode.Random,
             PlayMode.Random => PlayMode.Single,
-            _ => PlayMode.Order
+            _ => PlayMode.Order,
         };
         UpdateModeButton();
     }
@@ -460,11 +768,20 @@ public partial class NativeMusicPlayerPage : ContentPage
     {
         modeButton.Text = _playMode switch
         {
-            PlayMode.Order => "顺序",
-            PlayMode.Random => "随机",
-            PlayMode.Single => "单曲",
-            _ => "顺序"
+            PlayMode.Order => FontAwesomeIcons.SortAmountAsc, // 顺序播放
+            PlayMode.Random => FontAwesomeIcons.Random, // 随机播放
+            PlayMode.Single => FontAwesomeIcons.Retweet, // 单曲循环
+            _ => FontAwesomeIcons.SortAmountAsc,
         };
+
+        var tooltip = _playMode switch
+        {
+            PlayMode.Order => "顺序播放",
+            PlayMode.Random => "随机播放",
+            PlayMode.Single => "单曲循环",
+            _ => "顺序播放",
+        };
+        ToolTipProperties.SetText(modeButton, tooltip);
     }
 
     private void ParseLyrics(string? lrcContent)
@@ -473,7 +790,16 @@ public partial class NativeMusicPlayerPage : ContentPage
         _currentLyricIndex = -1;
         if (string.IsNullOrWhiteSpace(lrcContent))
         {
-            _lyrics.Add(new LyricLine(0, "纯音乐 / 暂无歌词", Colors.Gray));
+            _lyrics.Add(
+                new LyricLineViewModel
+                {
+                    Time = 0,
+                    Text = "纯音乐 / 暂无歌词",
+                    Color = Colors.Gray,
+                    FontSize = 14,
+                    Opacity = 0.5,
+                }
+            );
             return;
         }
 
@@ -497,7 +823,16 @@ public partial class NativeMusicPlayerPage : ContentPage
 
             if (!string.IsNullOrEmpty(text))
             {
-                _lyrics.Add(new LyricLine(time, text, Colors.Gray));
+                _lyrics.Add(
+                    new LyricLineViewModel
+                    {
+                        Time = time,
+                        Text = text,
+                        Color = Colors.Gray,
+                        FontSize = 14,
+                        Opacity = 0.5,
+                    }
+                );
             }
         }
     }
@@ -527,23 +862,40 @@ public partial class NativeMusicPlayerPage : ContentPage
             return;
         }
 
+        var oldIndex = _currentLyricIndex;
         _currentLyricIndex = index;
-        for (var i = 0; i < _lyrics.Count; i++)
+
+        // Update only changed items to avoid flickering
+        if (oldIndex >= 0 && oldIndex < _lyrics.Count)
         {
-            var line = _lyrics[i];
-            var color = i == _currentLyricIndex ? Colors.White : Colors.Gray;
-            _lyrics[i] = line with { Color = color };
+            var oldLine = _lyrics[oldIndex];
+            oldLine.Color = Colors.Gray;
+            oldLine.FontSize = _lyricsOnBackground ? 20 : 14;
+            oldLine.Opacity = 0.5;
+            oldLine.FontWeight = FontAttributes.None;
         }
 
-        lyricsView.ItemsSource = null;
-        lyricsView.ItemsSource = _lyrics;
-        bgLyricsView.ItemsSource = _lyrics;
+        if (_currentLyricIndex >= 0 && _currentLyricIndex < _lyrics.Count)
+        {
+            var currentLine = _lyrics[_currentLyricIndex];
+            currentLine.Color = _lyricsOnBackground ? Color.FromArgb("#FFB700") : Colors.White;
+            currentLine.FontSize = _lyricsOnBackground ? 24 : 16;
+            currentLine.Opacity = 1.0;
+            currentLine.FontWeight = FontAttributes.Bold;
+        }
 
-        if (_currentLyricIndex >= 0)
+        // Scroll to current lyric with smooth animation
+        if (_currentLyricIndex >= 0 && _currentLyricIndex < _lyrics.Count)
         {
             var current = _lyrics[_currentLyricIndex];
-            lyricsView.ScrollTo(current, position: ScrollToPosition.Center, animate: true);
-            bgLyricsView.ScrollTo(current, position: ScrollToPosition.Center, animate: true);
+            if (_showLyrics)
+            {
+                lyricsView.ScrollTo(current, position: ScrollToPosition.Center, animate: true);
+            }
+            if (_lyricsOnBackground)
+            {
+                bgLyricsView.ScrollTo(current, position: ScrollToPosition.Center, animate: true);
+            }
         }
     }
 
@@ -554,13 +906,9 @@ public partial class NativeMusicPlayerPage : ContentPage
             return;
         }
 
-        trackList.ItemsSource = _musics.Select((m, i) => new TrackItem(
-            i + 1,
-            m.Title,
-            m.Artist,
-            m.Id,
-            i == _currentIndex
-        )).ToList();
+        trackList.ItemsSource = _musics
+            .Select((m, i) => new TrackItem(i + 1, m.Title, m.Artist, m.Id, i == _currentIndex))
+            .ToList();
 
         if (_currentIndex >= 0)
         {
@@ -580,9 +928,17 @@ public partial class NativeMusicPlayerPage : ContentPage
         catch (Exception ex)
         {
             Log.Error(ex, "播放器操作失败：{ActionName}", actionName);
-            await DisplayAlertAsync("播放器", $"操作失败：{actionName}", "确定");
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                await DisplayAlertAsync("播放器", $"操作失败：{actionName}", "确定");
+            });
         }
     }
+
+    // private Task<bool> DisplayAlertAsync(string title, string message, string cancel)
+    // {
+    //     return DisplayAlertAsync(title, message, cancel);
+    // }
 
     private static string FormatTime(double seconds)
     {

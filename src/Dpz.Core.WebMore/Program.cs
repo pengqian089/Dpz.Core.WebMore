@@ -38,6 +38,8 @@ public partial class Program
     /// </summary>
     public const string AssetsPrefix = "./_content/Dpz.Core.WebMore";
 
+    public static bool UseBlazorMusicPlayer { get; set; }
+
     internal static void Configure(WebMoreOptions options)
     {
         if (options == null)
@@ -69,5 +71,6 @@ public partial class Program
         WebHost = options.WebHost;
         AssetsHost = options.AssetsHost;
         LibraryHost = options.LibraryHost;
+        UseBlazorMusicPlayer = options.UseBlazorMusicPlayer;
     }
 }

@@ -1,4 +1,4 @@
-﻿using Dpz.Core.WebMore;
+using Dpz.Core.WebMore;
 using Dpz.Core.WebMore.App.Pages.Tools;
 using Dpz.Core.WebMore.Service;
 using Microsoft.Extensions.Logging;
@@ -17,6 +17,9 @@ public static class MauiProgram
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("Font Awesome 7 Free-Solid-900.otf", "FASolid");
+                fonts.AddFont("Font Awesome 7 Free-Regular-400.otf", "FARegular");
+                fonts.AddFont("Font Awesome 7 Brands-Regular-400.otf", "FABrands");
             });
 
         builder.Services.AddMauiBlazorWebView();
@@ -24,6 +27,7 @@ public static class MauiProgram
         builder.Services.AddWebMoreUi(
             new WebMoreOptions
             {
+                UseBlazorMusicPlayer = false,
 #if DEBUG
                 BaseAddress = "https://localhost:53381",
                 WebHost = "https://localhost:37701",
@@ -45,6 +49,11 @@ public static class MauiProgram
         builder.Services.AddScoped<
             IMusicPlayerService,
             Platforms.Android.AndroidMusicPlayerService
+        >();
+#elif WINDOWS
+        builder.Services.AddScoped<
+            IMusicPlayerService,
+            Platforms.Windows.WindowsMusicPlayerService
         >();
 #endif
 

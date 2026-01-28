@@ -13,6 +13,8 @@ public sealed class WebMoreOptions
     public string WebHost { get; set; } = "";
     public string AssetsHost { get; set; } = "";
     public string LibraryHost { get; set; } = "";
+
+    public bool UseBlazorMusicPlayer { get; set; } = true;
 }
 
 public static class WebMoreServiceCollectionExtensions

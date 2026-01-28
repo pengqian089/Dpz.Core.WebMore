@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Dpz.Core.WebMore.Models;
 using Dpz.Core.WebMore.Service;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Logging;
 using Microsoft.JSInterop;
 
 namespace Dpz.Core.WebMore.Shared.Components;
@@ -14,10 +15,9 @@ namespace Dpz.Core.WebMore.Shared.Components;
 public partial class MusicPlayer(
     IMusicService musicService,
     IMusicPlayerService musicPlayerService,
-    IJSRuntime jsRuntime
-)
-    : ComponentBase,
-        IAsyncDisposable
+    IJSRuntime jsRuntime,
+    ILogger<MusicPlayer> logger
+) : ComponentBase, IAsyncDisposable
 {
     private IJSObjectReference? _uiModule;
     private IJSObjectReference? _uiController;
@@ -174,7 +174,7 @@ public partial class MusicPlayer(
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to restore player state: {ex.Message}");
+            logger.LogError(ex, "恢复播放状态失败");
             // 失败时至少加载第一首歌
             if (_currentIndex < 0 && _musics.Count > 0)
             {
@@ -485,7 +485,7 @@ public partial class MusicPlayer(
         StateHasChanged();
     }
 
-    private System.Threading.Timer? _clickTimer;
+    private Timer? _clickTimer;
 
     /// <summary>
     /// 迷你播放器点击事件（区分单击和双击）
@@ -497,7 +497,7 @@ public partial class MusicPlayer(
             return;
         }
 
-        _clickTimer = new System.Threading.Timer(
+        _clickTimer = new Timer(
             _ =>
             {
                 _clickTimer?.Dispose();
@@ -506,7 +506,7 @@ public partial class MusicPlayer(
             },
             null,
             300,
-            System.Threading.Timeout.Infinite
+            Timeout.Infinite
         );
     }
 
@@ -514,10 +514,7 @@ public partial class MusicPlayer(
     {
         if (_clickTimer != null)
         {
-            _clickTimer.Change(
-                System.Threading.Timeout.Infinite,
-                System.Threading.Timeout.Infinite
-            );
+            _clickTimer.Change(Timeout.Infinite, Timeout.Infinite);
             _clickTimer.Dispose();
             _clickTimer = null;
         }
@@ -636,7 +633,7 @@ public partial class MusicPlayer(
     [JSInvokable]
     private void HandleError(string message)
     {
-        Console.WriteLine($"Audio Error: {message}");
+        logger.LogError("播放错误：{Message}", message);
     }
 
     private void HandleNextRequested() => InvokeAsync(Next);
@@ -686,11 +683,13 @@ public partial class MusicPlayer(
             {
                 await _uiController.DisposeAsync();
             }
-            catch (JSDisconnectedException)
+            catch (JSDisconnectedException e)
             {
+                logger.LogError(e, "js 模块已断开");
             }
-            catch (JSException)
+            catch (JSException e)
             {
+                logger.LogError(e, "js 模块已异常退出");
             }
         }
         if (_uiModule != null)
@@ -699,11 +698,13 @@ public partial class MusicPlayer(
             {
                 await _uiModule.DisposeAsync();
             }
-            catch (JSDisconnectedException)
+            catch (JSDisconnectedException e)
             {
+                logger.LogError(e, "js 模块已断开");
             }
-            catch (JSException)
+            catch (JSException e)
             {
+                logger.LogError(e, "js 模块已异常退出");
             }
         }
         _uiRef?.Dispose();
