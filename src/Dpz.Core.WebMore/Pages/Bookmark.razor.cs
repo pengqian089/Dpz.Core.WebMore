@@ -51,11 +51,18 @@ public partial class Bookmark(
     {
         if (firstRender)
         {
-            _module = await jsRuntime.InvokeAsync<IJSObjectReference>(
-                "import",
-                "./Pages/Bookmark.razor.js"
-            );
-            await _module.InvokeVoidAsync("init", ".bookmark__grid");
+            try
+            {
+                _module = await jsRuntime.InvokeAsync<IJSObjectReference>(
+                    "import",
+                    "./Pages/Bookmark.razor.js"
+                );
+                await _module.InvokeVoidAsync("init", ".bookmark__grid");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"书签加载 JS 模块失败：{ex.Message}");
+            }
         }
         // Always try to layout after render, the JS observer should handle it but we can force it if needed
         // await _module.InvokeVoidAsync("layout");
@@ -114,7 +121,14 @@ public partial class Bookmark(
             _searchText = _suggestions[_selectedIndex];
             if (_module != null)
             {
-                await _module.InvokeVoidAsync("scrollToItem", _selectedIndex);
+                try
+                {
+                    await _module.InvokeVoidAsync("scrollToItem", _selectedIndex);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"书签滚动失败：{ex.Message}");
+                }
             }
         }
         else if (e.Key == "ArrowUp")
@@ -127,7 +141,14 @@ public partial class Bookmark(
             _searchText = _suggestions[_selectedIndex];
             if (_module != null)
             {
-                await _module.InvokeVoidAsync("scrollToItem", _selectedIndex);
+                try
+                {
+                    await _module.InvokeVoidAsync("scrollToItem", _selectedIndex);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"书签滚动失败：{ex.Message}");
+                }
             }
         }
         else if (e.Key == "Enter")

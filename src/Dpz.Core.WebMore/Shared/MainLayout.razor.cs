@@ -77,18 +77,25 @@ public partial class MainLayout(
     {
         _ = InvokeAsync(async () =>
         {
-            if (_jsModule != null)
+            try
             {
-                await _jsModule.InvokeVoidAsync(
-                    "requestBrowserNotification",
-                    "小喇叭开始广播辣",
-                    model.Markdown
-                );
-            }
+                if (_jsModule != null)
+                {
+                    await _jsModule.InvokeVoidAsync(
+                        "requestBrowserNotification",
+                        "小喇叭开始广播辣",
+                        model.Markdown
+                    );
+                }
 
-            if (_loggerModule != null)
+                if (_loggerModule != null)
+                {
+                    await _loggerModule.InvokeVoidAsync("outPutInfo", model.Markdown);
+                }
+            }
+            catch (Exception ex)
             {
-                await _loggerModule.InvokeVoidAsync("outPutInfo", model.Markdown);
+                Console.WriteLine($"推送消息处理失败：{ex.Message}");
             }
         });
     }
@@ -115,7 +122,14 @@ public partial class MainLayout(
                     2 => "outPutError",
                     _ => "outPutInfo",
                 };
-                await _loggerModule.InvokeVoidAsync(funcName, message);
+                try
+                {
+                    await _loggerModule.InvokeVoidAsync(funcName, message);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[{toastType}] {message} ({ex.Message})");
+                }
             }
             else
             {
@@ -148,7 +162,14 @@ public partial class MainLayout(
                     2 => "outPutError",
                     _ => "outPutInfo",
                 };
-                await _loggerModule.InvokeVoidAsync(funcName, message);
+                try
+                {
+                    await _loggerModule.InvokeVoidAsync(funcName, message);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[AppSystem] {message} ({ex.Message})");
+                }
             }
             else
             {
@@ -247,7 +268,14 @@ public partial class MainLayout(
         {
             if (_loggerModule != null)
             {
-                await _loggerModule.InvokeVoidAsync("outPutInfo", message);
+                try
+                {
+                    await _loggerModule.InvokeVoidAsync("outPutInfo", message);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"{message} ({ex.Message})");
+                }
             }
             else
             {
@@ -298,7 +326,6 @@ public partial class MainLayout(
 
         // 添加点击反馈
         _versionClickClass = "version-text--clicked";
-        StateHasChanged();
 
         // 移除点击反馈样式
         _ = Task.Delay(200)

@@ -191,7 +191,14 @@ public partial class CodeView(
                 // Scroll to active element after restoration
                 if (_module != null)
                 {
-                    await _module.InvokeVoidAsync("scrollToActive", _sidebarElement);
+                    try
+                    {
+                        await _module.InvokeVoidAsync("scrollToActive", _sidebarElement);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"代码视图滚动失败：{ex.Message}");
+                    }
                 }
             }
             finally
@@ -287,7 +294,6 @@ public partial class CodeView(
         _activePath = arg.CurrentPaths;
         _selectedNode = arg;
         UpdateUrl(arg.CurrentPaths);
-        StateHasChanged();
         return Task.CompletedTask;
     }
 
@@ -316,7 +322,6 @@ public partial class CodeView(
         _expandedNodes.TryAdd(pathKey, obj);
 
         UpdateUrl(obj.CurrentPaths);
-        StateHasChanged();
     }
 
     private void UpdateUrl(IEnumerable<string> paths)

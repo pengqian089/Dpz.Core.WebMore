@@ -89,10 +89,17 @@ public partial class CanvasChat(
         await Task.Delay(100);
 
         // 导入 JS 模块
-        _jsModule ??= await jsRuntime.InvokeAsync<IJSObjectReference>(
-            "import",
-            "./Shared/Components/CanvasChat.razor.js"
-        );
+        try
+        {
+            _jsModule ??= await jsRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./Shared/Components/CanvasChat.razor.js"
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"画板加载 JS 模块失败：{ex.Message}");
+        }
 
         // 初始化画笔颜色（从 localStorage 读取或根据主题设置）
         await InitializeColorAsync();
@@ -101,10 +108,17 @@ public partial class CanvasChat(
         await InitializeCanvasAsync();
 
         // 设置窗口大小变化监听
-        if (_dotNetRef == null)
+        if (_dotNetRef == null && _jsModule != null)
         {
             _dotNetRef = DotNetObjectReference.Create(this);
-            await _jsModule.InvokeVoidAsync("setupResizeListener", _dotNetRef);
+            try
+            {
+                await _jsModule.InvokeVoidAsync("setupResizeListener", _dotNetRef);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"画板注册尺寸监听失败：{ex.Message}");
+            }
         }
 
         // 只有手动打开时才显示 Toast
@@ -124,7 +138,6 @@ public partial class CanvasChat(
             _ = ReleaseAccessAsync();
         }
 
-        StateHasChanged();
         return Task.CompletedTask;
     }
 

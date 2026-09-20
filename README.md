@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
+[![.NET](https://img.shields.io/badge/.NET-11.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
 [![Blazor](https://img.shields.io/badge/Blazor-WASM-512BD4?logo=blazor)](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -50,7 +50,8 @@ Dpz.Core.WebMore 是一个使用 Blazor WebAssembly 技术构建的现代化个�
 
 ## 🛠️ 技术栈
 
-- **框架**: ASP.NET Core Blazor WebAssembly (.NET 10.0)
+- **框架**: ASP.NET Core Blazor WebAssembly (.NET 11.0)
+- **运行时**: CoreCLR (`UseMonoRuntime=false`) + runtime-async (`Features=runtime-async=on`)
 - **前端**: Blazor Components + JavaScript Interop
 - **实时通信**: SignalR
 - **样式**: 自定义 CSS
@@ -98,8 +99,8 @@ Dpz.Core.WebMore/
 
 ### 环境要求
 
-- [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0) 或更高版本
-- 推荐使用 Visual Studio 2022 / Rider / VS Code
+- [.NET 11.0 SDK](https://dotnet.microsoft.com/download/dotnet/11.0)（RC1 或更高；仓库根目录 `global.json` 固定为 `11.0.100-rc.1`，`rollForward: latestFeature`）
+- 推荐使用 Visual Studio 2026 / Rider / VS Code
 
 ### 运行项目
 
@@ -121,7 +122,7 @@ Dpz.Core.WebMore/
 
 4. **访问应用**
    
-   在浏览器中打开 `https://localhost:5001` 或 `http://localhost:5000`
+   在浏览器中打开 `https://localhost:3509` 或 `http://localhost:3508`
 
 ### 构建发布
 

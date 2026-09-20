@@ -117,11 +117,18 @@ public partial class Mumble(
         // Check likes from local storage
         foreach (var vm in _viewModels)
         {
-            var isLiked = await jsRuntime.InvokeAsync<string>(
-                "localStorage.getItem",
-                $"mumble_like_{vm.Model.Id}"
-            );
-            vm.IsLiked = !string.IsNullOrEmpty(isLiked);
+            try
+            {
+                var isLiked = await jsRuntime.InvokeAsync<string>(
+                    "localStorage.getItem",
+                    $"mumble_like_{vm.Model.Id}"
+                );
+                vm.IsLiked = !string.IsNullOrEmpty(isLiked);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"读取点赞状态失败：{ex.Message}");
+            }
         }
 
         _loading = false;
@@ -143,11 +150,18 @@ public partial class Mumble(
         if (mumble != null)
         {
             vm.Model.Like = mumble.Like;
-            await jsRuntime.InvokeVoidAsync(
-                "localStorage.setItem",
-                $"mumble_like_{vm.Model.Id}",
-                "true"
-            );
+            try
+            {
+                await jsRuntime.InvokeVoidAsync(
+                    "localStorage.setItem",
+                    $"mumble_like_{vm.Model.Id}",
+                    "true"
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"保存点赞状态失败：{ex.Message}");
+            }
         }
         else
         {

@@ -28,16 +28,23 @@ public partial class DialogContainer(IAppDialogService dialogService, IJSRuntime
     {
         if (firstRender)
         {
-            _dialogModule = await jsRuntime.InvokeAsync<IJSObjectReference>(
-                "import",
-                "./js/modules/dialog-interop.js"
-            );
-
-            // 初始化全局按键监听
-            if (_dialogModule != null)
+            try
             {
-                var dotNetHelper = DotNetObjectReference.Create(this);
-                await _dialogModule.InvokeVoidAsync("initKeyboardListener", dotNetHelper);
+                _dialogModule = await jsRuntime.InvokeAsync<IJSObjectReference>(
+                    "import",
+                    "./js/modules/dialog-interop.js"
+                );
+
+                // 初始化全局按键监听
+                if (_dialogModule != null)
+                {
+                    var dotNetHelper = DotNetObjectReference.Create(this);
+                    await _dialogModule.InvokeVoidAsync("initKeyboardListener", dotNetHelper);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"对话框容器加载 JS 模块失败：{ex.Message}");
             }
         }
     }

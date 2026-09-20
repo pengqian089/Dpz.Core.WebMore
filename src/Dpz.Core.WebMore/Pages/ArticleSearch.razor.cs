@@ -25,7 +25,6 @@ public partial class ArticleSearch(IArticleService articleService) : ComponentBa
 
         _loading = true;
         _searchResult.Clear();
-        StateHasChanged();
 
         try
         {

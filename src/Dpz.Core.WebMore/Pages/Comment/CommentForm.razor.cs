@@ -34,9 +34,19 @@ public partial class CommentForm(IJSRuntime jsRuntime, IAppDialogService appDial
 
     protected override async Task OnInitializedAsync()
     {
-        _model.NickName = await jsRuntime.InvokeAsync<string>("localStorage.getItem", "nickname");
-        _model.Email = await jsRuntime.InvokeAsync<string>("localStorage.getItem", "email");
-        _model.Site = await jsRuntime.InvokeAsync<string>("localStorage.getItem", "site");
+        try
+        {
+            _model.NickName = await jsRuntime.InvokeAsync<string>(
+                "localStorage.getItem",
+                "nickname"
+            );
+            _model.Email = await jsRuntime.InvokeAsync<string>("localStorage.getItem", "email");
+            _model.Site = await jsRuntime.InvokeAsync<string>("localStorage.getItem", "site");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"读取本地缓存失败：{ex.Message}");
+        }
         await base.OnInitializedAsync();
     }
 
@@ -50,7 +60,7 @@ public partial class CommentForm(IJSRuntime jsRuntime, IAppDialogService appDial
 
     private async Task SendAsync(EditContext arg)
     {
-        if (!arg.Validate())
+        if (!await arg.ValidateAsync())
         {
             foreach (var message in arg.GetValidationMessages())
             {
@@ -61,17 +71,28 @@ public partial class CommentForm(IJSRuntime jsRuntime, IAppDialogService appDial
 
         _isSending = true;
 
-        if (!string.IsNullOrEmpty(_model.NickName))
+        try
         {
-            await jsRuntime.InvokeVoidAsync("localStorage.setItem", "nickname", _model.NickName);
+            if (!string.IsNullOrEmpty(_model.NickName))
+            {
+                await jsRuntime.InvokeVoidAsync(
+                    "localStorage.setItem",
+                    "nickname",
+                    _model.NickName
+                );
+            }
+            if (!string.IsNullOrEmpty(_model.Email))
+            {
+                await jsRuntime.InvokeVoidAsync("localStorage.setItem", "email", _model.Email);
+            }
+            if (!string.IsNullOrEmpty(_model.Site))
+            {
+                await jsRuntime.InvokeVoidAsync("localStorage.setItem", "site", _model.Site);
+            }
         }
-        if (!string.IsNullOrEmpty(_model.Email))
+        catch (Exception ex)
         {
-            await jsRuntime.InvokeVoidAsync("localStorage.setItem", "email", _model.Email);
-        }
-        if (!string.IsNullOrEmpty(_model.Site))
-        {
-            await jsRuntime.InvokeVoidAsync("localStorage.setItem", "site", _model.Site);
+            Console.WriteLine($"保存本地缓存失败：{ex.Message}");
         }
 
         StateHasChanged();
@@ -90,7 +111,6 @@ public partial class CommentForm(IJSRuntime jsRuntime, IAppDialogService appDial
         finally
         {
             _isSending = false;
-            StateHasChanged();
         }
 
         if (success)

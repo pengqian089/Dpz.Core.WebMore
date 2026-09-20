@@ -119,7 +119,6 @@ public partial class NavMenu(NavigationManager navigation, IJSRuntime jsRuntime)
             _isMobileMenuOpen = false;
             // _isSubMenuExpanded = false; // Don't collapse submenu automatically
             await UpdateBodyOverflow();
-            StateHasChanged();
         }
     }
 

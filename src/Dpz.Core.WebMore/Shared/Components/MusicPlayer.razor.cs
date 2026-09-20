@@ -74,22 +74,32 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
     {
         if (firstRender)
         {
-            // 导入隔离的 JS 模块
-            _jsModule = await jsRuntime.InvokeAsync<IJSObjectReference>(
-                "import",
-                "./Shared/Components/MusicPlayer.razor.js"
-            );
-            _objRef = DotNetObjectReference.Create(this);
-            _jsPlayer = await _jsModule.InvokeAsync<IJSObjectReference>("initAudioPlayer", _objRef);
-
-            // 确保音乐列表加载完成
-            if (_musicLoadTask != null)
+            try
             {
-                await _musicLoadTask;
-            }
+                // 导入隔离的 JS 模块
+                _jsModule = await jsRuntime.InvokeAsync<IJSObjectReference>(
+                    "import",
+                    "./Shared/Components/MusicPlayer.razor.js"
+                );
+                _objRef = DotNetObjectReference.Create(this);
+                _jsPlayer = await _jsModule.InvokeAsync<IJSObjectReference>(
+                    "initAudioPlayer",
+                    _objRef
+                );
 
-            // 恢复保存的状态，或加载第一首歌
-            await RestoreStateAsync();
+                // 确保音乐列表加载完成
+                if (_musicLoadTask != null)
+                {
+                    await _musicLoadTask;
+                }
+
+                // 恢复保存的状态，或加载第一首歌
+                await RestoreStateAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"音乐播放器初始化失败：{ex.Message}");
+            }
         }
     }
 
@@ -180,7 +190,14 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
             CurrentTime = _currentTime,
         };
 
-        await _jsPlayer.InvokeVoidAsync("saveState", state);
+        try
+        {
+            await _jsPlayer.InvokeVoidAsync("saveState", state);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"保存播放状态失败：{ex.Message}");
+        }
     }
 
     /// <summary>
@@ -203,7 +220,14 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
             CurrentTime = currentTime,
         };
 
-        await _jsPlayer.InvokeVoidAsync("saveState", state);
+        try
+        {
+            await _jsPlayer.InvokeVoidAsync("saveState", state);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"保存播放进度失败：{ex.Message}");
+        }
     }
 
     /// <summary>
@@ -236,18 +260,25 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
 
         if (_jsPlayer != null)
         {
-            await _jsPlayer.InvokeVoidAsync("setSrc", _currentTrack.MusicUrl);
-            // 设置当前歌曲 ID 用于进度保存
-            await _jsPlayer.InvokeVoidAsync("startProgressSave", _currentTrack.Id);
-            await UpdateMediaSession();
-
-            if (_showList)
+            try
             {
-                await _jsPlayer.InvokeVoidAsync(
-                    "scrollToItem",
-                    $"track-item-{_currentIndex}",
-                    "nearest"
-                );
+                await _jsPlayer.InvokeVoidAsync("setSrc", _currentTrack.MusicUrl);
+                // 设置当前歌曲 ID 用于进度保存
+                await _jsPlayer.InvokeVoidAsync("startProgressSave", _currentTrack.Id);
+                await UpdateMediaSession();
+
+                if (_showList)
+                {
+                    await _jsPlayer.InvokeVoidAsync(
+                        "scrollToItem",
+                        $"track-item-{_currentIndex}",
+                        "nearest"
+                    );
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"加载歌曲失败：{ex.Message}");
             }
 
             if (autoPlay)
@@ -274,12 +305,19 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
     {
         if (_jsPlayer != null && _currentTrack != null)
         {
-            await _jsPlayer.InvokeVoidAsync(
-                "updateMediaSession",
-                _currentTrack.Title,
-                _currentTrack.Artist,
-                _currentTrack.CoverUrl
-            );
+            try
+            {
+                await _jsPlayer.InvokeVoidAsync(
+                    "updateMediaSession",
+                    _currentTrack.Title,
+                    _currentTrack.Artist,
+                    _currentTrack.CoverUrl
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"更新媒体会话失败：{ex.Message}");
+            }
         }
     }
 
@@ -335,11 +373,25 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
 
         if (_isPlaying)
         {
-            await _jsPlayer.InvokeVoidAsync("pause");
+            try
+            {
+                await _jsPlayer.InvokeVoidAsync("pause");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"暂停播放失败：{ex.Message}");
+            }
         }
         else
         {
-            await _jsPlayer.InvokeVoidAsync("play");
+            try
+            {
+                await _jsPlayer.InvokeVoidAsync("play");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"开始播放失败：{ex.Message}");
+            }
         }
     }
 
@@ -347,7 +399,14 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
     {
         if (_jsPlayer != null)
         {
-            await _jsPlayer.InvokeVoidAsync("play");
+            try
+            {
+                await _jsPlayer.InvokeVoidAsync("play");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"开始播放失败：{ex.Message}");
+            }
         }
     }
 
@@ -355,7 +414,14 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
     {
         if (_jsPlayer != null)
         {
-            await _jsPlayer.InvokeVoidAsync("pause");
+            try
+            {
+                await _jsPlayer.InvokeVoidAsync("pause");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"暂停播放失败：{ex.Message}");
+            }
         }
     }
 
@@ -414,7 +480,14 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
             var time = _duration * (pct / 100.0);
             if (_jsPlayer != null)
             {
-                await _jsPlayer.InvokeVoidAsync("setCurrentTime", time);
+                try
+                {
+                    await _jsPlayer.InvokeVoidAsync("setCurrentTime", time);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"跳转播放进度失败：{ex.Message}");
+                }
             }
         }
     }
@@ -470,11 +543,18 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
         {
             // 延迟一点以确保 DOM 渲染完成
             await Task.Delay(100);
-            await _jsPlayer.InvokeVoidAsync(
-                "scrollToItem",
-                $"track-item-{_currentIndex}",
-                "center"
-            );
+            try
+            {
+                await _jsPlayer.InvokeVoidAsync(
+                    "scrollToItem",
+                    $"track-item-{_currentIndex}",
+                    "center"
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"滚动播放列表失败：{ex.Message}");
+            }
         }
     }
 
@@ -497,7 +577,14 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
         // 通知 JS 更新 hash 和滚动条状态
         if (_jsPlayer != null)
         {
-            await _jsPlayer.InvokeVoidAsync("setPanelOpen", _isPanelOpen);
+            try
+            {
+                await _jsPlayer.InvokeVoidAsync("setPanelOpen", _isPanelOpen);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"切换播放器面板失败：{ex.Message}");
+            }
         }
     }
 
@@ -590,16 +677,30 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
                     if (_showLyrics && !_lyricsOnBackground)
                     {
                         // 滚动面板内的歌词
-                        _jsPlayer.InvokeVoidAsync(
-                            "scrollToItem",
-                            $"lyric-line-{_currentLyricIndex}",
-                            "center"
-                        );
+                        try
+                        {
+                            _jsPlayer.InvokeVoidAsync(
+                                "scrollToItem",
+                                $"lyric-line-{_currentLyricIndex}",
+                                "center"
+                            );
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"滚动歌词失败：{ex.Message}");
+                        }
                     }
                     else if (_lyricsOnBackground)
                     {
                         // 滚动背景歌词
-                        _jsPlayer.InvokeVoidAsync("scrollToBgLyric", _currentLyricIndex);
+                        try
+                        {
+                            _jsPlayer.InvokeVoidAsync("scrollToBgLyric", _currentLyricIndex);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"滚动背景歌词失败：{ex.Message}");
+                        }
                     }
                 }
             }
@@ -618,8 +719,15 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
         {
             if (_jsPlayer != null)
             {
-                await _jsPlayer.InvokeVoidAsync("setCurrentTime", 0);
-                await _jsPlayer.InvokeVoidAsync("play");
+                try
+                {
+                    await _jsPlayer.InvokeVoidAsync("setCurrentTime", 0);
+                    await _jsPlayer.InvokeVoidAsync("play");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"单曲循环重播失败：{ex.Message}");
+                }
             }
         }
         else
@@ -690,7 +798,14 @@ public partial class MusicPlayer(IMusicService musicService, IJSRuntime jsRuntim
         if (_jsPlayer != null)
         {
             // 停止进度保存
-            await _jsPlayer.InvokeVoidAsync("stopProgressSave");
+            try
+            {
+                await _jsPlayer.InvokeVoidAsync("stopProgressSave");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"停止进度保存失败：{ex.Message}");
+            }
             await _jsPlayer.DisposeAsync();
         }
         if (_jsModule != null)

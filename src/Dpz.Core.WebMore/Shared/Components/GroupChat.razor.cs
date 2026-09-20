@@ -41,10 +41,17 @@ public partial class GroupChat(
         groupChatService.OnError += HandleError;
 
         // 导入 JS 模块
-        _jsModule = await jsRuntime.InvokeAsync<IJSObjectReference>(
-            "import",
-            "./Shared/Components/GroupChat.razor.js"
-        );
+        try
+        {
+            _jsModule = await jsRuntime.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./Shared/Components/GroupChat.razor.js"
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"群聊加载 JS 模块失败：{ex.Message}");
+        }
 
         // 检测是否为移动端
         _isMobile = await IsMobileAsync();
@@ -77,7 +84,14 @@ public partial class GroupChat(
         // 阻止输入框 Enter 键默认行为
         if (_jsModule != null)
         {
-            await _jsModule.InvokeVoidAsync("preventEnterKey");
+            try
+            {
+                await _jsModule.InvokeVoidAsync("preventEnterKey");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"群聊阻止 Enter 默认行为失败：{ex.Message}");
+            }
         }
 
         // 滚动到底部
@@ -138,7 +152,6 @@ public partial class GroupChat(
     {
         _inputMessage = e.Value?.ToString() ?? "";
         _showCommands = _inputMessage.StartsWith("/");
-        StateHasChanged();
     }
 
     private void SelectCommand(string command)
@@ -178,7 +191,6 @@ public partial class GroupChat(
         finally
         {
             _isSending = false;
-            StateHasChanged();
         }
     }
 
@@ -313,7 +325,6 @@ public partial class GroupChat(
         }
 
         _isLoadingHistory = true;
-        StateHasChanged();
 
         await groupChatService.GetHistoryAsync(_loadedPageIndex + 1);
     }

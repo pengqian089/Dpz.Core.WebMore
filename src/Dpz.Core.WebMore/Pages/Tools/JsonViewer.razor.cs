@@ -28,13 +28,10 @@ public partial class JsonViewer : ComponentBase
         _totalNodes = 0;
         _searchResult = "";
         _isProcessing = true;
-        // 立即更新 UI，显示加载状态
-        StateHasChanged();
 
         if (string.IsNullOrWhiteSpace(_jsonInput))
         {
             _isProcessing = false;
-            StateHasChanged();
             return;
         }
 
@@ -69,7 +66,6 @@ public partial class JsonViewer : ComponentBase
         finally
         {
             _isProcessing = false;
-            StateHasChanged(); // 更新 UI，隐藏加载状态
         }
     }
 
@@ -77,8 +73,6 @@ public partial class JsonViewer : ComponentBase
     {
         _errorMessage = "";
         _isProcessing = true;
-        // 立即更新 UI，显示加载状态
-        StateHasChanged();
 
         try
         {
@@ -87,7 +81,6 @@ public partial class JsonViewer : ComponentBase
             {
                 _errorMessage = "文件超过最大限制（20MB）";
                 _isProcessing = false;
-                StateHasChanged();
                 return;
             }
 
@@ -105,7 +98,6 @@ public partial class JsonViewer : ComponentBase
         {
             _errorMessage = $"Error loading file: {ex.Message}";
             _isProcessing = false;
-            StateHasChanged();
         }
     }
 

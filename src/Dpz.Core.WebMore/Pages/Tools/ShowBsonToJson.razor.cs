@@ -76,8 +76,6 @@ public partial class ShowBsonToJson(IAppDialogService dialogService, IJSRuntime 
         {
             _isProcessing = false;
         }
-
-        StateHasChanged();
     }
 
     private async Task CopyToClipboardAsync()

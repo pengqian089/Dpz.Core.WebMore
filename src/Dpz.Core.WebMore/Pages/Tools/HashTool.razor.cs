@@ -77,7 +77,6 @@ public partial class HashTool(IJSRuntime jsRuntime) : ComponentBase, IAsyncDispo
     {
         _errorMessage = string.Empty;
         _isProcessing = true;
-        StateHasChanged();
 
         try
         {
@@ -104,7 +103,6 @@ public partial class HashTool(IJSRuntime jsRuntime) : ComponentBase, IAsyncDispo
         finally
         {
             _isProcessing = false;
-            StateHasChanged();
         }
     }
 
@@ -193,7 +191,6 @@ public partial class HashTool(IJSRuntime jsRuntime) : ComponentBase, IAsyncDispo
             StateHasChanged();
             await Task.Delay(2000);
             _justCopied = false;
-            StateHasChanged();
         }
         catch (Exception)
         {

@@ -38,24 +38,31 @@ public partial class DialogBox(IJSRuntime jsRuntime) : IAsyncDisposable
     {
         if (firstRender)
         {
-            _dialogModule = await jsRuntime.InvokeAsync<IJSObjectReference>(
-                "import",
-                "./js/modules/dialog-interop.js"
-            );
+            try
+            {
+                _dialogModule = await jsRuntime.InvokeAsync<IJSObjectReference>(
+                    "import",
+                    "./js/modules/dialog-interop.js"
+                );
 
-            if (Model.Type == DialogType.Prompt)
-            {
-                await _inputRef.FocusAsync();
-            }
-            else if (Model.Type != DialogType.Component)
-            {
-                await _confirmBtnRef.FocusAsync();
-            }
+                if (Model.Type == DialogType.Prompt)
+                {
+                    await _inputRef.FocusAsync();
+                }
+                else if (Model.Type != DialogType.Component)
+                {
+                    await _confirmBtnRef.FocusAsync();
+                }
 
-            // 对话框打开时 DOM 管理器已暂停，手动触发 LazyLoad 更新以加载图片
-            if (_dialogModule != null)
+                // 对话框打开时 DOM 管理器已暂停，手动触发 LazyLoad 更新以加载图片
+                if (_dialogModule != null)
+                {
+                    await _dialogModule.InvokeVoidAsync("updateLazyLoad");
+                }
+            }
+            catch (Exception ex)
             {
-                await _dialogModule.InvokeVoidAsync("updateLazyLoad");
+                Console.WriteLine($"对话框加载 JS 模块失败：{ex.Message}");
             }
         }
     }

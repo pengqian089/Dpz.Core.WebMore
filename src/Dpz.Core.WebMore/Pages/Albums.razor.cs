@@ -36,16 +36,27 @@ public partial class Albums(
     {
         if (firstRender)
         {
-            _module = await jsRuntime.InvokeAsync<IJSObjectReference>(
-                "import",
-                "./Pages/Albums.razor.js"
-            );
-            _objRef = DotNetObjectReference.Create(this);
-            _jsAlbums = await _module.InvokeAsync<IJSObjectReference>("create", _objRef, ".albums");
-
-            if (_pictures.Count > 0)
+            try
             {
-                await _jsAlbums.InvokeVoidAsync("init", _pictures);
+                _module = await jsRuntime.InvokeAsync<IJSObjectReference>(
+                    "import",
+                    "./Pages/Albums.razor.js"
+                );
+                _objRef = DotNetObjectReference.Create(this);
+                _jsAlbums = await _module.InvokeAsync<IJSObjectReference>(
+                    "create",
+                    _objRef,
+                    ".albums"
+                );
+
+                if (_pictures.Count > 0)
+                {
+                    await _jsAlbums.InvokeVoidAsync("init", _pictures);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Albums 初始化 JS 模块失败：{ex.Message}");
             }
         }
     }
@@ -79,7 +90,14 @@ public partial class Albums(
                 // If we already have the JS module loaded (loaded subsequent pages), append items
                 if (_jsAlbums != null)
                 {
-                    await _jsAlbums.InvokeVoidAsync("appendItems", page);
+                    try
+                    {
+                        await _jsAlbums.InvokeVoidAsync("appendItems", page);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Albums 追加图片失败：{ex.Message}");
+                    }
                 }
 
                 _pageIndex++;
@@ -107,7 +125,14 @@ public partial class Albums(
     {
         if (_jsAlbums != null)
         {
-            await _jsAlbums.InvokeVoidAsync("openGallery", index);
+            try
+            {
+                await _jsAlbums.InvokeVoidAsync("openGallery", index);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Albums 打开图库失败：{ex.Message}");
+            }
         }
     }
 
@@ -115,7 +140,14 @@ public partial class Albums(
     {
         if (_jsAlbums != null && !string.IsNullOrWhiteSpace(url))
         {
-            await _jsAlbums.InvokeVoidAsync("downloadImage", url);
+            try
+            {
+                await _jsAlbums.InvokeVoidAsync("downloadImage", url);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Albums 下载图片失败：{ex.Message}");
+            }
         }
     }
 
@@ -123,10 +155,17 @@ public partial class Albums(
     {
         if (_jsAlbums != null && !string.IsNullOrWhiteSpace(url))
         {
-            var result = await _jsAlbums.InvokeAsync<string?>("shareImage", url);
-            if (!string.IsNullOrEmpty(result))
+            try
             {
-                dialogService.Toast(result, ToastType.Success);
+                var result = await _jsAlbums.InvokeAsync<string?>("shareImage", url);
+                if (!string.IsNullOrEmpty(result))
+                {
+                    dialogService.Toast(result, ToastType.Success);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Albums 分享图片失败：{ex.Message}");
             }
         }
     }
@@ -135,7 +174,14 @@ public partial class Albums(
     {
         if (_jsAlbums != null)
         {
-            await _jsAlbums.InvokeVoidAsync("dispose");
+            try
+            {
+                await _jsAlbums.InvokeVoidAsync("dispose");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Albums 释放 JS 资源失败：{ex.Message}");
+            }
             await _jsAlbums.DisposeAsync();
         }
         if (_module != null)

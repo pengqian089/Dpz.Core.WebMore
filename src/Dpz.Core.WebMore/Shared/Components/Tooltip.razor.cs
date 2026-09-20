@@ -45,10 +45,17 @@ public partial class Tooltip(IJSRuntime jsRuntime) : ComponentBase, IAsyncDispos
     {
         if (firstRender)
         {
-            _module = await jsRuntime.InvokeAsync<IJSObjectReference>(
-                "import",
-                "./Shared/Components/Tooltip.razor.js"
-            );
+            try
+            {
+                _module = await jsRuntime.InvokeAsync<IJSObjectReference>(
+                    "import",
+                    "./Shared/Components/Tooltip.razor.js"
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Tooltip 加载 JS 模块失败：{ex.Message}");
+            }
         }
     }
 
@@ -56,12 +63,19 @@ public partial class Tooltip(IJSRuntime jsRuntime) : ComponentBase, IAsyncDispos
     {
         if (_module is not null && !string.IsNullOrEmpty(Text))
         {
-            await _module.InvokeVoidAsync(
-                "show",
-                _triggerElement,
-                _contentElement,
-                Placement?.ToString()
-            );
+            try
+            {
+                await _module.InvokeVoidAsync(
+                    "show",
+                    _triggerElement,
+                    _contentElement,
+                    Placement?.ToString()
+                );
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Tooltip 显示失败：{ex.Message}");
+            }
         }
     }
 
@@ -69,7 +83,14 @@ public partial class Tooltip(IJSRuntime jsRuntime) : ComponentBase, IAsyncDispos
     {
         if (_module is not null)
         {
-            await _module.InvokeVoidAsync("hide", _contentElement);
+            try
+            {
+                await _module.InvokeVoidAsync("hide", _contentElement);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Tooltip 隐藏失败：{ex.Message}");
+            }
         }
     }
 

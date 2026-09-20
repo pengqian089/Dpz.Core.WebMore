@@ -115,7 +115,6 @@ public partial class ToolsLayout(NavigationManager navigationManager) : IDisposa
     {
         _searchKeyword = string.Empty;
         FilterTools();
-        StateHasChanged();
     }
 
     private void SelectCategory(string category)

@@ -88,10 +88,17 @@ public partial class SteamDetail(ISteamService steamService, IJSRuntime jsRuntim
         var newValue = !current;
         _collapsedGroups[key] = newValue;
 
-        await jsRuntime.InvokeVoidAsync(
-            "localStorage.setItem",
-            $"steam-group-{key}",
-            newValue.ToString()
-        );
+        try
+        {
+            await jsRuntime.InvokeVoidAsync(
+                "localStorage.setItem",
+                $"steam-group-{key}",
+                newValue.ToString()
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"保存分组折叠状态失败：{ex.Message}");
+        }
     }
 }
