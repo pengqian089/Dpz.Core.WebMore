@@ -4,7 +4,9 @@
      @attributes="AdditionalAttributes" 
      @ref="_triggerElement"
      @onmouseenter="Show" 
-     @onmouseleave="Hide">
+     @onmouseleave="Hide"
+     @oncontextmenu="OnContextMenu"
+     @oncontextmenu:preventDefault="_preventContextMenu">
     @ChildContent
     
     <span @ref="_contentElement" 

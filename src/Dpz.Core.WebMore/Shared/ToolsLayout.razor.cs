@@ -66,6 +66,15 @@ public partial class ToolsLayout(NavigationManager navigationManager) : IDisposa
                 Category = "文本处理",
                 ExactMatch = false,
             },
+            new ToolItem
+            {
+                Name = "哈希校验",
+                Description = "生成并校验文本或文件的哈希值",
+                Icon = "fa fa-fingerprint",
+                Url = "tools/hash-check",
+                Category = "编码解码",
+                ExactMatch = false,
+            },
         ];
 
         // 提取所有分类

@@ -35,14 +35,14 @@
 
 <!-- Main Panel -->
 <div class="music-player__panel @(_isPanelOpen ? "music-player__panel--open" : "")" id="mp-panel">
-    <div class="music-player__backdrop" @onclick="() => TogglePanel(false)"></div>
+    <div class="music-player__backdrop" @onclick="async () => await TogglePanelAsync(false)"></div>
     <aside class="music-player__content">
         <header class="music-player__header">
             <div class="music-player__info">
                 <h3 class="music-player__title">@(_currentTrack?.Title ?? "Loading...")</h3>
                 <div class="music-player__artist">@(_currentTrack?.Artist ?? "-")</div>
             </div>
-            <button class="music-player__close-btn" @onclick="() => TogglePanel(false)">✕</button>
+            <button class="music-player__close-btn" @onclick="async () => await TogglePanelAsync(false)">✕</button>
         </header>
 
         <section class="music-player__main">
@@ -105,7 +105,7 @@
                 </div>
 
                 <div class="music-player__extra-controls">
-                    <button class="music-player__text-btn" @onclick="CycleMode">
+                    <button class="music-player__text-btn" @onclick="CycleModeAsync">
                         @if (_playMode == PlayMode.Order)
                         {
                             <Tooltip Text="顺序播放">
@@ -128,13 +128,13 @@
                     <Tooltip Text="歌词">
                         <button
                             class="music-player__text-btn @(_showLyrics || _lyricsOnBackground ? "music-player__text-btn--active" : "")"
-                            @onclick="ToggleLrc">
+                            @onclick="ToggleLrcAsync">
                             <i class="fa-regular fa-file-lines"></i>
                         </button>
                     </Tooltip>
                     <Tooltip Text="播放列表">
                         <button class="music-player__text-btn @(_showList ? "music-player__text-btn--active" : "")"
-                            @onclick="ToggleList">
+                            @onclick="ToggleListAsync">
                             <i class="fa fa-list-ul"></i>
                         </button>
                     </Tooltip>
@@ -145,7 +145,7 @@
         <section class="music-player__list @(_showList ? "music-player__list--visible" : "")" id="mp-list">
             <!-- Mobile Close Button -->
             <div class="music-player__list-close-mobile" style="@(_showList ? "display:flex" : "display:none")"
-                @onclick="ToggleList">
+                @onclick="ToggleListAsync">
                 <i class="fa-solid fa-angles-down"></i>
             </div>
 

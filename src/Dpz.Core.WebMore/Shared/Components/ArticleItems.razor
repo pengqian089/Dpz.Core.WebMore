@@ -38,10 +38,14 @@
                 </span>
             </div>
             <h3 class="article-card__title">
-                <a href="/article/read/@item.Id">@item.Title</a>
+                <Tooltip Text="@item.Title">
+                    <a href="/article/read/@item.Id">@item.Title</a>
+                </Tooltip>
             </h3>
             <div class="article-card__excerpt">
-                @((MarkupString)(item.Introduction ?? ""))
+                <Tooltip Text="@item.Introduction">
+                    @((MarkupString)(item.Introduction ?? ""))
+                </Tooltip>
             </div>
             <div class="article-card__footer">
                 <div class="article-card__tags">
