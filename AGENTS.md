@@ -1,38 +1,36 @@
+# Dpz.Core.WebMore
 
-# 格式化 C# — 工具清单在 src/dotnet-tools.json（不是标准的 .config/）
-# 必须在 src/ 下运行，而不是仓库根目录
-dotnet tool restore     # 在 src/ 下
-dotnet csharpier .      # 在 src/ 下（配置：src/.csharpierrc.yaml，csharpier 1.3.0）
+基于 Blazor WebAssembly 的个人网站客户端，目标框架 `net10.0`，单项目。所有内容都在 `src/`；解决方案为 `src/Dpz.Core.WebMore.slnx`（旧的 `.sln` 已删除）。仓库没有任何测试项目。
 
+## 常用命令（在 `src/` 下执行）
 
+- 构建：`dotnet build Dpz.Core.WebMore.slnx`
+- 运行：`dotnet run --project Dpz.Core.WebMore`
+  - 地址以 `Properties/launchSettings.json` 为准：http://localhost:3508 / https://localhost:3509
+  - README 中的 5000/5001 已过时；`launchBrowser=false`，不会自动打开浏览器
+- 验证改动 = 构建通过 + 手动验证页面，没有测试可跑
 
-所有 `net11.0` 项目都在其 `.csproj` 中通过 `<Features>runtime-async=on</Features>` 启用 Runtime Async（预览功能；可按项目用 `<UseRuntimeAsync>false</UseRuntimeAsync>` 关闭）。两个 `netstandard2.0` 源生成器项目不使用它。
+## 必须知道的机制
 
-## 编码规范
+- **服务 DI 是反射自动注册的**：`Program.cs` 中 `RegisterInject` 扫描 `Dpz.Core.WebMore.Service` 命名空间下的接口，与 `Dpz.Core.WebMore.Service.Impl` 下的唯一实现做 `AddScoped` 配对。新服务必须严格放进这两个命名空间，否则不会被注入。
+- **启动配置缺一不可**：`wwwroot/appsettings.json` 必须包含 `BaseAddress`、`SourceSite`、`AssetsHost`、`LibraryHost`，缺任何一个都会在启动时抛异常。
+- 开发环境（`appsettings.Development.json`）指向本地后端：API `https://localhost:53381`、主站 `https://localhost:37701`、资源/库 `https://localhost:5505`。这些服务不在本仓库，未启动时页面能渲染但数据请求全部失败。
+- `index.html` 从 `dpangzi.com` 加载 FontAwesome/Prism/tocbot/Photoswipe/lazyload 等外部资源；`Program.cs` 中 `UpyunHost` 是硬编码 CDN。不要把这些改成仓库内本地文件。
+- `dpz.core.enumlibrary` 来自 `src/NuGet.config` 配置的 GitHub Packages 源，restore 需要 GitHub 凭据（报 401/403 时先检查这里）。
 
-- 缩进：4 个空格。最大行长：100 字符。
-- 文件作用域命名空间：`namespace X.Y;`
-- 私有字段：`_camelCase` 前缀
-- 始终使用大括号（即使是单行 `if`/`for` 等）
-- 不允许行尾内联注释（`var x = 1; // bad`）— 该约定仅靠代码评审约束，没有 Roslyn 分析器强制
-- 不允许 public 字段 — 使用属性
-- 只有一个构造函数时使用主构造函数（primary constructor）
-- 方法名不得使用 `Ensure` 前缀 — 使用更能表达方法目的的命名
-- 异步方法必须以 `Async` 结尾，且始终接受 `CancellationToken cancellationToken = default`
-- 只用结构化日志 — Serilog 调用中不得使用字符串插值
-- 数组/列表返回空集合而非 null（`byte[]?` 可以）
-- 参数：尽可能抽象。返回值：尽可能具体。
-- 使用 C# 14 的 `extension` 方法语法（不是传统 `this` 参数）
-- **服务的公共方法（及接口签名）绝不能直接返回实体类型。** 实体位于 `Dpz.Core.Public.Entity`，只在仓储/服务内部使用；服务的公共 API 必须返回 `Dpz.Core.Public.ViewModel` 中的 DTO / ViewModel / Response 类型（例如 `VmVideo`、`MusicResponse`、`CommentViewModel`）。以此将持久化模型与调用方隔离。
-- 对象映射使用 **Mapster**（`IMapper` / `TypeAdapterConfig`），不是 AutoMapper。运行时类型映射必须使用注入的 `IMapper`；不要调用静态 `Adapt<T>()`/`Adapt(...)`，因为那会绕过 DI 注册的自定义映射。
-- 返回值类型不得使用匿名、元组等类型
+## CSS 构建（非标准 Blazor 流程，容易漏）
 
-## 服务 DI 注册（源生成器驱动）
+- 在 `src/Dpz.Core.WebMore` 下执行 `./build.ps1`：合并 `wwwroot/css/*.css`（自动跳过 `global.min.*`）→ `cleancss` 压缩 → 生成带 MD5 前 8 位的 `global.min.<hash>.css` → 改写 `wwwroot/index.html` 中的 `<link>`。
+- 脚本依赖全局命令 `cleancss`（clean-css-cli），仓库未声明该依赖，本机当前未安装。
+- **新增或修改 `wwwroot/css/` 下的 CSS 后必须重新运行该脚本**，否则页面引用不到改动。
+- `.razor.css` 作用域样式不走该脚本，由 Blazor 编译进 `Dpz.Core.WebMore.styles.css`。
 
+## 编码约定
 
+权威文档：`src/EncodingConventions.md`（中文）。对 `src/` 文件生效的是 `src/.editorconfig`（`root = true`，根目录 `.editorconfig` 被遮蔽）。与默认习惯差异最大的几条：
 
-
-
-## 分支命名
-
-`<type>/<issue-id>-<short-description>` — 类型：`feature/`、`bugfix/`/`fix/`、`hotfix/`、`release/`、`chore/`、`docs/`、`refactor/`、`test/`
+- 一个类型一个 `.cs` 文件；Blazor 组件/页面的代码放在独立的 `.razor.cs` 分部文件
+- 优先构造函数/主构造函数注入，不用 `[Inject]`（现有组件形如 `public partial class Article(IArticleService articleService)`）
+- 只有单个构造函数时必须使用主构造函数；不允许 public 字段；严格按 nullable 语义编码
+- 4 空格缩进、最长 100 列、控制语句始终带大括号、文件作用域命名空间、命名空间 = 项目名.目录
+- UI 文案、注释、提交信息使用中文；提交遵循 Conventional Commits（如 `feat(hash-tool): ...`、`chore: ...`），分支用 `feat/*` 或 `develop-*`，PR 合入 `main`
