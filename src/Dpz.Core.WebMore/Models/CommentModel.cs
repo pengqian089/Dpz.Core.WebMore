@@ -31,7 +31,7 @@ public class CommentModel
     /// 评论人
     /// </summary>
     [JsonConverter(typeof(CommenterConverter))]
-    public required Commenter Commenter { get; set; }
+    public required CommenterResponse Commenter { get; set; }
 
     /// <summary>
     /// 回复内容
@@ -69,7 +69,7 @@ public class CommentChildren
     /// 评论人
     /// </summary>
     [JsonConverter(typeof(CommenterConverter))]
-    public required Commenter Commenter { get; set; }
+    public required CommenterResponse Commenter { get; set; }
 
     /// <summary>
     /// 回复内容
@@ -89,7 +89,7 @@ public class CommentChildren
     public bool ShowReply { get; set; }
 }
 
-public abstract class Commenter
+public abstract class CommenterResponse
 {
     /// <summary>
     /// 昵称
@@ -100,7 +100,7 @@ public abstract class Commenter
 /// <summary>
 /// 登录会员评论
 /// </summary>
-public class MemberCommenter : Commenter
+public class MemberCommenterResponse : CommenterResponse
 {
     /// <summary>
     /// 头像
@@ -110,13 +110,13 @@ public class MemberCommenter : Commenter
     /// <summary>
     /// 身份标识
     /// </summary>
-    public string? Identity { get; set; }
+    public required string Identity { get; set; }
 }
 
 /// <summary>
 /// 匿名评论
 /// </summary>
-public class GuestCommenter : Commenter
+public class GuestCommenterResponse : CommenterResponse
 {
     /// <summary>
     /// 网站
@@ -129,9 +129,9 @@ public class GuestCommenter : Commenter
     public required string EmailMd5 { get; set; }
 }
 
-public class CommenterConverter : JsonConverter<Commenter>
+public class CommenterConverter : JsonConverter<CommenterResponse>
 {
-    public override Commenter? Read(
+    public override CommenterResponse? Read(
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options
@@ -164,14 +164,14 @@ public class CommenterConverter : JsonConverter<Commenter>
         var typeStr = reader.GetString();
         var type = typeStr switch
         {
-            nameof(GuestCommenter) => typeof(GuestCommenter),
-            nameof(MemberCommenter) => typeof(MemberCommenter),
-            _ => typeof(Commenter),
+            nameof(GuestCommenterResponse) => typeof(GuestCommenterResponse),
+            nameof(MemberCommenterResponse) => typeof(MemberCommenterResponse),
+            _ => throw new JsonException($"Unsupported commenter type: {typeStr}"),
         };
         using var output = new MemoryStream();
         ReadObject(ref reader, output, options);
         var result = JsonSerializer.Deserialize(output.ToArray(), type, options);
-        return result as Commenter;
+        return result as CommenterResponse;
     }
 
     private void ReadObject(ref Utf8JsonReader reader, Stream output, JsonSerializerOptions options)
@@ -234,7 +234,7 @@ public class CommenterConverter : JsonConverter<Commenter>
 
     public override void Write(
         Utf8JsonWriter writer,
-        Commenter value,
+        CommenterResponse value,
         JsonSerializerOptions options
     )
     {

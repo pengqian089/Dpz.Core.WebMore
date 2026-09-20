@@ -1,9 +1,9 @@
 ﻿<div class="comment-avatar-wrapper">
-    @if (Commenter is GuestCommenter guestCommenter)
+    @if (Commenter is GuestCommenterResponse guestCommenter)
     {
         <img class="comment-avatar-img" src="https://cravatar.cn/avatar/@guestCommenter.EmailMd5" alt="@guestCommenter.NickName"/>
     }
-    else if(Commenter is MemberCommenter memberCommenter)
+    else if(Commenter is MemberCommenterResponse memberCommenter)
     {
         <img class="comment-avatar-img" src="@memberCommenter.Avatar" alt="@memberCommenter.NickName"/>
     }
@@ -12,5 +12,5 @@
 @code {
     [Parameter]
     [EditorRequired]
-    public required Commenter Commenter { get; set; }
+    public required CommenterResponse Commenter { get; set; }
 }

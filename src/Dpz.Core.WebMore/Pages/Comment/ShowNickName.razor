@@ -1,5 +1,5 @@
 ﻿<span class="comment-item__user-info">
-    @if (Commenter is MemberCommenter memberCommenter)
+    @if (Commenter is MemberCommenterResponse memberCommenter)
     {
         <span class="comment-item__author">@memberCommenter.NickName</span>
         if (!string.IsNullOrEmpty(memberCommenter.Identity))
@@ -10,7 +10,7 @@
             </span>
         }
     }
-    else if (Commenter is GuestCommenter guestCommenter)
+    else if (Commenter is GuestCommenterResponse guestCommenter)
     {
         if (!string.IsNullOrEmpty(guestCommenter.Site))
         {
@@ -29,7 +29,7 @@
 @code {
     [Parameter]
     [EditorRequired]
-    public required Commenter Commenter { get; set; }
+    public required CommenterResponse Commenter { get; set; }
     
     private static string ForceHttps(string url)
     {
