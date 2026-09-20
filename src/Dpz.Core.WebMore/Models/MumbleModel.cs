@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Dpz.Core.WebMore.Models;
 
@@ -29,6 +30,11 @@ public class MumbleModel
     public int CommentCount { get; set; }
 
     public required UserInfo Author { get; set; }
-        
+
+    /// <summary>
+    /// 碎碎念相关图片元信息
+    /// </summary>
+    public List<MumbleImageModel> Images { get; set; } = [];
+
     public bool ShowComment { get; set; }
 }

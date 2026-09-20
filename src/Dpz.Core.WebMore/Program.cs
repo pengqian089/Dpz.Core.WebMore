@@ -92,8 +92,17 @@ public partial class Program
     /// </summary>
     public static string LibraryHost { get; private set; } = "";
 
-    /// <summary>
-    /// upyun host
-    /// </summary>
-    public static string UpyunHost => "https://cdn.dpangzi.com";
+    private const string cdnHost1 = "cdn.dpangzi.com";
+    private const string cdnHost2 = "static.dpangzi.com";
+
+    public static bool IsCdnHost(string url)
+    {
+        if (string.IsNullOrWhiteSpace(url) || !Uri.TryCreate(url, UriKind.Absolute, out var uri))
+        {
+            return false;
+        }
+
+        return string.Equals(uri.Host, cdnHost1, StringComparison.OrdinalIgnoreCase)
+            || string.Equals(uri.Host, cdnHost2, StringComparison.OrdinalIgnoreCase);
+    }
 }

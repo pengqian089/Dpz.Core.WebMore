@@ -28,7 +28,7 @@ else
                     </div>
 
                     <div @ref="vm.ContentRef" class="mumble-card__content markdown-body @(vm.IsExpanded || !vm.NeedExpand ? "" : "is-collapsed")">
-                        <MarkdownPreview Markdown="@vm.Model.Markdown"></MarkdownPreview>
+                        @((MarkupString)vm.Html)
                     </div>
 
                     @if (vm.NeedExpand)
@@ -39,6 +39,8 @@ else
                             </button>
                         </div>
                     }
+
+                    <MumbleGallery Images="@vm.Images" GalleryId="@($"mumble-{vm.Model.Id}")" />
 
                     <div class="mumble-card__footer">
                         <a href="javascript:void(0)" @onclick="() => OnDetail(vm)" class="mumble-action" title="详情">
@@ -78,9 +80,14 @@ else
                     {
                         <div class="history-item">
                             <div class="history-item__content markdown-body">
-                                <MarkdownPreview Markdown="@item.Markdown"></MarkdownPreview>
+                                @((MarkupString)item.Html)
                             </div>
-                            <ShowDateTime Class="history-item__time timeago" DateTime="@item.CreateTime"></ShowDateTime>
+                            <MumbleGallery Images="@item.Images"
+                                           GalleryId="@($"mumble-history-{item.Model.Id}")"
+                                           CssClass="history-item__gallery"
+                                           PreviewImageCount="@(item.Images.Count == 2 ? 2 : 1)" />
+                            <ShowDateTime Class="history-item__time timeago"
+                                          DateTime="@item.Model.CreateTime"></ShowDateTime>
                         </div>
                     }
                 </div>

@@ -4,9 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using AngleSharp;
 using Dpz.Core.WebMore.Helper;
-using Markdig;
 using Microsoft.AspNetCore.Components;
 
 namespace Dpz.Core.WebMore.Shared.Components;
@@ -25,17 +23,6 @@ public partial class MarkdownPreview : ComponentBase
 
     private string _htmlContent = "";
     private string _lastRenderedMarkdown = "";
-
-    private static readonly MarkdownPipeline Pipeline = new MarkdownPipelineBuilder()
-        .UseAutoLinks()
-        .UsePipeTables()
-        .UseTaskLists()
-        .UseEmphasisExtras()
-        .UseFooters()
-        .UseCitations()
-        .UseMathematics()
-        .UseAutoIdentifiers()
-        .Build();
 
     private static readonly Dictionary<string, string> Cache = new();
 
@@ -102,34 +89,7 @@ public partial class MarkdownPreview : ComponentBase
 
     private async Task<string> ParseMarkdownAsync()
     {
-        var html = Markdig.Markdown.ToHtml(Markdown, Pipeline);
-
-        var context = BrowsingContext.New(Configuration.Default);
-        var document = await context.OpenAsync(y => y.Content(html));
-        var links = document.GetElementsByTagName("a");
-        links.ForEach(y =>
-        {
-            var href = y.GetAttribute("href");
-            if (
-                href != null
-                && !href.StartsWith("javascript", StringComparison.CurrentCultureIgnoreCase)
-            )
-            {
-                y.SetAttribute("target", "_blank");
-            }
-        });
-        var images = document.GetElementsByTagName("img");
-        images.ForEach(y =>
-        {
-            var src = y.GetAttribute("src");
-            if (string.IsNullOrWhiteSpace(src) || src == $"{Program.LibraryHost}/loaders/oval.svg")
-            {
-                return;
-            }
-            y.SetAttribute("data-src", src);
-            y.SetAttribute("class", "lazy");
-            y.SetAttribute("src", $"{Program.LibraryHost}/loaders/oval.svg");
-        });
-        return document.Body?.InnerHtml ?? "";
+        var (html, _) = await MarkdownRenderer.RenderAsync(Markdown);
+        return html;
     }
 }

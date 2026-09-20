@@ -66,6 +66,14 @@ export class Gallery {
             index: index,
             loading: false
         };
+
+        // 优先使用服务端渲染的原始尺寸（data-gallery-width/height）
+        const dataWidth = parseInt(img.dataset.galleryWidth || '', 10);
+        const dataHeight = parseInt(img.dataset.galleryHeight || '', 10);
+        if (dataWidth > 0 && dataHeight > 0) {
+            item.w = dataWidth;
+            item.h = dataHeight;
+        }
         
         // 关键修复：只有在没有 data-origin 的情况下才使用当前图片尺寸
         // 如果有 data-origin，说明当前显示的是缩略图，尺寸不准确

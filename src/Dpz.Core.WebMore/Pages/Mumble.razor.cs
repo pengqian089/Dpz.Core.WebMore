@@ -25,7 +25,7 @@ public partial class Mumble(
 
     private IPagedList<MumbleModel> _source = PagedList<MumbleModel>.Empty();
     private List<MumbleViewModel> _viewModels = [];
-    private List<MumbleModel> _histories = [];
+    private List<MumbleHistoryViewModel> _histories = [];
 
     private bool _loading = true;
     private IJSObjectReference? _module;
@@ -36,7 +36,8 @@ public partial class Mumble(
     {
         if (_histories.Count == 0)
         {
-            _histories = await mumbleService.GetHistories();
+            var histories = await mumbleService.GetHistories();
+            _histories = await MapHistoriesAsync(histories);
         }
         await base.OnInitializedAsync();
     }
@@ -110,9 +111,20 @@ public partial class Mumble(
         _source = await mumbleService.GetPageAsync(pageIndex, PageSize, "");
 
         // Map to ViewModel
-        _viewModels = _source
-            .Select(x => new MumbleViewModel { Model = x, IsExpanded = false })
-            .ToList();
+        _viewModels = [];
+        foreach (var model in _source)
+        {
+            var (html, images) = await RenderContentAsync(model);
+            _viewModels.Add(
+                new MumbleViewModel
+                {
+                    Model = model,
+                    Html = html,
+                    Images = images,
+                    IsExpanded = false,
+                }
+            );
+        }
 
         // Check likes from local storage
         foreach (var vm in _viewModels)
@@ -134,6 +146,68 @@ public partial class Mumble(
         _loading = false;
         PageIndex = _source.CurrentPageIndex;
         await base.OnParametersSetAsync();
+    }
+
+    private static async Task<List<MumbleHistoryViewModel>> MapHistoriesAsync(
+        IEnumerable<MumbleModel> models
+    )
+    {
+        var result = new List<MumbleHistoryViewModel>();
+        foreach (var model in models)
+        {
+            var (html, images) = await RenderContentAsync(model);
+            result.Add(
+                new MumbleHistoryViewModel
+                {
+                    Model = model,
+                    Html = html,
+                    Images = images,
+                }
+            );
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// 渲染正文并提取图片，使用图片元信息补全尺寸
+    /// </summary>
+    private static async Task<(string Html, List<MumbleImageModel> Images)> RenderContentAsync(
+        MumbleModel model
+    )
+    {
+        var (html, images) = await MarkdownRenderer.RenderAsync(model.Markdown, stripImages: true);
+        ApplyImageMetadata(images, model.Images);
+        return (html, images);
+    }
+
+    private static void ApplyImageMetadata(
+        IEnumerable<MumbleImageModel> images,
+        IEnumerable<MumbleImageModel> metadata
+    )
+    {
+        var metadataMap = new Dictionary<string, MumbleImageModel>(
+            StringComparer.OrdinalIgnoreCase
+        );
+        foreach (var item in metadata)
+        {
+            if (!string.IsNullOrWhiteSpace(item.Url))
+            {
+                metadataMap[item.Url] = item;
+            }
+        }
+        if (metadataMap.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var image in images)
+        {
+            if (metadataMap.TryGetValue(image.Url, out var meta))
+            {
+                image.Width = meta.Width;
+                image.Height = meta.Height;
+            }
+        }
     }
 
     private async Task LikeAsync(MumbleViewModel vm)
@@ -177,8 +251,14 @@ public partial class Mumble(
             "碎碎念详情",
             builder =>
             {
-                builder.OpenComponent<MarkdownPreview>(0);
-                builder.AddAttribute(1, "Markdown", vm.Model.Markdown);
+                builder.OpenElement(0, "div");
+                builder.AddAttribute(1, "class", "mumble-card__content markdown-body");
+                builder.AddMarkupContent(2, vm.Html);
+                builder.CloseElement();
+
+                builder.OpenComponent<MumbleGallery>(3);
+                builder.AddAttribute(4, "Images", vm.Images);
+                builder.AddAttribute(5, "GalleryId", $"mumble-detail-{vm.Model.Id}");
                 builder.CloseComponent();
             },
             "800px" // Default width
@@ -218,6 +298,17 @@ public partial class Mumble(
     public class MumbleViewModel
     {
         public required MumbleModel Model { get; set; }
+
+        /// <summary>
+        /// 已移除图片的正文
+        /// </summary>
+        public string Html { get; set; } = "";
+
+        /// <summary>
+        /// 图片列表
+        /// </summary>
+        public List<MumbleImageModel> Images { get; set; } = [];
+
         public bool IsLiked { get; set; }
         public bool IsExpanded { get; set; }
         public bool ShowComments { get; set; }

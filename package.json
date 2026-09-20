@@ -1,0 +1,21 @@
+{
+  "name": "dpz.core.webmore",
+  "version": "1.0.0",
+  "description": "<div align=\"center\">",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pengqian089/Dpz.Core.WebMore.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/pengqian089/Dpz.Core.WebMore/issues"
+  },
+  "homepage": "https://github.com/pengqian089/Dpz.Core.WebMore#readme"
+}

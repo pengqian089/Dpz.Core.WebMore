@@ -1,0 +1,32 @@
+@if (Images.Count > 0)
+{
+    <div class="@CssClass mumble-gallery mumble-gallery--@GridCount" data-gallery-id="@GalleryId">
+        @for (var i = 0; i < Images.Count; i++)
+        {
+            var image = Images[i];
+            var isHidden = ShowMore && i >= PreviewCount;
+
+            <div class="mumble-gallery__item @(isHidden ? "is-hidden" : "")">
+                <div class="mumble-gallery__loading">
+                    <i class="fa fa-spinner fa-spin"></i>
+                </div>
+                <img src="@image.ThumbnailUrl"
+                     data-origin="@image.Url"
+                     data-gallery-width="@(image.HasSize ? image.Width.ToString() : null)"
+                     data-gallery-height="@(image.HasSize ? image.Height.ToString() : null)"
+                     width="@(image.HasSize ? image.Width.ToString() : null)"
+                     height="@(image.HasSize ? image.Height.ToString() : null)"
+                     alt="@image.Alt"
+                     loading="lazy"
+                     decoding="async"
+                     class="mumble-gallery__image">
+            </div>
+        }
+        @if (ShowMore)
+        {
+            <div class="mumble-gallery__item mumble-gallery__more" data-gallery-more="true">
+                <span>+@(Images.Count - PreviewCount)</span>
+            </div>
+        }
+    </div>
+}

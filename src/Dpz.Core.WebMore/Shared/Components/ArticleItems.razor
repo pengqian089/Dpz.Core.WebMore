@@ -5,7 +5,7 @@
         @if (!string.IsNullOrEmpty(item.MainImage))
         {
             <div class="article-card__cover">
-                @if (!item.MainImage.StartsWith(Program.UpyunHost, StringComparison.OrdinalIgnoreCase))
+                @if (!Program.IsCdnHost(item.MainImage))
                 {
                     <img
                         src="@Program.LibraryHost/loaders/oval.svg"
