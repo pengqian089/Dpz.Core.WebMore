@@ -275,7 +275,7 @@ JavaScript 文件位于 `wwwroot/js/` 目录下，Blazor 组件可通过 `IJSRun
 
 <div align="center">
 
-**[⬆ 回到顶部](#dpzcorewebmore)**
+
 
 Made with ❤️ using Blazor
 
